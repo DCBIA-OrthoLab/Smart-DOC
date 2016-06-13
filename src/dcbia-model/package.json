@@ -1,5 +1,5 @@
 {
-  "name": "dcbia-ortho-model",
+  "name": "dcbia-model",
   "version": "1.0.0",
   "description": "Handle request to add data to couchdb",
   "main": "index.js",
