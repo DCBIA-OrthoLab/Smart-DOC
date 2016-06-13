@@ -1,0 +1,9 @@
+{
+    "_id": "_design/getClinicalDataCollection",
+    "language": "javascript",
+    "views": {
+        "items": {
+            "map": "function(doc) {\n\tif(doc.type === \"clinicalDataCollection\"){\n\t\tfor(var i = 0 in doc.items){\n\t\t\temit(doc._id, doc.items[i]);\n\t\t}\n\t}\n}"
+        }
+    }
+}

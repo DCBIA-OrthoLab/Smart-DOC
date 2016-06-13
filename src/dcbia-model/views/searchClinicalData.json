@@ -4,6 +4,9 @@
     "views": {
         "collectionName": {
             "map": "function(doc) {\n\tif(doc.type === \"clinicalDataCollection\"){\n\t\temit(doc.name, doc.items);\t\n\t}\n}"
+        },
+        "patientId": {
+            "map": "function(doc) {\n\tif(doc.type === \"clinicalData\"){\n\t\temit(doc.patientId, doc._id);\t\n\t}\n}"
         }
     }
 }
