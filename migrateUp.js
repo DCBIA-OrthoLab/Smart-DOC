@@ -1,2 +1,4 @@
 var couchUpdateViews = require('couch-update-views');
-couchUpdateViews.couchUpdateViews();
+
+couchUpdateViews.migrateUP('http://localhost:5984/clusterjobs', './node_modules/clusterpost-server/views');
+couchUpdateViews.migrateUP('http://localhost:5984/clusterjobs', './src/dcbia-model/views');

@@ -1,25 +1,26 @@
-var clusterpostserver = require('clusterpost-server');
 
+var clusterpostserver = require('clusterpost-server');
 
 var plugins = [];
 
-var plugin = {};
-plugin.register = require("dcbia-ortholab");
-plugin.options = {};
-
-plugins.push(plugin);
-
-var dcbimodel = {};
-dcbimodel.register = require("dcbia-model");
-dcbimodel.options = {
-	"default" : "clusterjobs",
-	"clusterjobs" : {
+var dcbiaModel = {};
+dcbiaModel.register = require('dcbia-model');
+dcbiaModel.options = {
+	"default": "clusterjobs",
+	"clusterjobs": {
 		"hostname": "http://localhost:5984",
 		"database": "clusterjobs"
 	}
 };
 
-plugins.push(dcbimodel);
+
+var dcbiaOrtho = {};
+dcbiaOrtho.register = require('dcbia-ortholab');
+dcbiaOrtho.options = {}
+
+plugins.push(dcbiaModel);
+plugins.push(dcbiaOrtho);
+
 
 clusterpostserver.server.register(plugins, function(err){
     if (err) {
