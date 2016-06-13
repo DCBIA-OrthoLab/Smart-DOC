@@ -1,0 +1,58 @@
+{
+	"host": "localhost",
+	"port": 8180,
+	"plugins": {
+		"vision": {},
+		"inert": {},
+		"lout": {},
+		"h2o2": {},
+		"hapi-auth-jwt": {},
+		"clusterpost-auth": {
+			"privateKey": "hQvWtXjwhyKiTNt6Eg4qVlPQvlI1jgtdeLvXrDZcPkYXwLRBUHvgToNNVBwC/ZW6jKCdiBXSKG1DjKgl4IQaxKZmS65bRRMa7z1y4STf49LmdYMoHk/0zrVFv9K/Oy6eVWsA5w==",
+			"saltRounds": 10,
+			"algorithm": { 
+				"algorithm": "HS256"
+			},
+			"algorithms": { 
+				"algorithms": [ "HS256" ] 
+			},
+			"mailer": {
+				"nodemailer": {
+					"host": "smtp.unc.edu",
+				    "secure": false,
+				    "port": 587,
+				    "auth": {
+				        "user": "jprieto",
+				        "pass": "808PaolaK-9!"
+				    }
+				},
+				"from": "Juan Carlos Prieto <jprieto@med.unc.edu>"
+			}
+		},
+		"clusterpost-provider": {
+			"dataproviders" : {
+				"default" : "clusterjobs",
+				"clusterjobs" : {
+					"hostname": "http://localhost:5984",
+					"database": "clusterjobs",
+					"username": "",
+					"password": ""
+				},
+				"COUCHDB" : {
+					"hostname": "http://localhost:5984",
+					"database": "spine",
+					"username": "",
+					"password": ""
+				}
+			},
+			"executionservers" : {
+				"testserver" : {
+					"hostname" : "localhost", 
+					"user" : "prieto",
+					"identityfile" : "/Users/prieto/.ssh/id_rsa",
+					"sourcedir" : "/Users/prieto/NetBeansProjects/install/clusterpost-execution/node_modules/clusterpost-execution"			
+				}
+			}
+		}
+	}
+}

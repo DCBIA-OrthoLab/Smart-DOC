@@ -1,0 +1,262 @@
+
+<navbar></navbar>
+
+<div ng-controller="clinicalData"> 
+
+	<div class="row">
+		<div class="panel panel-default">
+	  		<div class="panel-body">
+				<div class="col-md-12">
+					<div class="btn-group">
+					 <button type="button" class="btn btn-default" ng-click="clinicalDataCollection.showCreate = true">
+					 	<span class="glyphicon glyphicon-plus"></span>
+					 	New Collection
+					 </button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="row" ng-if="clinicalDataCollection.showCreate">
+		<div class="panel panel-success">
+		  <div class="panel-body">
+		  	<div class="input-group">
+	  			<span class="input-group-addon">Name</span>
+	  			<input type="text" class="form-control" placeholder="Collection name" aria-describedby="basic-addon3" ng-model="clinicalDataCollection.newCollection.name">
+	  		</div>
+	  		<div class="btn-group">
+				 <button type="button" class="btn btn-default" ng-click="clinicalDataCollection.create(clinicalDataCollection.newCollection);clinicalDataCollection.showCreate=false">
+				 	<span class="glyphicon glyphicon-ok"></span>
+				 	Create
+				 </button>
+				 <button type="button" class="btn btn-default" ng-click="clinicalDataCollection.showCreate = false">
+				 	<span class="glyphicon glyphicon-remove"></span>
+				 	Cancel
+				 </button>
+				</div>
+		  </div>
+		</div>
+	</div>
+
+	<div class="row" ng-if="!clinicalDataCollection.showCreate">
+		<div class="panel panel-default">
+	  		<div class="panel-body">
+	  			<div class="col-sm-6 col-md-4">
+					<div ng-class="clinicalDataCollection.collectionsProperties['defaultClinicalDataCollection'].class">
+					    <div class="thumbnail">
+					    	<!-- <img src="" alt=""> -->
+					      <div class="caption">
+					        <h3>{{defaultClinicalDataCollection.name}}</h3>
+					        <p>
+					        	<b>Number of items: </b> {{defaultClinicalDataCollection.items.length}}
+					        </p>
+				        	<div class="btn-group">
+							 <button type="button" class="btn btn-default" ng-click="clinicalDataCollection.showSection = 0;clinicalDataCollection.select(defaultClinicalDataCollection)">
+							 	<span class="glyphicon glyphicon-refresh"></span>
+							 </button>
+
+							 <button type="button" class="btn btn-default" ng-click="csv.export(defaultClinicalDataCollection)">
+							 	<span class="glyphicon glyphicon-download"></span>
+							 </button>
+							 
+							</div>
+					      </div>
+					    </div>
+					</div>
+				</div>
+				<div class="col-sm-6 col-md-4" ng-repeat="collection in clinicalDataCollection.collections">
+					<div ng-class="clinicalDataCollection.collectionsProperties[collection._id].class">
+					    <div class="thumbnail">
+					    	<!-- <img src="" alt=""> -->
+					      <div class="caption">
+					        <h3>{{collection.name}}</h3>
+					        <p>
+					        	<b>Number of items: </b> {{collection.items.length}}
+					        </p>
+				        	<div class="btn-group">
+							 <button type="button" class="btn btn-default" ng-click="clinicalDataCollection.showSection = 0;clinicalDataCollection.select(collection)">
+							 	<span class="glyphicon glyphicon-eye-open"></span>
+							 </button>
+							 <button type="button" class="btn btn-default" ng-click="clinicalDataCollection.showSection = 1;clinicalDataCollection.addClinicalData(collection)">
+							 	<span class="glyphicon glyphicon-plus-sign"></span>
+							 </button>
+
+							 <button type="button" class="btn btn-default" ng-click="csv.export(collection)">
+							 	<span class="glyphicon glyphicon-download"></span>
+							 </button>
+							 
+							 <button type="button" class="btn btn-danger" ng-click="clinicalDataCollection.showSection = -1;clinicalDataCollection.delete(collection)">
+							 	<span class="glyphicon glyphicon-remove-sign"></span>
+							 </button>
+							</div>
+					      </div>
+					    </div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="panel panel-info" ng-if="clinicalDataCollection.showSection == 0">
+			<div class="panel panel-default" ng-if="user.scope.indexOf('admin') !== -1">
+		  		<div class="panel-body">
+		  			<div class="btn-group">
+						 <button type="button" class="btn btn-default" ng-click="clinical.deleteAllFiltered(clinicalDataCollection.displayedCollection)">
+						 	<span class="glyphicon glyphicon-remove"></span>
+						 </button>
+					</div>
+		  		</div>
+		  	</div>
+			<div class="panel panel-default" style="overflow:scroll">
+		  		<div class="panel-body">
+		  			<table st-table="clinicalDataCollection.displayedCollection" st-safe-src="clinicalDataCollection.selectedCollectionData" class="table table-striped">
+						<thead>
+							<tr>
+								<th ng-repeat="key in clinicalDataCollection.selectedCollectionDataKeys" st-sort="{{key}}">{{key}}</th>
+							</tr>
+							<tr>
+								<th ng-repeat="key in clinicalDataCollection.selectedCollectionDataKeys">
+									<input st-search="{{key}}" placeholder="search for {{key}}" class="input-sm form-control" type="search"/>
+								</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr ng-repeat="row in clinicalDataCollection.displayedCollection">
+								<td ng-repeat="key in clinicalDataCollection.selectedCollectionDataKeys">{{row[key]}}</td>
+								<td>
+									<button type="button" class="btn btn-info" ng-click="clinical.showSection = 0;clinical.edit(row)">
+										<span class="glyphicon glyphicon-pencil"></span>
+									</button>
+								</td>
+								<td>
+									<button type="button" class="btn btn-danger" ng-click="clinical.delete(row)">
+									 	<span class="glyphicon glyphicon-remove"></span>
+									 </button>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+		  		</div>
+		  	</div>
+			<div class="panel panel-default" ng-if="clinical.showSection == 0">
+		  		<div class="panel-body">
+		  			<div class="panel panel-default">
+		  				<div class="panel-body">
+		  					<div class="btn-group">
+								 <button type="button" class="btn btn-default" ng-click="clinical.update(clinical.dataEdit)">
+								 	<span class="glyphicon glyphicon-upload"></span>
+								 </button>
+								 <button type="button" class="btn btn-default" ng-click="clinical.showSection = -1">
+								 	<span class="glyphicon glyphicon-remove"></span>
+								 </button>
+							</div>
+		  				</div>
+		  			</div>
+		  			<div class="panel panel-default">
+		  				<div class="panel-body">
+		  					<clinical-markers form-data="clinical.dataEdit" edit-fields="true" ng-if="clinical.dataEdit.formId == 'clinicalMarkers'"></clinical-markers>
+		  				</div>
+		  			</div>
+
+		  			<div class="panel panel-default">
+		  				<div class="panel-body">
+		  					<div class="btn-group">
+								 <button type="button" class="btn btn-default" ng-click="clinical.update(clinical.dataEdit)">
+								 	<span class="glyphicon glyphicon-upload"></span>
+								 </button>
+								 <button type="button" class="btn btn-default" ng-click="clinical.showSection = -1">
+								 	<span class="glyphicon glyphicon-remove"></span>
+								 </button>
+							</div>
+		  				</div>
+		  			</div>
+		  			
+		  		</div>
+		  	</div>
+			
+		</div>
+
+		<div class="panel panel-info" ng-if="clinicalDataCollection.showSection == 1">
+		  <div class="panel-body">
+		  	
+		  	<div class="panel panel-default">
+			  <div class="panel-body">
+		  		<div class="btn-group">
+
+					 <button type="button" class="btn btn-default" ng-click="clinicalDataCollection.selectedForm = 0">
+					 	<span class="glyphicon glyphicon-list-alt"></span>
+					 	Clinical Markers
+					 </button>
+
+					 <label class="btn btn-default" for="clinicalData-file-selector" ng-click="clinicalDataCollection.selectedForm = -1;">
+					 	<span class="glyphicon glyphicon-folder-open"></span>
+					    <input id="clinicalData-file-selector" file-model='csv.file' type="file" style="display:none;">
+					</label>
+
+					 <button type="button" class="btn btn-default" ng-click="clinicalDataCollection.showAddClinicalData = false">
+					 	<span class="glyphicon glyphicon-remove"></span>
+					 	Cancel
+					 </button>
+			  	</div>
+			  </div>
+			</div>
+
+		  	<div class="panel panel-info" ng-if="clinicalDataCollection.selectedForm !== -1">
+			  <div class="panel-body">
+			  	<div class="btn-group">
+					<button type="button" class="btn btn-default" ng-click="clinical.create()">
+						<span class="glyphicon glyphicon-save"></span>
+						Submit
+					</button>
+				</div>
+				<clinical-markers form-data="clinical.data" ng-if="clinicalDataCollection.selectedForm == 0"></clinical-markers>
+				<div class="btn-group">
+					<button type="button" class="btn btn-default" ng-click="clinical.create()">
+						<span class="glyphicon glyphicon-save"></span>
+						Submit
+					</button>
+				</div>
+			  </div>
+			</div>
+
+			<div class="panel panel-info" style="overflow:scroll" ng-if="clinicalDataCollection.selectedForm == -1 && csv.selectedCollectionData">
+		  		<div class="panel-body">
+
+		  			<div class="btn-group col-md-3">
+						<button type="button" class="btn btn-default" ng-click="csv.create()">
+						 	<span class="glyphicon glyphicon-save"></span>
+						 	Save
+						</button>
+					</div>
+
+					<div class="input-group col-md-6" ng-if="csv.selectPatientId">
+						<span class="input-group-addon" id="sizing-addon2">patientId:</span>
+						<select ng-model="csv.selectedPatientId" class="form-control">
+							<option ng-repeat="key in csv.selectedCollectionDataKeys">{{key}}</option>
+						</select>
+					</div>
+
+				  	<table st-table="csv.displayedCollection" st-safe-src="csv.selectedCollectionData" class="table table-striped" >
+						<thead>
+							<tr>
+								<th ng-repeat="key in csv.selectedCollectionDataKeys" st-sort="{{key}}">{{key}}</th>
+							</tr>
+							<tr>
+								<th ng-repeat="key in csv.selectedCollectionDataKeys">
+									<input st-search="{{key}}" placeholder="search for {{key}}" class="input-sm form-control" type="search"/>
+								</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr ng-repeat="row in csv.displayedCollection">
+								<td ng-repeat="key in csv.selectedCollectionDataKeys">{{row[key]}}</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		  </div>
+		</div>
+		
+	</div>
+</div>

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html lang="en" ng-app="myApp" class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html lang="en" ng-app="myApp" class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html lang="en" ng-app="myApp" class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html lang="en" ng-app="cTRIVIAL" class="no-js"> <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="style/BrainConnectivityStyle.css" type="text/css">
+  <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css" type="text/css">
+  
+  <title>DCBIA-Ortholab</title>
+
+</head>
+<body ng-app="cTRIVIAL">
+
+  <div class="wrapper">
+      <div class="container-fluid">
+          <div class="col-md-10 col-md-offset-1">
+            <div ng-include src="'header/appHeader.html'" class="row"></div>
+            <div ng-view class="row"></div>
+          </div>
+      </div>
+      <div class="push"></div>
+  </div>
+  
+  
+
+  <!-- In production use: -->
+  <script src="bower_components/angular/angular.js"></script>
+  <script src="bower_components/angular-route/angular-route.js"></script>
+  <script src="bower_components/angular-bootstrap/ui-bootstrap.min.js" ></script>
+  <script src="bower_components/underscore/underscore-min.js" ></script>
+  <script src="bower_components/jquery/dist/jquery.min.js" ></script>
+  <script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+  <script src="bower_components/angular-file-model/angular-file-model.js"></script>
+  <script src="bower_components/angular-smart-table/dist/smart-table.min.js" ></script>
+
+  
+
+  <!-- Application scripts -->
+  <script src="app.js"></script>
+  <!-- Services --> 
+  
+  <script src="services/cluster.service.js"></script>
+  <script src="services/dcbia.service.js"></script>
+  <script src="services/cluster.auth.js"></script>
+  <!-- Controllers --> 
+  <script src="scripts/controllers/home.js"></script>
+  <script src="scripts/controllers/clinicalData.js"></script>
+  <!-- Directives --> 
+  <script src="scripts/directives/directiveUserLogin.js"></script>
+  <script src="scripts/directives/directiveNavbar.js"></script>
+  <script src="scripts/directives/directiveCirclePlot.js"></script>
+  <!-- Directives Forms --> 
+  <script src="scripts/directives/directiveClinicalMarkers.js"></script>
+
+
+
+</body>
+</html>

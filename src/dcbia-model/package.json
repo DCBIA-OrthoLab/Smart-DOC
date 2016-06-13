@@ -1,0 +1,15 @@
+{
+  "name": "dcbia-ortho-model",
+  "version": "1.0.0",
+  "description": "Handle request to add data to couchdb",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "couchdb",
+    "DCBIA-orthoLab"
+  ],
+  "author": "juanprietob@gmail.com",
+  "license": "Apache-2.0"
+}

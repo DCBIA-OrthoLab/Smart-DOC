@@ -1,0 +1,15 @@
+{
+  "name": "dcbia-ortholab",
+  "version": "1.0.0",
+  "description": "Front end for the web based system dcbia-ortholab",
+  "main": "index.js",
+  "scripts": {
+    "test": "lab -v test.js"
+  },
+  "author": "juanprietob@gmail.com",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "clusterpost-server": "^1.0.5",
+    "couch-update-views": "^1.0.4"
+  }
+}

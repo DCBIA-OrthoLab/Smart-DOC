@@ -1,0 +1,970 @@
+
+<div class="row">
+
+	<div class="panel panel-success">
+	  <div class="panel-body">
+	  	<div class="input-group">
+  			<span class="input-group-addon">Id</span>
+  			<input type="string" class="form-control" placeholder="Patient id (required)" aria-describedby="basic-addon3" ng-model="formData.patientId" ng-readonly="editFields">
+  		</div>
+  		<div class="input-group">
+  			<span class="input-group-addon">Patient name</span>
+  			<input type="text" class="form-control" placeholder="Patient name" aria-describedby="basic-addon3" ng-model="formData.name">
+  		</div>
+  		<div class="input-group">
+  			<span class="input-group-addon">Date</span>
+  			<input type="text" class="form-control" placeholder="0.0" aria-describedby="basic-addon3" ng-model="formData.date" readonly>
+  		</div>
+	  </div>
+	</div>
+
+	<div class="panel panel-default">
+	  <div class="panel-heading">
+	    <h3 class="panel-title">Do you have pain on the right side of your face, the left side or both sides?</h3>
+	  </div>
+	  <div class="panel-body">
+	    <div class="input-group">
+	      <span class="input-group-addon">
+	        <input type="radio" aria-label="..." ng-model="formData.painLocation" value="None">
+	      </span>
+	      <label class="form-control" >None</label>
+	    </div>
+	    <div class="input-group">
+	      <span class="input-group-addon">
+	        <input type="radio" aria-label="..." ng-model="formData.painLocation"  value="Right">
+	      </span>
+	      <label class="form-control" >Right</label>
+	    </div>
+		<div class="input-group">
+	      <span class="input-group-addon">
+	        <input type="radio" aria-label="..." ng-model="formData.painLocation"  value="Left">
+	      </span>
+	      <label class="form-control" >Left</label>
+	    </div>
+	    <div class="input-group">
+	      <span class="input-group-addon">
+	        <input type="radio" aria-label="..." ng-model="formData.painLocation"  value="Both">
+	      </span>
+	      <label class="form-control" >Both</label>
+	    </div>
+	  </div>
+	</div>
+	<br>
+	<div class="panel panel-default">
+	  <div class="panel-heading">
+	    <h3 class="panel-title">Could you point to the areas where you feel pain?</h3>
+	  </div>
+	  <div class="panel-body">
+
+	  	<div class="col-md-6">
+		  	<div class="panel panel-default">
+			  <div class="panel-heading">
+			    Rigth
+			  </div>
+			  <div class="panel-body">
+			  	<div class="input-group">
+			      <span class="input-group-addon">
+			        <input type="radio" aria-label="..." ng-model="formData.painRight" value="0">
+			      </span>
+			      <label class="form-control">None</label>
+			    </div>
+			    <div class="input-group">
+			      <span class="input-group-addon">
+			        <input type="radio" aria-label="..." ng-model="formData.painRight"  value="1">
+			      </span>
+			      <label class="form-control" >Jaw joint</label>
+			    </div>
+				<div class="input-group">
+			      <span class="input-group-addon">
+			        <input type="radio" aria-label="..." ng-model="formData.painRight"  value="2">
+			      </span>
+			      <label class="form-control" >Muscles</label>
+			    </div>
+			    <div class="input-group">
+			      <span class="input-group-addon">
+			        <input type="radio" aria-label="..." ng-model="formData.painRight"  value="3">
+			      </span>
+			      <label class="form-control" >Both</label>
+			    </div>
+			  </div>
+			</div>
+		</div>
+
+		<div class="col-md-6">
+			<div class="panel panel-default">
+			  <div class="panel-heading">
+			    Left
+			  </div>
+			  <div class="panel-body">
+			  	<div class="input-group">
+			      <span class="input-group-addon">
+			        <input type="radio" aria-label="..." ng-model="formData.painLeft" value="0">
+			      </span>
+			      <label class="form-control">None</label>
+			    </div>
+			    <div class="input-group">
+			      <span class="input-group-addon">
+			        <input type="radio" aria-label="..." ng-model="formData.painLeft"  value="1">
+			      </span>
+			      <label class="form-control" >Jaw joint</label>
+			    </div>
+				<div class="input-group">
+			      <span class="input-group-addon">
+			        <input type="radio" aria-label="..." ng-model="formData.painLeft"  value="2">
+			      </span>
+			      <label class="form-control" >Muscles</label>
+			    </div>
+			    <div class="input-group">
+			      <span class="input-group-addon">
+			        <input type="radio" aria-label="..." ng-model="formData.painLeft"  value="3">
+			      </span>
+			      <label class="form-control" >Both</label>
+			    </div>
+			  </div>
+			</div>
+		</div>
+	  </div>
+	</div>
+
+	<div class="panel panel-default">
+	  <div class="panel-heading">
+	    <h3 class="panel-title">Opening Pattern</h3>
+	  </div>
+	  <div class="panel-body">
+	  	<div class="input-group">
+	  		<span class="input-group-addon">
+	  			<input type="radio" aria-label="..." ng-model="formData.openingPattern"  value="0">
+	  		</span>
+	  		<label class="form-control">Straight</label>
+	    </div>
+	    <div class="input-group">
+		    <span class="input-group-addon">
+					<input type="radio" aria-label="..." ng-model="formData.openingPattern" value="1">
+				</span>
+				<label class="form-control">Right Lateral Deviation (uncorrected) Right Corrected ("S") Deviation</label>
+			</div>
+			<div class="input-group">
+				<span class="input-group-addon">
+					<input type="radio" aria-label="..." ng-model="formData.openingPattern" value="2">
+				</span>
+				<label class="form-control">Left Lateral Deviation (uncorrected) Left Corrected ("S") Deviation</label>
+			</div>
+			<div class="input-group">
+				<span class="input-group-addon">
+					<input type="radio" aria-label="..." ng-model="formData.openingPattern" value="3">
+				</span>
+				<label class="form-control">Other</label>
+				<input type="text" class="form-control" aria-describedby="basic-addon1" ng-model="formData.openingPatternComments">
+			</div>
+	  </div>
+	</div>
+
+	<div class="panel panel-default">
+		<div class="panel-heading">
+	    	<h3 class="panel-title">Vertical range motion</h3>
+	  	</div>
+	  	<div class="panel-body">
+	  		<div class="input-group">
+	  			<span class="input-group-addon">Unassisted opening without pain</span>
+	  			<input type="number" class="form-control" placeholder="0.0" aria-describedby="basic-addon3" ng-model="formData.verticalRangeUnassistedWOPain">
+	  			<span class="input-group-addon">mm</span>
+			</div>
+			<div class="input-group">
+					<span class="input-group-addon">Maximum unassisted opening</span>
+	  			<input type="number" class="form-control" placeholder="0.0" aria-describedby="basic-addon3" ng-model="formData.verticalRangeUnassistedMax">
+	  			<span class="input-group-addon">mm</span>
+			</div>
+			<div class="input-group">
+				<span class="input-group-addon" >Maximum assisted opening</span>
+  			<input type="number" class="form-control" placeholder="0.0" aria-describedby="basic-addon3" ng-model="formData.verticalRangeAssistedMax">
+  			<span class="input-group-addon">mm</span>
+			</div>
+			<div class="input-group">
+				<span class="input-group-addon" >Vertical incisal overlap</span>
+  			<input type="number" class="form-control" placeholder="0.0" aria-describedby="basic-addon3" ng-model="formData.verticalRangeIncisalOverlap">
+  			<span class="input-group-addon">mm</span>
+			</div>
+		</div>
+	</div>
+
+	<div class="panel panel-default">
+		<div class="panel-heading">
+	    	<h3 class="panel-title">Joint sounds</h3>
+	  	</div>
+	  	<div class="panel-body">
+	  		<div class="col-md-6">
+	  			<div class="panel panel-default">
+					  <div class="panel-heading">
+					    Rigth
+					  </div>
+					  <div class="panel-body">
+					  	<div class="input-group">
+					      <span class="input-group-addon">
+					        <input type="radio" aria-label="..." ng-model="formData.jointSoundRight" value="0">
+					      </span>
+					      <label class="form-control">None</label>
+					    </div>
+					    <div class="input-group">
+					      <span class="input-group-addon">
+					        <input type="radio" aria-label="..." ng-model="formData.jointSoundRight"  value="1">
+					      </span>
+					      <label class="form-control" >Click</label>
+					    </div>
+						<div class="input-group">
+					      <span class="input-group-addon">
+					        <input type="radio" aria-label="..." ng-model="formData.jointSoundRight"  value="2">
+					      </span>
+					      <label class="form-control" >Coarse crepitus</label>
+					    </div>
+					    <div class="input-group">
+					      <span class="input-group-addon">
+					        <input type="radio" aria-label="..." ng-model="formData.jointSoundRight"  value="3">
+					      </span>
+					      <label class="form-control" >Fine crepitus</label>
+					    </div>
+					    <div class="input-group">
+					    	<span class="input-group-addon">Measurement of Opening Click</span>
+				  			<input type="text" class="form-control" placeholder="0.0" ng-model="formData.jointSoundRightMeasurment">
+				  			<span class="input-group-addon">mm</span>
+						</div>
+				  </div>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="panel panel-default">
+				  <div class="panel-heading">
+				    Left
+				  </div>
+				  <div class="panel-body">
+				  	<div class="input-group">
+				      <span class="input-group-addon">
+				        <input type="radio" aria-label="..." ng-model="formData.jointSoundLeft" value="0">
+				      </span>
+				      <label class="form-control">None</label>
+				    </div>
+				    <div class="input-group">
+				      <span class="input-group-addon">
+				        <input type="radio" aria-label="..." ng-model="formData.jointSoundLeft"  value="1">
+				      </span>
+				      <label class="form-control" >Click</label>
+				    </div>
+						<div class="input-group">
+				      <span class="input-group-addon">
+				        <input type="radio" aria-label="..." ng-model="formData.jointSoundLeft"  value="2">
+				      </span>
+				      <label class="form-control" >Coarse crepitus</label>
+				    </div>
+				    <div class="input-group">
+				      <span class="input-group-addon">
+				        <input type="radio" aria-label="..." ng-model="formData.jointSoundLeft"  value="3">
+				      </span>
+				      <label class="form-control" >Fine crepitus</label>
+				    </div>
+				    <div class="input-group">
+				    	<span class="input-group-addon">Measurement of Opening Click</span>
+			  			<input type="number" class="form-control" placeholder="0.0" ng-model="formData.jointSoundLeftMeasurement">
+			  			<span class="input-group-addon">mm</span>
+						</div>
+					</div>
+				</div>
+			</div>
+	  	</div>
+	</div>
+
+	<div class="panel panel-default">
+	 	<div class="panel-heading">
+	 		<h3 class="panel-title">Excursions</h3>
+	 	</div>
+	  <div class="panel-body">
+	  	<div class="input-group">
+	  		<span class="input-group-addon" id="basic-addon3">Right Lateral Excursion</span>
+	  		<input type="number" class="form-control" placeholder="0.0" aria-describedby="basic-addon3" ng-model="formData.excursionsRightLateral">
+	  		<span class="input-group-addon">mm</span>
+			</div>
+			<div class="input-group">
+	  		<span class="input-group-addon" id="basic-addon3">Left Lateral Excursion</span>
+	  		<input type="number" class="form-control" placeholder="0.0" aria-describedby="basic-addon3" ng-model="formData.excursionsLeftLateral">
+	  		<span class="input-group-addon">mm</span>
+			</div>
+			<div class="input-group">
+	  		<span class="input-group-addon" id="basic-addon3">Protrusion</span>
+	  		<input type="number" class="form-control" placeholder="0.0" aria-describedby="basic-addon3" ng-model="formData.excursionsProtrusion">
+	  		<span class="input-group-addon">mm</span>
+			</div>
+
+			<div class="panel panel-default">
+			 	<div class="panel-heading">
+			 		Midline Deviation
+			 	</div>
+			  <div class="panel-body">
+					<div class="input-group">
+			  		<span class="input-group-addon" id="basic-addon3">Deviation</span>
+			  		<input type="number" class="form-control" placeholder="0.0" aria-describedby="basic-addon3" ng-model="formData.excursionsMidlineDeviation">
+			  		<span class="input-group-addon">mm</span>
+					</div>
+					<div class="input-group">
+			      <span class="input-group-addon">
+			        <input type="radio" aria-label="..." ng-model="formData.excursionsMidlineDeviationSide"  value="1">
+			      </span>
+			      <label class="form-control" >Right</label>
+			    </div>
+			    <div class="input-group">
+			      <span class="input-group-addon">
+			        <input type="radio" aria-label="..." ng-model="formData.excursionsMidlineDeviationSide"  value="2">
+			      </span>
+			      <label class="form-control" >Left</label>
+			    </div>
+			    <div class="input-group">
+			      <span class="input-group-addon">
+			        <input type="radio" aria-label="..." ng-model="formData.excursionsMidlineDeviationSide"  value="8">
+			      </span>
+			      <label class="form-control" >N/A</label>
+			    </div>
+			  </div>
+			</div>
+	  </div>
+	</div>
+
+
+	<div class="panel panel-default">
+	 	<div class="panel-heading">
+	 		<h3 class="panel-title">Joint sounds excursions</h3>
+	 	</div>
+	  <div class="panel-body">
+	  	<div class="col-md-12">
+	  		<div class="panel panel-default">
+				  <div class="panel-heading">
+				    Rigth sounds
+				  </div>
+				  <div class="panel-body">
+				  	<div class="col-md-4">
+					  	<div class="panel panel-default">
+							  <div class="panel-heading">
+							    Excursion right
+							  </div>
+							  <div class="panel-body">
+							  	<div class="input-group">
+							  		<label class="form-control">None</label>
+							      <span class="input-group-addon">
+							        <input type="radio" aria-label="..." ng-model="formData.jointSoundExcursionsRightSoundExcursionRight" value="0">
+							      </span>
+							    </div>
+							    <div class="input-group">
+							    	<label class="form-control">Click</label>
+							      <span class="input-group-addon">
+							        <input type="radio" aria-label="..." ng-model="formData.jointSoundExcursionsRightSoundExcursionRight"  value="1">
+							      </span>
+							    </div>
+									<div class="input-group">
+										<label class="form-control" >Coarse crepitus</label>
+							      <span class="input-group-addon">
+							        <input type="radio" aria-label="..." ng-model="formData.jointSoundExcursionsRightSoundExcursionRight"  value="2">
+							      </span>
+							    </div>
+							    <div class="input-group">
+							    	<label class="form-control" >Fine crepitus</label>
+							      <span class="input-group-addon">
+							        <input type="radio" aria-label="..." ng-model="formData.jointSoundExcursionsRightSoundExcursionRight"  value="3">
+							      </span>
+							    </div>
+							  </div>
+							</div>
+					  </div>
+					  <div class="col-md-4">
+					  	<div class="panel panel-default">
+							  <div class="panel-heading">
+							    Excursion left
+							  </div>
+							  <div class="panel-body">
+							  	<div class="input-group">
+							  		<label class="form-control">None</label>
+							      <span class="input-group-addon">
+							        <input type="radio" aria-label="..." ng-model="formData.jointSoundExcursionsRightSoundExcursionLeft" value="0">
+							      </span>
+							    </div>
+							    <div class="input-group">
+							    	<label class="form-control">Click</label>
+							      <span class="input-group-addon">
+							        <input type="radio" aria-label="..." ng-model="formData.jointSoundExcursionsRightSoundExcursionLeft"  value="1">
+							      </span>
+							    </div>
+									<div class="input-group">
+										<label class="form-control" >Coarse crepitus</label>
+							      <span class="input-group-addon">
+							        <input type="radio" aria-label="..." ng-model="formData.jointSoundExcursionsRightSoundExcursionLeft"  value="2">
+							      </span>
+							    </div>
+							    <div class="input-group">
+							    	<label class="form-control" >Fine crepitus</label>
+							      <span class="input-group-addon">
+							        <input type="radio" aria-label="..." ng-model="formData.jointSoundExcursionsRightSoundExcursionLeft"  value="3">
+							      </span>
+							    </div>
+							  </div>
+							</div>
+					  </div>
+
+					  <div class="col-md-4">
+					  	<div class="panel panel-default">
+							  <div class="panel-heading">
+							    Protrusion
+							  </div>
+							  <div class="panel-body">
+							  	<div class="input-group">
+							  		<label class="form-control">None</label>
+							      <span class="input-group-addon">
+							        <input type="radio" aria-label="..." ng-model="formData.jointSoundExcursionsRightSoundExcursionProtrusion" value="0">
+							      </span>
+							    </div>
+							    <div class="input-group">
+							    	<label class="form-control">Click</label>
+							      <span class="input-group-addon">
+							        <input type="radio" aria-label="..." ng-model="formData.jointSoundExcursionsRightSoundExcursionProtrusion"  value="1">
+							      </span>
+							    </div>
+									<div class="input-group">
+										<label class="form-control" >Coarse crepitus</label>
+							      <span class="input-group-addon">
+							        <input type="radio" aria-label="..." ng-model="formData.jointSoundExcursionsRightSoundExcursionProtrusion"  value="2">
+							      </span>
+							    </div>
+							    <div class="input-group">
+							    	<label class="form-control" >Fine crepitus</label>
+							      <span class="input-group-addon">
+							        <input type="radio" aria-label="..." ng-model="formData.jointSoundExcursionsRightSoundExcursionProtrusion"  value="3">
+							      </span>
+							    </div>
+							  </div>
+							</div>
+					  </div>
+					</div>
+				</div>
+	  	</div>
+	  	<div class="col-md-12">
+	  		<div class="panel panel-default">
+				  <div class="panel-heading">
+				    Left sounds
+				  </div>
+				  <div class="panel-body">
+				  	<div class="col-md-4">
+					  	<div class="panel panel-default">
+							  <div class="panel-heading">
+							    Excursion right
+							  </div>
+							  <div class="panel-body">
+							  	<div class="input-group">
+							  		<label class="form-control">None</label>
+							      <span class="input-group-addon">
+							        <input type="radio" aria-label="..." ng-model="formData.jointSoundExcursionsLeftSoundExcursionRight" value="0">
+							      </span>
+							    </div>
+							    <div class="input-group">
+							    	<label class="form-control">Click</label>
+							      <span class="input-group-addon">
+							        <input type="radio" aria-label="..." ng-model="formData.jointSoundExcursionsLeftSoundExcursionRight"  value="1">
+							      </span>
+							    </div>
+									<div class="input-group">
+										<label class="form-control" >Coarse crepitus</label>
+							      <span class="input-group-addon">
+							        <input type="radio" aria-label="..." ng-model="formData.jointSoundExcursionsLeftSoundExcursionRight"  value="2">
+							      </span>
+							    </div>
+							    <div class="input-group">
+							    	<label class="form-control" >Fine crepitus</label>
+							      <span class="input-group-addon">
+							        <input type="radio" aria-label="..." ng-model="formData.jointSoundExcursionsLeftSoundExcursionRight"  value="3">
+							      </span>
+							    </div>
+							  </div>
+							</div>
+					  </div>
+					  <div class="col-md-4">
+					  	<div class="panel panel-default">
+							  <div class="panel-heading">
+							    Excursion left
+							  </div>
+							  <div class="panel-body">
+							  	<div class="input-group">
+							  		<label class="form-control">None</label>
+							      <span class="input-group-addon">
+							        <input type="radio" aria-label="..." ng-model="formData.jointSoundExcursionsLeftSoundExcursionLeft" value="0">
+							      </span>
+							    </div>
+							    <div class="input-group">
+							    	<label class="form-control">Click</label>
+							      <span class="input-group-addon">
+							        <input type="radio" aria-label="..." ng-model="formData.jointSoundExcursionsLeftSoundExcursionLeft"  value="1">
+							      </span>
+							    </div>
+									<div class="input-group">
+										<label class="form-control" >Coarse crepitus</label>
+							      <span class="input-group-addon">
+							        <input type="radio" aria-label="..." ng-model="formData.jointSoundExcursionsLeftSoundExcursionLeft"  value="2">
+							      </span>
+							    </div>
+							    <div class="input-group">
+							    	<label class="form-control" >Fine crepitus</label>
+							      <span class="input-group-addon">
+							        <input type="radio" aria-label="..." ng-model="formData.jointSoundExcursionsLeftSoundExcursionLeft"  value="3">
+							      </span>
+							    </div>
+							  </div>
+							</div>
+					  </div>
+
+					  <div class="col-md-4">
+					  	<div class="panel panel-default">
+							  <div class="panel-heading">
+							    Protrusion
+							  </div>
+							  <div class="panel-body">
+							  	<div class="input-group">
+							  		<label class="form-control">None</label>
+							      <span class="input-group-addon">
+							        <input type="radio" aria-label="..." ng-model="formData.jointSoundExcursionsLeftSoundExcursionProtrusion" value="0">
+							      </span>
+							    </div>
+							    <div class="input-group">
+							    	<label class="form-control">Click</label>
+							      <span class="input-group-addon">
+							        <input type="radio" aria-label="..." ng-model="formData.jointSoundExcursionsLeftSoundExcursionProtrusion"  value="1">
+							      </span>
+							    </div>
+									<div class="input-group">
+										<label class="form-control" >Coarse crepitus</label>
+							      <span class="input-group-addon">
+							        <input type="radio" aria-label="..." ng-model="formData.jointSoundExcursionsLeftSoundExcursionProtrusion"  value="2">
+							      </span>
+							    </div>
+							    <div class="input-group">
+							    	<label class="form-control" >Fine crepitus</label>
+							      <span class="input-group-addon">
+							        <input type="radio" aria-label="..." ng-model="formData.jointSoundExcursionsLeftSoundExcursionProtrusion"  value="3">
+							      </span>
+							    </div>
+							  </div>
+							</div>
+					  </div>
+					</div>
+				</div>
+	  	</div>
+	  </div>
+	</div>
+
+	<div class="panel panel-info">
+		<div class="panel-heading">
+	    <h3>Directions for next items</h3>
+	  </div>
+	  <div class="panel-body">
+	  	The examiner will be palpating (touching) different areas of your face, head and neck. We would like you to indicate if you do not feel pain or just feel pressure (0), or pain (1-3). Please rate how much pain you feel for each of the palpations according to the scale below. Circle the number that corresponds to the amount of pain you feel. We would like you to make a separate rating for both the right and left palpations.
+	  	<br>
+			0 = No Pain/Pressure Only 
+			<br>
+			1 = Mild Pain
+			<br>
+			2 = Moderate Pain
+			<br>
+			3 = Severe Pain
+	  </div>
+	</div>
+
+	<div class="panel panel-default">
+		<div class="panel-heading">
+			<h3>Extraoral muscle pain with palpation</h3>
+		</div>
+		<div class="panel-body">
+		  	<div class="col-md-6">
+			  	<div class="panel panel-default">
+			  		<div class="panel-heading">
+					    Temporalis
+					</div>
+					<div class="panel-body">
+					  	<div class="col-md-6">
+						  	<div class="panel panel-default">
+									<div class="panel-heading">
+								    Right
+								  </div>
+								  <div class="panel-body">
+								  	<div class="input-group">
+								  		<span class="input-group-addon">
+								        <input type="radio" aria-label="..." ng-model="formData.palpationExtraoralMuscleTemporalisRight"  value="0">
+								      </span>
+								      <label class="form-control" >0</label>
+								  	</div>
+							     	<div class="input-group">
+								      <span class="input-group-addon">
+								        <input type="radio" aria-label="..." ng-model="formData.palpationExtraoralMuscleTemporalisRight"  value="1">
+								      </span>
+								      <label class="form-control" >1</label>
+							    	</div>
+							    	<div class="input-group">
+								      <span class="input-group-addon">
+								        <input type="radio" aria-label="..." ng-model="formData.palpationExtraoralMuscleTemporalisRight"  value="2">
+								      </span>
+								      <label class="form-control" >2</label>
+								    </div>
+								    <div class="input-group">
+								      <span class="input-group-addon">
+								        <input type="radio" aria-label="..." ng-model="formData.palpationExtraoralMuscleTemporalisRight"  value="3">
+								      </span>
+								      <label class="form-control" >3</label>
+								    </div>
+								  </div>
+							  </div>
+							</div>
+							<div class="col-md-6">
+						    <div class="panel panel-default">
+									<div class="panel-heading">
+								    Left
+								  </div>
+								  <div class="panel-body">
+								  	<div class="input-group">
+								  		<span class="input-group-addon">
+								        <input type="radio" aria-label="..." ng-model="formData.palpationExtraoralMuscleRemporalisLeft"  value="0">
+								      </span>
+								      <label class="form-control" >0</label>
+								  	</div>
+							     	<div class="input-group">
+								      <span class="input-group-addon">
+								        <input type="radio" aria-label="..." ng-model="formData.palpationExtraoralMuscleRemporalisLeft"  value="1">
+								      </span>
+								      <label class="form-control" >1</label>
+							    	</div>
+							    	<div class="input-group">
+								      <span class="input-group-addon">
+								        <input type="radio" aria-label="..." ng-model="formData.palpationExtraoralMuscleRemporalisLeft"  value="2">
+								      </span>
+								      <label class="form-control" >2</label>
+								    </div>
+								    <div class="input-group">
+								      <span class="input-group-addon">
+								        <input type="radio" aria-label="..." ng-model="formData.palpationExtraoralMuscleRemporalisLeft"  value="3">
+								      </span>
+								      <label class="form-control" >3</label>
+								    </div>
+								  </div>
+								</div>
+							</div>
+					  	</div>
+					</div>
+			</div>
+			<div class="col-md-6">
+				<div class="panel panel-default">
+					<div class="panel-heading">
+					    Masseter
+					</div>
+					<div class="panel-body">
+					  	<div class="col-md-6">
+						  	<div class="panel panel-default">
+						  		<div class="panel-heading">
+								    Right
+								</div>
+								<div class="panel-body">
+								  	<div class="input-group">
+								  		<span class="input-group-addon">
+								        <input type="radio" aria-label="..." ng-model="formData.palpationExtraoralMuscleMasseterRight"  value="0">
+								      </span>
+								      <label class="form-control" >0</label>
+								  	</div>
+							     	<div class="input-group">
+								      <span class="input-group-addon">
+								        <input type="radio" aria-label="..." ng-model="formData.palpationExtraoralMuscleMasseterRight"  value="1">
+								      </span>
+								      <label class="form-control" >1</label>
+							    	</div>
+							    	<div class="input-group">
+								      <span class="input-group-addon">
+								        <input type="radio" aria-label="..." ng-model="formData.palpationExtraoralMuscleMasseterRight"  value="2">
+								      </span>
+								      <label class="form-control" >2</label>
+								    </div>
+								    <div class="input-group">
+								      <span class="input-group-addon">
+								        <input type="radio" aria-label="..." ng-model="formData.palpationExtraoralMuscleMasseterRight"  value="3">
+								      </span>
+								      <label class="form-control" >3</label>
+								    </div>
+								</div>
+							</div>
+						</div>
+						<div class="col-md-6">
+					    	<div class="panel panel-default">
+					    		<div class="panel-heading">
+					    			Left
+					    		</div>
+								<div class="panel-body">
+								  	<div class="input-group">
+								  		<span class="input-group-addon">
+								  			<input type="radio" aria-label="..." ng-model="formData.palpationExtraoralMuscleMasseterLeft"  value="0">
+								  		</span>
+								  		<label class="form-control" >0</label>
+								  	</div>
+							     	<div class="input-group">
+								      <span class="input-group-addon">
+								        <input type="radio" aria-label="..." ng-model="formData.palpationExtraoralMuscleMasseterLeft"  value="1">
+								      </span>
+								      <label class="form-control" >1</label>
+							    	</div>
+							    	<div class="input-group">
+								      <span class="input-group-addon">
+								        <input type="radio" aria-label="..." ng-model="formData.palpationExtraoralMuscleMasseterLeft"  value="2">
+								      </span>
+								      <label class="form-control" >2</label>
+								    </div>
+								    <div class="input-group">
+								      <span class="input-group-addon">
+								        <input type="radio" aria-label="..." ng-model="formData.palpationExtraoralMuscleMasseterLeft"  value="3">
+								      </span>
+								      <label class="form-control" >3</label>
+								    </div>
+							  	</div>
+							</div>
+						</div>
+					</div>
+		  		</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="panel panel-default">
+		<div class="panel-heading">
+	    <h3>Joint pain with palpation</h3>
+	  </div>
+	  <div class="panel-body">
+	  	<div class="panel panel-default">
+				<div class="panel-heading">
+			    Lateral pole "outside"
+			  </div>
+			  <div class="panel-body">
+			  	<div class="col-md-6">
+				  	<div class="panel panel-default">
+							<div class="panel-heading">
+						    Right
+						  </div>
+						  <div class="panel-body">
+						  	<div class="input-group">
+						  		<span class="input-group-addon">
+						        <input type="radio" aria-label="..." ng-model="formData.palpationJointLateralPoleRight"  value="0">
+						      </span>
+						      <label class="form-control" >0</label>
+						  	</div>
+					     	<div class="input-group">
+						      <span class="input-group-addon">
+						        <input type="radio" aria-label="..." ng-model="formData.palpationJointLateralPoleRight"  value="1">
+						      </span>
+						      <label class="form-control" >1</label>
+					    	</div>
+					    	<div class="input-group">
+						      <span class="input-group-addon">
+						        <input type="radio" aria-label="..." ng-model="formData.palpationJointLateralPoleRight"  value="2">
+						      </span>
+						      <label class="form-control" >2</label>
+						    </div>
+						    <div class="input-group">
+						      <span class="input-group-addon">
+						        <input type="radio" aria-label="..." ng-model="formData.palpationJointLateralPoleRight"  value="3">
+						      </span>
+						      <label class="form-control" >3</label>
+						    </div>
+						  </div>
+					  </div>
+					</div>
+					<div class="col-md-6">
+				    <div class="panel panel-default">
+							<div class="panel-heading">
+						    Left
+						  </div>
+						  <div class="panel-body">
+						  	<div class="input-group">
+						  		<span class="input-group-addon">
+						        <input type="radio" aria-label="..." ng-model="formData.palpationJointLateralPoleLeft"  value="0">
+						      </span>
+						      <label class="form-control" >0</label>
+						  	</div>
+					     	<div class="input-group">
+						      <span class="input-group-addon">
+						        <input type="radio" aria-label="..." ng-model="formData.palpationJointLateralPoleLeft"  value="1">
+						      </span>
+						      <label class="form-control" >1</label>
+					    	</div>
+					    	<div class="input-group">
+						      <span class="input-group-addon">
+						        <input type="radio" aria-label="..." ng-model="formData.palpationJointLateralPoleLeft"  value="2">
+						      </span>
+						      <label class="form-control" >2</label>
+						    </div>
+						    <div class="input-group">
+						      <span class="input-group-addon">
+						        <input type="radio" aria-label="..." ng-model="formData.palpationJointLateralPoleLeft"  value="3">
+						      </span>
+						      <label class="form-control" >3</label>
+						    </div>
+						  </div>
+						</div>
+					</div>
+			  </div>
+			</div>
+		</div>
+	</div>
+
+
+	<div class="panel panel-default">
+		<div class="panel-heading">
+			<h3>Intraoral muscle pain with palpation</h3>
+		</div>
+		<div class="panel-body">
+		  	<div class="col-md-6">
+			  	<div class="panel panel-default">
+						<div class="panel-heading">
+					    Lateral pterygoid area "Behind upper molars"
+					  </div>
+					  <div class="panel-body">
+					  	<div class="col-md-6">
+						  	<div class="panel panel-default">
+									<div class="panel-heading">
+								    Right
+								  </div>
+								  <div class="panel-body">
+								  	<div class="input-group">
+								  		<span class="input-group-addon">
+								        <input type="radio" aria-label="..." ng-model="formData.palpationIntraoralMuscleLateralPterygoidRight"  value="0">
+								      </span>
+								      <label class="form-control" >0</label>
+								  	</div>
+							     	<div class="input-group">
+								      <span class="input-group-addon">
+								        <input type="radio" aria-label="..." ng-model="formData.palpationIntraoralMuscleLateralPterygoidRight"  value="1">
+								      </span>
+								      <label class="form-control" >1</label>
+							    	</div>
+							    	<div class="input-group">
+								      <span class="input-group-addon">
+								        <input type="radio" aria-label="..." ng-model="formData.palpationIntraoralMuscleLateralPterygoidRight"  value="2">
+								      </span>
+								      <label class="form-control" >2</label>
+								    </div>
+								    <div class="input-group">
+								      <span class="input-group-addon">
+								        <input type="radio" aria-label="..." ng-model="formData.palpationIntraoralMuscleLateralPterygoidRight"  value="3">
+								      </span>
+								      <label class="form-control" >3</label>
+								    </div>
+								  </div>
+							  </div>
+							</div>
+							<div class="col-md-6">
+						    <div class="panel panel-default">
+									<div class="panel-heading">
+								    Left
+								  </div>
+								  <div class="panel-body">
+								  	<div class="input-group">
+								  		<span class="input-group-addon">
+								        <input type="radio" aria-label="..." ng-model="formData.palpationIntraoralMuscleLateralPterygoidLeft"  value="0">
+								      </span>
+								      <label class="form-control" >0</label>
+								  	</div>
+							     	<div class="input-group">
+								      <span class="input-group-addon">
+								        <input type="radio" aria-label="..." ng-model="formData.palpationIntraoralMuscleLateralPterygoidLeft"  value="1">
+								      </span>
+								      <label class="form-control" >1</label>
+							    	</div>
+							    	<div class="input-group">
+								      <span class="input-group-addon">
+								        <input type="radio" aria-label="..." ng-model="formData.palpationIntraoralMuscleLateralPterygoidLeft"  value="2">
+								      </span>
+								      <label class="form-control" >2</label>
+								    </div>
+								    <div class="input-group">
+								      <span class="input-group-addon">
+								        <input type="radio" aria-label="..." ng-model="formData.palpationIntraoralMuscleLateralPterygoidLeft"  value="3">
+								      </span>
+								      <label class="form-control" >3</label>
+								    </div>
+								  </div>
+								</div>
+							</div>
+					  </div>
+					</div>
+				</div>
+				<div class="col-md-6">
+					<div class="panel panel-default">
+							<div class="panel-heading">
+								Tendon of temporalis "Tendon"
+							</div>
+							  <div class="panel-body">
+							  	<div class="col-md-6">
+								  	<div class="panel panel-default">
+											<div class="panel-heading">
+										    Right
+										  </div>
+										  <div class="panel-body">
+										  	<div class="input-group">
+										  		<span class="input-group-addon">
+										        <input type="radio" aria-label="..." ng-model="formData.palpationIntraoralMuscleTendonTemporalisRight"  value="0">
+										      </span>
+										      <label class="form-control" >0</label>
+										  	</div>
+									     	<div class="input-group">
+										      <span class="input-group-addon">
+										        <input type="radio" aria-label="..." ng-model="formData.palpationIntraoralMuscleTendonTemporalisRight"  value="1">
+										      </span>
+										      <label class="form-control" >1</label>
+									    	</div>
+									    	<div class="input-group">
+										      <span class="input-group-addon">
+										        <input type="radio" aria-label="..." ng-model="formData.palpationIntraoralMuscleTendonTemporalisRight"  value="2">
+										      </span>
+										      <label class="form-control" >2</label>
+										    </div>
+										    <div class="input-group">
+										      <span class="input-group-addon">
+										        <input type="radio" aria-label="..." ng-model="formData.palpationIntraoralMuscleTendonTemporalisRight"  value="3">
+										      </span>
+										      <label class="form-control" >3</label>
+										    </div>
+										  </div>
+									  </div>
+									</div>
+									<div class="col-md-6">
+									    <div class="panel panel-default">
+									    	<div class="panel-heading">
+											    Left
+											</div>
+											  <div class="panel-body">
+											  	<div class="input-group">
+											  		<span class="input-group-addon">
+											        <input type="radio" aria-label="..." ng-model="formData.palpationIntraoralMuscleTendonTemporalisLeft"  value="0">
+											      </span>
+											      <label class="form-control" >0</label>
+											  	</div>
+										     	<div class="input-group">
+											      <span class="input-group-addon">
+											        <input type="radio" aria-label="..." ng-model="formData.palpationIntraoralMuscleTendonTemporalisLeft"  value="1">
+											      </span>
+											      <label class="form-control" >1</label>
+										    	</div>
+										    	<div class="input-group">
+											      <span class="input-group-addon">
+											        <input type="radio" aria-label="..." ng-model="formData.palpationIntraoralMuscleTendonTemporalisLeft"  value="2">
+											      </span>
+											      <label class="form-control" >2</label>
+											    </div>
+											    <div class="input-group">
+											      <span class="input-group-addon">
+											        <input type="radio" aria-label="..." ng-model="formData.palpationIntraoralMuscleTendonTemporalisLeft"  value="3">
+											      </span>
+											      <label class="form-control" >3</label>
+											    </div>
+									  		</div>
+										</div>
+								</div>
+						  </div>
+					</div>
+				</div>
+		</div>
+	</div>
+	
+</div>
