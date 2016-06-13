@@ -1,14 +1,17 @@
 {
   "name": "dcbia-model",
   "version": "1.0.0",
-  "description": "Handle request to add data to couchdb",
+  "description": "Federate clinical, biological and morphological data in a node.js and couchdb environment.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
     "couchdb",
-    "DCBIA-orthoLab"
+    "DCBIA-orthoLab",
+    "clinical data",
+    "biological data",
+    "morphological data"
   ],
   "author": "juanprietob@gmail.com",
   "license": "Apache-2.0"
