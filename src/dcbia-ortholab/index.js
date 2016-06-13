@@ -5,7 +5,7 @@ exports.register = function (server, options, next) {
 		path: '/',
 		method: '*',
 		handler: function (request, reply) {
-			reply.redirect('/DCBIA-OrthoLab/public/');
+			reply.redirect('/DCBIA-OrthoLab/public');
 		}
 	});
 	
@@ -19,7 +19,6 @@ exports.register = function (server, options, next) {
 			description: 'This route serves the static website of ProbtrackBrainConnectivity. Everything inside the plugins/static/public/ directory will be directly accessible under this route.'
 		}
 	});
-
     next();
 };
 
