@@ -3,6 +3,14 @@
   "version": "1.0.0",
   "description": "Federate clinical, biological and morphological data in a node.js and couchdb environment.",
   "main": "index.js",
+  "dependencies": {
+    "bluebird": "^3.3.0",
+    "request": "^2.69.0",
+    "underscore": "^1.8.3",
+    "boom": "^3.1.2",
+    "couch-provider": "^1.0.0",
+    "joi": "^7.3.0"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
