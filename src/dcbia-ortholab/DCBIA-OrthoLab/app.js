@@ -19,7 +19,8 @@ config(['$routeProvider', function($routeProvider) {
     templateUrl: 'views/controllers/home.html'
   })
   .when('/clinicalData', {
-    templateUrl: 'views/controllers/clinicalData.html'
+    templateUrl: 'views/controllers/clinicalData.html',
+    reloadOnSearch: false
   })
   .when('/importClinicalData', {
     templateUrl: 'views/controllers/importClinicalData.html'

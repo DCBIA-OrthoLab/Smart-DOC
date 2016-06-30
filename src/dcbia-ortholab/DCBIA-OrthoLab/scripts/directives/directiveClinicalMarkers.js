@@ -1,6 +1,5 @@
 angular.module('cTRIVIAL')
-.directive('clinicalMarkers', function($rootScope) {
-
+.directive('clinicalMarkers', function($rootScope, $location) {
 
 	function link($scope){
 

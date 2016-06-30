@@ -192,6 +192,11 @@
 					 	Clinical Markers
 					 </button>
 
+					 <button type="button" class="btn btn-default" ng-click="clinicalDataCollection.selectedForm = 1">
+					 	<span class="glyphicon glyphicon-list-alt"></span>
+					 	Diagnostic Temporo Mandibular
+					 </button>
+
 					 <label class="btn btn-default" for="clinicalData-file-selector" ng-click="clinicalDataCollection.selectedForm = -1;">
 					 	<span class="glyphicon glyphicon-folder-open"></span>
 					    <input id="clinicalData-file-selector" file-model='csv.file' type="file" style="display:none;">
@@ -214,6 +219,7 @@
 					</button>
 				</div>
 				<clinical-markers form-data="clinical.data" ng-if="clinicalDataCollection.selectedForm == 0"></clinical-markers>
+				<diagnostic-temporo-mandibular form-data="clinical.data" ng-if="clinicalDataCollection.selectedForm == 1"></diagnostic-temporo-mandibular>
 				<div class="btn-group">
 					<button type="button" class="btn btn-default" ng-click="clinical.create()">
 						<span class="glyphicon glyphicon-save"></span>
