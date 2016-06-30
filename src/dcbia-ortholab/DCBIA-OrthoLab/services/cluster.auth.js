@@ -57,7 +57,7 @@ angular.module('cTRIVIAL')
     createUser: function(user){
       return $http({
         method: 'POST',
-        url: '/clusterauth/user',
+        url: '/auth/user',
         data: user
       })
       .then(function(res){
@@ -70,7 +70,7 @@ angular.module('cTRIVIAL')
       }else{
         return $http({
           method: 'GET',
-          url: '/clusterauth/user'
+          url: '/auth/user'
         }).then(function(res){
           $rootScope.user = res.data;
           return res.data;
@@ -80,14 +80,14 @@ angular.module('cTRIVIAL')
     deleteUser: function(user){
       return $http({
         method: 'DELETE',
-        url: '/clusterauth/user',
+        url: '/auth/user',
         data: user
       });
     },
     login: function(user){
       return $http({
         method: 'POST',
-        url: '/clusterauth/login',
+        url: '/auth/login',
         data: user
       })
       .then(function(res){
@@ -97,7 +97,7 @@ angular.module('cTRIVIAL')
     updatePassword: function(user, token){
       return $http({
         method: 'PUT',
-        url: '/clusterauth/login',
+        url: '/auth/login',
         data: user,
         headers: {
           authorization: "Bearer " + token
@@ -110,7 +110,7 @@ angular.module('cTRIVIAL')
     sendRecoverPassword: function(email){
        return $http({
         method: 'POST',
-        url: '/clusterauth/reset',
+        url: '/auth/reset',
         data: email
       });
     },
