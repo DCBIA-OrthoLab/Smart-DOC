@@ -41,7 +41,7 @@ module.exports = function (server, conf) {
 		config: {
 			auth: {
                 strategy: 'token',
-                scope: ['clusterpost']
+                scope: ['dentist']
             },
 			handler: handlers.getClinicalCollections,
 			validate: {
@@ -62,7 +62,7 @@ module.exports = function (server, conf) {
 		config: {
 			auth: {
                 strategy: 'token',
-                scope: ['clusterpost']
+                scope: ['dentist']
             },
 			handler: handlers.createDocument,
 			validate: {
@@ -83,7 +83,7 @@ module.exports = function (server, conf) {
 		config: {
 			auth: {
                 strategy: 'token',
-                scope: ['clusterpost']
+                scope: ['dentist']
             },
 			handler: handlers.getDocument,
 			validate: {
@@ -106,7 +106,7 @@ module.exports = function (server, conf) {
 		config: {
 			auth: {
                 strategy: 'token',
-                scope: ['clusterpost']
+                scope: ['dentist']
             },
 			handler: handlers.deleteDocument,
 			validate: {
@@ -129,7 +129,7 @@ module.exports = function (server, conf) {
 		config: {
 			auth: {
                 strategy: 'token',
-                scope: ['clusterpost']
+                scope: ['dentist']
             },
 			handler: handlers.updateDocument,
 			validate: {
@@ -150,7 +150,7 @@ module.exports = function (server, conf) {
 		config: {
 			auth: {
                 strategy: 'token',
-                scope: ['clusterpost']
+                scope: ['dentist']
             },
 			handler: handlers.getAllClinicalCollectionData,
 			validate: {
@@ -172,7 +172,7 @@ module.exports = function (server, conf) {
 		config: {
 			auth: {
                 strategy: 'token',
-                scope: ['clusterpost']
+                scope: ['dentist']
             },
 			handler: handlers.getClinicalCollectionData,
 			validate: {
@@ -196,7 +196,7 @@ module.exports = function (server, conf) {
 		config: {
 			auth: {
                 strategy: 'token',
-                scope: ['clusterpost']
+                scope: ['dentist']
             },
 			handler: handlers.createDocument,
 			validate: {
@@ -217,7 +217,7 @@ module.exports = function (server, conf) {
 		config: {
 			auth: {
                 strategy: 'token',
-                scope: ['clusterpost']
+                scope: ['dentist']
             },
 			handler: handlers.getDocument,
 			validate: {
@@ -237,7 +237,7 @@ module.exports = function (server, conf) {
 		config: {
 			auth: {
                 strategy: 'token',
-                scope: ['clusterpost']
+                scope: ['dentist']
             },
 			handler: handlers.deleteDocument,
 			validate: {
@@ -260,7 +260,7 @@ module.exports = function (server, conf) {
 		config: {
 			auth: {
                 strategy: 'token',
-                scope: ['clusterpost']
+                scope: ['dentist']
             },
 			handler: handlers.updateDocument,
 			validate: {
@@ -281,7 +281,7 @@ module.exports = function (server, conf) {
 		config: {
 			auth: {
                 strategy: 'token',
-                scope: ['clusterpost']
+                scope: ['dentist']
             },
 			handler: handlers.addAttachment,
 	      	validate: {
