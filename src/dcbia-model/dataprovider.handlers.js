@@ -3,9 +3,14 @@ var _ = require('underscore');
 var Promise = require('bluebird');
 var Boom = require('boom');
 var spawn = require('child_process').spawn;
+var couchUpdateViews = require('couch-update-views');
+var path = require('path');
 
 module.exports = function (server, conf) {
 	
+
+	couchUpdateViews.migrateUp(server.methods.dcbia.getCouchDBServer(), path.join(__dirname, 'views'), true);
+
 
 	var handler = {};
 	/*
