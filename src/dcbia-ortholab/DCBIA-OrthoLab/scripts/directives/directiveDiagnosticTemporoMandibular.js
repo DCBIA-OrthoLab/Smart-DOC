@@ -2,11 +2,9 @@ angular.module('cTRIVIAL')
 .directive('diagnosticTemporoMandibular', function($rootScope, $location, $anchorScroll) {
 
 	function link($scope){
-
-		if(!$scope.formData){
+		
+		if(!$scope.editFields){
 			$scope.formData = {};
-		}
-		if(!$scope.formData.formId){
 			$scope.formData.formId = 'diagnosticTemporoMandibular';
 			$scope.formData.date = new Date();
 		}

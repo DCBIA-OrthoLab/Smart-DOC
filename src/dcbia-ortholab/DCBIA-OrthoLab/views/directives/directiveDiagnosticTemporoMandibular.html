@@ -12,10 +12,6 @@
   			<input type="string" class="form-control" placeholder="Patient id (required)" aria-describedby="basic-addon3" ng-model="formData.patientId" ng-readonly="editFields">
   		</div>
   		<div class="input-group">
-  			<span class="input-group-addon">Patient name</span>
-  			<input type="text" class="form-control" placeholder="Patient name" aria-describedby="basic-addon3" ng-model="formData.name">
-  		</div>
-  		<div class="input-group">
   			<span class="input-group-addon">Date</span>
   			<input type="text" class="form-control" placeholder="0.0" aria-describedby="basic-addon3" ng-model="formData.date" readonly>
   		</div>
@@ -124,7 +120,7 @@
 		</div>
 		<div class="panel-body">
 			<div class="input-group">
-				<input type="text" class="form-control" aria-describedby="basic-addon1" ng-model="formData.beginPainMonths">
+				<input type="number" class="form-control" aria-describedby="basic-addon1" ng-model="formData.beginPainMonths">
 				<span class="input-group-addon" id="basic-addon1">Months</span>
 			</div>
 		</div>

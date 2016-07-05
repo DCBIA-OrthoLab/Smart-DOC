@@ -64,6 +64,70 @@ angular.module('cTRIVIAL')
         method: 'DELETE',
         url: '/dcbia/clinical/data/' + id
       });
+    },
+    getMorphologicalDataCollections: function(){
+      return $http({
+        method: 'GET',
+        url: '/dcbia/morphological/collections'
+      });
+    },
+    getMorphologicalDataCollection: function(id){
+      return $http({
+        method: 'GET',
+        url: '/dcbia/morphological/collection/' + id
+      });
+    },
+    createMorphologicalDataCollection: function (data) {
+      return $http({
+        method: 'POST',
+        url: '/dcbia/morphological/collection',
+        data: data
+      });
+    },
+    updateMorphologicalDataCollection: function (data) {
+      return $http({
+        method: 'PUT',
+        url: '/dcbia/morphological/collection',
+        data: data
+      });
+    },
+    deleteMorphologicalDataCollection: function (id) {
+      return $http({
+        method: 'DELETE',
+        url: '/dcbia/morphological/collection/' + id
+      });
+    },
+    getAllMorphologicalData: function(){
+      return $http({
+        method: 'GET',
+        url: '/dcbia/morphological/collection/data'
+      });
+    },
+    getMorphologicalData: function(id){
+      return $http({
+        method: 'GET',
+        url: '/dcbia/morphological/collection/data/' + id
+      });
+    },
+    createMorphologicalData: function (data) {
+      return $http({
+        method: 'POST',
+        url: '/dcbia/morphological/data',
+        data: data
+      });
+    },
+    updateMorphologicalData: function (data) {
+      return $http({
+        method: 'PUT',
+        url: '/dcbia/morphological/data',
+        data: data
+      });
+    },
+    deleteMorphologicalData: function (id) {
+      return $http({
+        method: 'DELETE',
+        url: '/dcbia/morphological/data/' + id
+      });
     }
   }
 });

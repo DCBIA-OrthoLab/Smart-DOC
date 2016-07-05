@@ -105,8 +105,8 @@
 			<div class="panel panel-default" ng-if="user.scope.indexOf('admin') !== -1">
 		  		<div class="panel-body">
 		  			<div class="btn-group">
-						 <button type="button" class="btn btn-default" ng-click="clinical.deleteAllFiltered(clinicalDataCollection.displayedCollection)">
-						 	<span class="glyphicon glyphicon-remove"></span>
+						 <button type="button" class="btn btn-danger" ng-click="clinical.deleteAllFiltered(clinicalDataCollection.displayedCollection)">
+						 	Removes all filtered<span class="glyphicon glyphicon-remove"></span>
 						 </button>
 					</div>
 		  		</div>
@@ -159,6 +159,7 @@
 		  			<div class="panel panel-default">
 		  				<div class="panel-body">
 		  					<clinical-markers form-data="clinical.dataEdit" edit-fields="true" ng-if="clinical.dataEdit.formId == 'clinicalMarkers'"></clinical-markers>
+		  					<diagnostic-temporo-mandibular form-data="clinical.dataEdit" edit-fields="true" ng-if="clinical.dataEdit.formId == 'diagnosticTemporoMandibular'"></diagnostic-temporo-mandibular>
 		  				</div>
 		  			</div>
 

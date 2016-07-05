@@ -34,6 +34,36 @@ module.exports = function (server, conf) {
         	}))
         });
 
+	var morphologicaldatapost = Joi.object({
+        	type: Joi.string().valid('morphologicalData').required(),
+        	patientId: Joi.any().required()
+        }).unknown();
+
+	var morphologicaldata = Joi.object({
+			_id: Joi.string().alphanum().required(),
+			_rev: Joi.string().required(),
+        	type: Joi.string().valid('morphologicalData').required(),
+        	patientId: Joi.any().required()
+        }).unknown();
+
+	var morphologicalcollectionpost = Joi.object({
+			name: Joi.string().required(),
+        	type: Joi.string().valid('morphologicalDataCollection'),
+        	items: Joi.array().items(Joi.object().keys({
+        		_id: Joi.string().alphanum().required()
+        	}))
+        });
+
+	var morphologicalcollection = Joi.object({
+			_id: Joi.string().alphanum().required(),
+			_rev: Joi.string().required(),
+        	type: Joi.string().valid('morphologicalDataCollection').required(),
+        	name: Joi.string().required(),
+        	items: Joi.array().items(Joi.object().keys({
+        		_id: Joi.string().alphanum()
+        	}))
+        });
+
 
 	server.route({
 		path: '/dcbia/clinical/collections',
@@ -227,6 +257,9 @@ module.exports = function (server, conf) {
 			    }, 
 			    payload: false
 			},
+			response: {
+				schema: clinicaldata
+			},
 			description: 'Get the job document posted to the database'
 	    }
 	});
@@ -266,6 +299,249 @@ module.exports = function (server, conf) {
 			validate: {
 				query: false,
 		        payload: clinicaldata,
+		        params: false
+			},
+			payload:{
+				output: 'data'
+			},
+			description: 'This route will be used to update a job document in the couch database.'
+		}
+	});
+
+	server.route({
+		path: '/dcbia/morphological/collections',
+		method: 'GET',
+		config: {
+			auth: {
+                strategy: 'token',
+                scope: ['dentist']
+            },
+			handler: handlers.getMorphologicalCollections,
+			validate: {
+				query: false,
+		        payload: false,
+		        params: false
+			},
+			response: {
+				schema: Joi.array().items(morphologicalcollection)
+			},
+			description: 'This route will be used to post job documents to the couch database.'
+		}
+	});
+
+	server.route({
+		path: '/dcbia/morphological/collection',
+		method: 'POST',
+		config: {
+			auth: {
+                strategy: 'token',
+                scope: ['dentist']
+            },
+			handler: handlers.createDocument,
+			validate: {
+				query: false,
+		        payload: morphologicalcollectionpost,
+		        params: false
+			},
+			payload:{
+				output: 'data'
+			},
+			description: 'This route will be used to post job documents to the couch database.'
+		}
+	});
+
+	server.route({
+		method: 'GET',
+		path: "/dcbia/morphological/collection/{id}",
+		config: {
+			auth: {
+                strategy: 'token',
+                scope: ['dentist']
+            },
+			handler: handlers.getDocument,
+			validate: {
+			  	query: false,
+			    params: {
+			    	id: Joi.string().alphanum().required()
+			    }, 
+			    payload: false
+			},
+			response: {
+				schema: morphologicalcollection
+			},
+			description: 'Get the job document posted to the database'
+	    }
+	});
+
+	server.route({
+		path: '/dcbia/morphological/collection/{id}',
+		method: 'DELETE',
+		config: {
+			auth: {
+                strategy: 'token',
+                scope: ['dentist']
+            },
+			handler: handlers.deleteDocument,
+			validate: {
+			  	query: false,
+			    params: {
+			    	id: Joi.string().alphanum().required()
+			    }, 
+			    payload: false
+			},
+			payload:{
+				output: 'data'
+			},
+			description: 'This route will be used to delete job documents from the database'
+		}
+	});
+
+	server.route({
+		path: '/dcbia/morphological/collection',
+		method: 'PUT',
+		config: {
+			auth: {
+                strategy: 'token',
+                scope: ['dentist']
+            },
+			handler: handlers.updateDocument,
+			validate: {
+				query: false,
+		        payload: morphologicalcollection,
+		        params: false
+			},
+			payload:{
+				output: 'data'
+			},
+			description: 'This route will be used to update a job document in the couch database.'
+		}
+	});
+
+	server.route({
+		method: 'GET',
+		path: "/dcbia/morphological/collection/data",
+		config: {
+			auth: {
+                strategy: 'token',
+                scope: ['dentist']
+            },
+			handler: handlers.getAllMorphologicalCollectionData,
+			validate: {
+			  	query: false,
+			    params: false, 
+			    payload: false
+			},
+			response: {
+				schema: Joi.array().items(morphologicaldata)
+			},
+			description: 'Get all morphological data'
+	    }
+	});
+
+
+	server.route({
+		method: 'GET',
+		path: "/dcbia/morphological/collection/data/{id}",
+		config: {
+			auth: {
+                strategy: 'token',
+                scope: ['dentist']
+            },
+			handler: handlers.getMorphologicalCollectionData,
+			validate: {
+			  	query: false,
+			    params: {
+			    	id: Joi.string().alphanum().required()
+			    }, 
+			    payload: false
+			},
+			response: {
+				schema: Joi.array().items(morphologicaldata)
+			},
+			description: 'Get the job document posted to the database'
+	    }
+	});
+
+
+	server.route({
+		path: '/dcbia/morphological/data',
+		method: 'POST',
+		config: {
+			auth: {
+                strategy: 'token',
+                scope: ['dentist']
+            },
+			handler: handlers.createDocument,
+			validate: {
+				query: false,
+		        payload: morphologicaldatapost,
+		        params: false
+			},
+			payload:{
+				output: 'data'
+			},
+			description: 'This route will be used to post job documents to the couch database.'
+		}
+	});
+
+	server.route({
+		method: 'GET',
+		path: "/dcbia/morphological/data/{id}",
+		config: {
+			auth: {
+                strategy: 'token',
+                scope: ['dentist']
+            },
+			handler: handlers.getDocument,
+			validate: {
+			  	query: false,
+			    params: {
+			    	id: Joi.string().alphanum().required()
+			    }, 
+			    payload: false
+			},
+			response: {
+				schema: morphologicaldata
+			},
+			description: 'Get the job document posted to the database'
+	    }
+	});
+
+	server.route({
+		path: '/dcbia/morphological/data/{id}',
+		method: 'DELETE',
+		config: {
+			auth: {
+                strategy: 'token',
+                scope: ['dentist']
+            },
+			handler: handlers.deleteDocument,
+			validate: {
+			  	query: false,
+			    params: {
+			    	id: Joi.string().alphanum().required()
+			    }, 
+			    payload: false
+			},
+			payload:{
+				output: 'data'
+			},
+			description: 'This route will be used to delete job documents from the database'
+		}
+	});
+
+	server.route({
+		path: '/dcbia/morphological/data',
+		method: 'PUT',
+		config: {
+			auth: {
+                strategy: 'token',
+                scope: ['dentist']
+            },
+			handler: handlers.updateDocument,
+			validate: {
+				query: false,
+		        payload: morphologicaldata,
 		        params: false
 			},
 			payload:{

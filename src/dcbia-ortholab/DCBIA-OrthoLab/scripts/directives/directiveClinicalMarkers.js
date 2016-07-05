@@ -3,13 +3,12 @@ angular.module('cTRIVIAL')
 
 	function link($scope){
 
-		if(!$scope.formData){
+		if(!$scope.editFields){
 			$scope.formData = {};
-		}
-		if(!$scope.formData.formId){
 			$scope.formData.formId = 'clinicalMarkers';
 			$scope.formData.date = new Date();
 		}
+		
 	}
 	return {
     	restrict : 'E',

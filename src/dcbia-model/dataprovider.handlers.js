@@ -165,7 +165,83 @@ module.exports = function (server, conf) {
 		.then(rep)
 		.catch(function(e){
 			rep(Boom.wrap(e));
+		});
+	}
+
+
+	handler.getMorphologicalCollections = function(req, rep){
+
+		var credentials = req.auth.credentials;
+		var email = credentials.email;
+		
+		var view = '_design/searchMorphologicalData/_view/collectionName?include_docs=true';
+
+		server.methods.dcbia.getView(view)
+		.then(function(rows){
+			var docs = _.pluck(rows, 'doc');
+			var compactdocs = _.compact(docs);
+			return compactdocs;
 		})
+		.then(rep)
+		.catch(function(e){
+			rep(Boom.wrap(e));
+		});
+	
+	}
+
+	handler.getAllMorphologicalCollectionData = function(req, rep){
+		var credentials = req.auth.credentials;
+		var email = credentials.email;
+		
+		var view = '_design/searchMorphologicalData/_view/patientId?include_docs=true';
+
+		server.methods.dcbia.getView(view)
+		.then(function(rows){
+			var docs = _.pluck(rows, 'doc');
+			var compactdocs = _.compact(docs);
+			return compactdocs;
+		})
+		.then(rep)
+		.catch(function(e){
+			rep(Boom.wrap(e));
+		});
+	}
+
+	/*
+	*/
+	handler.getMorphologicalCollectionData = function(req, rep){
+		var credentials = req.auth.credentials;
+		var email = credentials.email;
+		
+		var view = '_design/getMorphologicalDataCollection/_view/items?include_docs=true&key="' + req.params.id + '"';
+
+		server.methods.dcbia.getView(view)
+		.then(function(rows){
+			var docs = _.pluck(rows, 'doc');
+			var compactdocs = _.compact(docs);
+			if(docs.length !== compactdocs.length){
+				return server.methods.dcbia.getDocument(req.params.id)
+				.then(function(col){
+					col.items = _.compact(_.map(rows, function(row){
+						if(row.doc !== null){
+							return row.value;
+						}else{
+							return null;
+						}
+					}));
+					return server.methods.dcbia.uploadDocuments(col)
+					.then(function(){
+						return compactdocs;
+					});
+				});
+			}else{
+				return compactdocs;
+			}
+		})
+		.then(rep)
+		.catch(function(e){
+			rep(Boom.wrap(e));
+		});
 	}
 	
 
