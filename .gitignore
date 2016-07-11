@@ -1,7 +1,8 @@
-conf.my.production.json conf.my.test.json 
-conf.production.json
-conf.test.json
+conf.my.production.json 
+conf.my.test.json 
 all.log
 node_modules
 bower_components
 npm-debug.log
+conf.my.production
+conf.my.test
