@@ -27,6 +27,16 @@
     "couch-provider": "^1.0.2",
     "couch-update-views": "^1.0.4",
     "dcbia-model": "file:src/dcbia-model",
-    "hapi-jwt-couch": "^1.0.11"
+    "dcbia-ortholab": "file:src/dcbia-ortholab",
+    "good": "^6.6.0",
+    "good-console": "^5.3.1",
+    "good-file": "^5.1.2",    
+    "h2o2": "^5.1.0",
+    "hapi": "^13.5.0",
+    "hapi-auth-jwt": "^4.0.0",
+    "hapi-jwt-couch": "^1.0.11",
+    "inert": "^4.0.1",
+    "lout": "^9.0.1",
+    "vision": "^4.1.0"
   }
 }
