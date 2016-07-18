@@ -1,0 +1,12 @@
+{
+    "_id": "_design/searchMorphologicalData",
+    "language": "javascript",
+    "views": {
+        "patientId": {
+            "map": "function(doc) {\n\tif(doc.type === \"morphologicalData\"){\n\t\temit(doc.patientId, doc._id);\t\n\t}\n}\n"
+        },
+        "collectionName": {
+            "map": "function(doc) {\n\tif(doc.type === \"morphologicalDataCollection\"){\n\t\temit(doc.name, doc.items);\t\n\t}\n}\n"
+        }
+    }
+}
