@@ -67,12 +67,28 @@ module.exports = function (server, conf) {
 	handler.addAttachment = function(req, rep){
 		server.methods.dcbia.getDocument(req.params.id)
 		.then(function(doc){
-			return server.methods.dcbia.validateJobOwnership(doc, req.auth.credentials);
-		})
-		.then(function(doc){
 			return server.methods.dcbia.addDocumentAttachment(doc, req.params.name, req.payload);
 		})
 		.then(rep)
+		.catch(function(e){
+			rep(Boom.wrap(e));
+		});
+	}
+
+	/*
+	*/
+	handler.getAttachment = function(req, rep){
+		var docid = req.params.id;
+		var name = req.params.name;
+
+		server.methods.dcbia.getDocument(docid)
+		.then(function(doc){
+			if(doc._attachments && doc._attachments[name]){
+				rep.proxy(server.methods.dcbia.getDocumentURIAttachment(docid + "/" + req.params.name));
+			}else{
+				rep(Boom.notFound(docid + "/" + name));
+			}
+		})
 		.catch(function(e){
 			rep(Boom.wrap(e));
 		});
@@ -242,6 +258,25 @@ module.exports = function (server, conf) {
 		.catch(function(e){
 			rep(Boom.wrap(e));
 		});
+	}
+
+	/*
+	*/
+	handler.getMorphologicalDataByPatientId = function(req, rep){
+		var credentials = req.auth.credentials;
+		var email = credentials.email;
+		
+		var view = '_design/searchMorphologicalData/_view/patientId?include_docs=true&key="' + req.params.id + '"';
+
+		server.methods.dcbia.getView(view)
+		.then(function(rows){
+			var docs = _.pluck(rows, 'doc');
+			rep(docs);
+		})
+		.catch(function(err){
+			rep(Boom.wrap(err));
+		});
+
 	}
 	
 

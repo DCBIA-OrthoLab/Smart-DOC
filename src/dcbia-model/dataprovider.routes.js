@@ -508,6 +508,29 @@ module.exports = function (server, conf) {
 	});
 
 	server.route({
+		method: 'GET',
+		path: "/dcbia/morphological/data/patientId/{id}",
+		config: {
+			auth: {
+                strategy: 'token',
+                scope: ['dentist']
+            },
+			handler: handlers.getMorphologicalDataByPatientId,
+			validate: {
+			  	query: false,
+			    params: {
+			    	id: Joi.string().alphanum().required()
+			    }, 
+			    payload: false
+			},
+			response: {
+				schema: Joi.array(morphologicaldata)
+			},
+			description: 'Get the morphological data by patientId'
+	    }
+	});
+
+	server.route({
 		path: '/dcbia/morphological/data/{id}',
 		method: 'DELETE',
 		config: {
@@ -549,6 +572,27 @@ module.exports = function (server, conf) {
 			},
 			description: 'This route will be used to update a job document in the couch database.'
 		}
+	});
+
+	server.route({
+		method: 'GET',
+		path: "/dcbia/{id}/{name}",
+		config: {
+			auth: {
+                strategy: 'token',
+                scope: ['dentist']
+            },
+			handler: handlers.getAttachment,
+	      	validate: {
+		      	query: false,
+		        params: {
+		        	id: Joi.string().alphanum().required(),
+		        	name: Joi.string().required()
+		        },
+		        payload: false
+		    },
+		    description: 'Get attachment data'
+	    }
 	});
 
 	server.route({
