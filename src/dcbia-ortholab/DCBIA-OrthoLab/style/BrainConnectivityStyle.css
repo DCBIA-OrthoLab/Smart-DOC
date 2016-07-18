@@ -1,3 +1,13 @@
+body {
+    font: 10px sans-serif;
+}
+
+.axis line {
+    fill: none;
+    stroke: black;
+    shape-rendering: crispEdges;
+}
+
 .jobInfo{
   font-size : 12px;
 }
@@ -591,4 +601,25 @@ div.nodeTooltip {
 
 .fdt_mat_input, .json-file-input{
   margin: 2% 2% 2% 2%;
+}
+
+.box {
+  font: 10px sans-serif;
+}
+
+.box line,
+.box rect,
+.box circle {
+  fill: #fff;
+  stroke: #000;
+  stroke-width: 1.5px;
+}
+
+.box .center {
+  stroke-dasharray: 3,3;
+}
+
+.box .outlier {
+  fill: none;
+  stroke: #ccc;
 }

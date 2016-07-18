@@ -81,8 +81,12 @@
 							 	<span class="glyphicon glyphicon-plus-sign"></span>
 							 </button>
 
-							 <button type="button" class="btn btn-default" ng-click="csv.export(collection)">
+							 <button type="button" class="btn btn-default" ng-click="morphologicalDataCollection.download(collection)">
 							 	<span class="glyphicon glyphicon-download"></span>
+							 </button>
+
+							 <button type="button" class="btn btn-danger" ng-click="morphologicalDataCollection.delete(collection)">
+							 	<span class="glyphicon glyphicon-remove"></span>
 							 </button>
 
 							</div>
@@ -97,7 +101,41 @@
 				<div class="row" ng-if="morphologicalDataCollection.section == 0">
 					<div class="panel panel-default">
 			  			<div class="panel-body">
+			  				<table st-table="morphologicalDataCollection.displayedCollection" st-safe-src="morphologicalDataCollection.selectedCollectionData" class="table table-striped">
+								<thead>
+									<tr>
+										<th ng-repeat="key in morphologicalDataCollection.selectedCollectionDataKeys" st-sort="{{key}}">{{key}}</th>
+									</tr>
+									<tr>
+										<th ng-repeat="key in morphologicalDataCollection.selectedCollectionDataKeys">
+											<input st-search="{{key}}" placeholder="search for {{key}}" class="input-sm form-control" type="search"/>
+										</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr ng-repeat="row in morphologicalDataCollection.displayedCollection">
+										<td ng-repeat="key in morphologicalDataCollection.selectedCollectionDataKeys">
+											<div ng-if="_.isArray(row[key])">
+												<button type="button" class="btn btn-default" ng-repeat="att in row[key]" ng-click="morphologicalData.viewAttachment(row, att)">
+													<span class="glyphicon glyphicon-eye"></span>{{att}}
+												</button>
+												
+											</div>
+											<div ng-if="!_.isArray(row[key])">
+												{{row[key]}}
+											</div>
+										</td>
+										<td>
+											<button type="button" class="btn btn-danger" ng-click="clinical.delete(row)">
+											 	<span class="glyphicon glyphicon-remove"></span>
+											 </button>
+										</td>
+									</tr>
+								</tbody>
+							</table>
 
+							<directive-threejs data="morphologicalData.surface" height="400">
+							</directive-threejs>
 			  			</div>
 			  		</div>
 				</div>
@@ -108,11 +146,11 @@
 			  				<div class="panel panel-success">
 							  <div class="panel-body">
 							  	<div class="btn-group">
-									 <button type="button" class="btn btn-default" ng-click="morphologicalData.addMorphologicalData(morphologicalData.data)">
-									 	<span class="glyphicon glyphicon-plus"></span>
+									 <button type="button" class="btn btn-default" ng-click="morphologicalDataCollection.addMorphologicalData()">
+									 	<span class="glyphicon glyphicon-plus"></span>Upload
 									 </button>
 									 <button type="button" class="btn btn-default" ng-click="morphologicalDataCollection.section = -1">
-									 	<span class="glyphicon glyphicon-remove"></span>
+									 	<span class="glyphicon glyphicon-remove"></span>Cancel
 									 </button>
 							  	</div>
 							  

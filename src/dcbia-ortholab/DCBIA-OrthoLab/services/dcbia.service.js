@@ -116,6 +116,20 @@ angular.module('cTRIVIAL')
         data: data
       });
     },
+    addAttachement: function (id, filename, data) {
+      return $http({
+        method: 'PUT',
+        url: '/dcbia/' + id + '/' + filename,
+        data: data
+      });
+    },
+    getAttachement: function (id, filename, responseType) {
+      return $http({
+        method: 'GET',
+        url: '/dcbia/' + id + '/' + filename,
+        responseType: responseType
+      });
+    },
     updateMorphologicalData: function (data) {
       return $http({
         method: 'PUT',
@@ -127,6 +141,12 @@ angular.module('cTRIVIAL')
       return $http({
         method: 'DELETE',
         url: '/dcbia/morphological/data/' + id
+      });
+    },
+    getMorphologicalDataByPatientId: function(id){
+      return $http({
+        method: 'GET',
+        url: '/dcbia/morphological/data/patientId/' + id
       });
     }
   }

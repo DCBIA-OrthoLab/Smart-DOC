@@ -1,2 +1,48 @@
+<div>
+            
+            <div class="input-group">
+                <span class="input-group-addon">
+                    <input type="radio" aria-label="..." ng-model="graph.type" value="0">
+                        </span>
+                <label class="form-control" >Compare two caracteristics</label>
+            </div>
+            <div class="input-group">
+                <span class="input-group-addon">
+                    <input type="radio" aria-label="..." ng-model="graph.type"  value="1">
+                        </span>
+                <label class="form-control" > Display all caracteristics</label>
+            </div>
 
-{{data}}
+</div>
+<div ng-if = "graph.type == 0">
+    <select class="form-control" ng-model="graph.axis.x">
+        <option ng-repeat="key in keys" value={{key}}>{{key}}</option>
+    </select>
+    <select class="form-control" ng-model="graph.axis.y">
+        <option ng-repeat="key in keys" value={{key}}>{{key}}</option>
+    </select>
+</div>
+
+<div ng-if="graph.type == 1">
+    <div class="input-group">
+        <span class="input-group-addon">
+            <input type="checkbox" aria-label="..." ng-model="graph.normalize">
+                </span>
+        <label class="form-control" > Normalize</label>
+    </div>
+
+    <box-plot-chart 
+      data="boxplotdata"
+      height="height"
+      margin="margin"
+      legend-y="legendYBP"
+      legend-x="legendXBP"
+      box-plot-title="titleBP"
+      style="margin: 20px; margin-bottom:50px;"
+    ></box-plot-chart>
+
+    <select class="form-control" ng-options="item as item.label for item in attachments.data" ng-model="attachments.selected"></select>
+
+    <directive-threejs data="attachments.surface" height="400" ng-if="attachments.surface">
+    </directive-threejs>
+</div>
