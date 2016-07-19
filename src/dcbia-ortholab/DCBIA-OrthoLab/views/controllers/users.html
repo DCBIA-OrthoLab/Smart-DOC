@@ -1,0 +1,68 @@
+<navbar></navbar>
+
+<div ng-controller="users"> 
+
+  <div class="row">
+  	<div class="panel panel-info">
+
+	  	<table st-table="displayedUsers" st-safe-src="userdata" class="table table-striped">
+			<thead>
+				<tr>
+					<th >
+						<input st-search="name" placeholder="search for username" class="input-sm form-control" type="search"/>
+					</th>
+					<th>
+						<input st-search="email" placeholder="search for email" class="input-sm form-control" type="search"/>
+					</th>
+					<th>
+						<input st-search="type" placeholder="search for type" class="input-sm form-control" type="search"/>
+					</th>
+					<th colspan="3">
+						<input st-search="scope" placeholder="search for scope" class="input-sm form-control" type="search"/>
+					</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-repeat="row in displayedUsers">
+					<td>{{row.name}}</td>
+					<td>{{row.email}}</td>
+					<td>{{row.type}}</td>
+					<td>
+						<div class="input-group">
+					      <span class="input-group-addon">
+					        <input type="checkbox" aria-label="..." ng-model="userscopes[row._id].default" ng-change="addRemoveScope(row)">
+					      </span>
+					      <label class="form-control" >Default</label>
+					    </div>
+					</td>
+					<td>
+						<div class="input-group">
+					      <span class="input-group-addon">
+					        <input type="checkbox" aria-label="..." ng-model="userscopes[row._id].dentist" ng-change="addRemoveScope(row)">
+					      </span>
+					      <label class="form-control" >Dentist</label>
+					    </div>
+					</td>
+					<td>
+						<div class="input-group">
+					      <span class="input-group-addon">
+					        <input type="checkbox" aria-label="..." ng-model="userscopes[row._id].admin" ng-change="addRemoveScope(row)">
+					      </span>
+					      <label class="form-control" >Admin</label>
+					    </div>
+					</td>
+					<td>
+						<button type="button" class="btn btn-danger" ng-click="deleteUser(row)">
+						 	<span class="glyphicon glyphicon-remove"></span>
+						 </button>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+
+  </div>
+
+  
+
+<div >

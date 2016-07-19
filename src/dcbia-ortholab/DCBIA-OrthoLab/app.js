@@ -31,6 +31,9 @@ config(['$routeProvider', function($routeProvider) {
   .when('/login/reset', {
     templateUrl: 'views/controllers/login.html'
   })
+  .when('/users', {
+    templateUrl: 'views/controllers/users.html'
+  })
   .when('/notFound', {
     templateUrl: 'views/controllers/notFound.html'
   })

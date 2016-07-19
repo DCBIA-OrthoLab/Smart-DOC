@@ -64,6 +64,12 @@ angular.module('cTRIVIAL')
         localStorage.setItem('clusterpost_token', res.data.token);
       });
     }, 
+    getUsers: function(){
+      return $http({
+          method: 'GET',
+          url: '/auth/users'
+        });
+    },
     getUser: function(){
       if($rootScope.user){
         return Promise.resolve($rootScope.user);
@@ -117,6 +123,13 @@ angular.module('cTRIVIAL')
     logout: function(){
       localStorage.removeItem('clusterpost_token');
       $location.path('/');
+    },
+    updateUser: function(user){
+      return $http({
+        method: 'PUT',
+        url: '/auth/users',
+        data: user
+      });
     }
   }
 })
