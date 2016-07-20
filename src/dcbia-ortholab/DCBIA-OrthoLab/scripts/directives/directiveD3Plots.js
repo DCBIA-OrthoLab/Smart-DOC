@@ -13,6 +13,14 @@ angular.module('cTRIVIAL')
 
         $scope.boxplotdata = {};
 
+        $scope.height = 600;
+          $scope.margin = {
+            left: 80,
+            right: 80,
+            top: 40,
+            bottom: 40
+          };
+
         $scope.update = function(){
 
         }
@@ -58,8 +66,6 @@ angular.module('cTRIVIAL')
 
         $scope.$watch('graph.type', function(){
 
-            console.log($scope.graph.type);
-
             var data = $scope.data;
 
             var allkeys = {};
@@ -68,7 +74,12 @@ angular.module('cTRIVIAL')
             delete allkeys._rev;
             delete allkeys.type;
 
-            $scope.keys = _.keys(allkeys);
+            $scope.keys = _.map(_.keys(allkeys),function(v, i){
+              return {
+                id: i, 
+                label: v
+              }
+            });
 
             if($scope.svg != undefined){
                 // !!!!!!!!!!!!!! A modifier !!!!!!!!!!!!!!!!!!!!
@@ -81,7 +92,7 @@ angular.module('cTRIVIAL')
             {
                       if($scope.graph.axis.x != undefined){
                       if($scope.graph.axis.y != undefined){
-                      displayTwoCaracteristics(data, $scope.graph.axis.x, $scope.graph.axis.y)
+                      displayTwoCaracteristics(data, $scope.graph.axis.x.label, $scope.graph.axis.y.label)
                       }
                       }
                       
@@ -98,65 +109,12 @@ angular.module('cTRIVIAL')
           if(!data){
             return;
           }
-          // definition of the size of the window
-          var margin = {top: 80, right: 80, bottom: 80, left: 80};
-          var width = 1000 - margin.left - margin.right;
-          var height = 600 - margin.top - margin.bottom;
 
-          //creation of the drawing windaw
-          $scope.svg = d3.select("#" + $scope.elementId).append("svg")
-          .attr("class", "d3plot")
-          .attr("width", width + margin.left + margin.right)
-          .attr("height", height + margin.top + margin.bottom)
-          .append("g")
-          .attr("class", "graph")
-          .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-          var svg = $scope.svg
-
-          //### X axis ###
-          var x = d3.scale.linear().domain([d3.min(data, function(d) { return d[carac1]; }), d3.max(data, function(d) { return d[carac1]; })]).range([0, width]);
-
-          var xAxis = d3.svg.axis()
-          .scale(x)
-          .orient("bottom");
-
-          svg.append("g")
-          .attr("class", "x axis")
-          .attr("transform", "translate(0," + height + ")")
-          .call(xAxis)
-          .append("text")
-          .attr("x", 6)
-          .attr("dx", width + 40)
-          .attr("dy", "1.22em")
-          .style("text-anchor", "end")
-          .text(carac1);
-
-          //### Y axis ###
-          var y = d3.scale.linear().domain([d3.min(data, function(d) { return d[carac2]; }), d3.max(data, function(d) { return d[carac2]; })]).range([height, 0]);
-
-          var yAxis = d3.svg.axis()
-          .scale(y).
-          orient("left");
-
-          svg.append("g")
-          .attr("class", "y axis")
-          .attr("transform", "translate(0,0)")
-          .call(yAxis)
-          .append("text")
-          .attr("y", 6)
-          .attr("dy", "-2em")
-          .style("text-anchor", "end")
-          .text(carac2);
-
-          // drow circles
-
-          var circ = svg.selectAll(".bar").data(data).enter();
-
-          circ.append("circle")
-          .attr("class", "circl")
-          .attr("cx", function(d) {return x(d[carac1]);})
-          .attr("cy", function(d) {return y(d[carac2]);})
-          .attr("r", 5);
+          $scope.compareTwoVariables = {};
+          $scope.compareTwoVariables.data = data;
+          $scope.compareTwoVariables.carac1 = carac1;
+          $scope.compareTwoVariables.carac2 = carac2;
+          
        }
 
         $scope.circleAction = function(key){
@@ -164,7 +122,11 @@ angular.module('cTRIVIAL')
             return d._id === key;
           });
 
-          dcbia.getMorphologicalDataByPatientId(data.patientId)
+          
+        }
+
+        $scope.getMorphologicalDataByPatientId = function(pid){
+          dcbia.getMorphologicalDataByPatientId(pid)
           .then(function(res){
             $scope.attachments = {};
             $scope.attachments.data = _.flatten(_.map(res.data, function(morphodata){
@@ -189,14 +151,6 @@ angular.module('cTRIVIAL')
           $scope.boxplotdata.data = data;
           $scope.boxplotdata.normalize = $scope.graph.normalize;
           $scope.boxplotdata.circleAction = $scope.circleAction;
-          $scope.width = 1000;
-          $scope.height = 400;
-          $scope.margin = {
-            left: 40,
-            right: 40,
-            top: 40,
-            bottom: 40
-          };
         }
 
         $scope.$watch("graph.normalize", function(){
@@ -212,6 +166,54 @@ angular.module('cTRIVIAL')
           }
           
         })
+
+
+        $scope.multiSeries = {
+          subjects: {},
+          selectedVariables: {}
+        };
+        $scope.multiSeries.addSubjects = function( data){
+          if($scope.multiSeries.subjects === undefined){
+            $scope.multiSeries.subjects = {};
+          }
+          _.each(data, function(d){
+            $scope.multiSeries.subjects[d._id] = true;
+          });
+        }
+
+        $scope.multiSeries.addVariables = function(variables){
+          _.each(variables, function(v){
+            $scope.multiSeries.selectedVariables[v.label] = true;
+          })
+        }
+
+        $scope.multiSeries.update = function(){
+
+          var selectedVariables  = _.compact(_.map($scope.multiSeries.selectedVariables, function(b, v){
+            if(b){
+              return v;
+            }
+          }));
+
+          var data = _.map(selectedVariables, function(v){
+              var obj = {};
+              _.each($scope.multiSeries.subjects, function(b, key){
+                if(b){
+                  var d = _.find($scope.data, function(d){
+                    return key === d._id;
+                  });
+                  obj[d.patientId] = d[v];
+                }
+              });
+              return obj;
+          });
+
+          $scope.multiSeries.data = {};
+          $scope.multiSeries.data.lines = _.compact(data);
+          $scope.multiSeries.data.labels = selectedVariables;
+          $scope.multiSeries.data.action = $scope.getMorphologicalDataByPatientId;
+
+        }
 
     };
 
