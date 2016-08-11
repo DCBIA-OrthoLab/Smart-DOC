@@ -6,3 +6,11 @@ bower_components
 npm-debug.log
 conf.my.production
 conf.my.test
+doc/sharingDataArticle/.gitignore
+doc/sharingDataArticle/article.out
+doc/sharingDataArticle/article.aux
+doc/sharingDataArticle/article.bbl
+doc/sharingDataArticle/article.blg
+doc/sharingDataArticle/article.dvi
+doc/sharingDataArticle/article.log
+doc/sharingDataArticle/article.ps
