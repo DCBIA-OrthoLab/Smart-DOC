@@ -1,5 +1,4 @@
-
-angular.module('cTRIVIAL')
+angular.module('jwt-user-login')
 .directive('userLogin', function($routeParams, $location, $rootScope, clusterauth){
 	function link($scope,$attrs,$filter){
 	
@@ -115,7 +114,7 @@ angular.module('cTRIVIAL')
 return {
     restrict : 'E',
     link : link,
-    templateUrl: 'views/directives/directiveUserLogin.html'
+    templateUrl: 'bower_components/jwt-user-login/jwtUserLogin.template.html'
 }
 
 });

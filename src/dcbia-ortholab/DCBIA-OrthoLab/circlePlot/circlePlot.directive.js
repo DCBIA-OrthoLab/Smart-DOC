@@ -1,4 +1,4 @@
-angular.module('cTRIVIAL')
+angular.module('circle-plot')
 .directive('circlePlot',function($routeParams,$location){
 
 	function link($scope,$attrs,$filter){
@@ -1272,7 +1272,7 @@ $scope.packageImports = function (nodes, threshold) {
     	plotData : "="
     },
     link : link,
-    templateUrl: 'views/directives/directiveCirclePlotTemplate.html'
+    templateUrl: 'bower_components/circle-plot/circlePlot.template.html'
 
 
   }

@@ -1,0 +1,22 @@
+{
+  "name": "d3-plots",
+  "homepage": "https://github.com/ClementMirabel/shiny-tooth",
+  "description": "",
+  "main": "d3Plots.module.js",
+  "keywords": [
+    "d3",
+    "plot"
+  ],
+  "authors": [
+    "clement.mirabel@gmail.com"
+  ],
+  "license": "Apache-2.0",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}

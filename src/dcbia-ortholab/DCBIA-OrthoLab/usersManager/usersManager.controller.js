@@ -1,5 +1,5 @@
 
-angular.module('cTRIVIAL')
+angular.module('users-manager')
 .controller('users', ['$scope','$http', '$filter', 'dcbia', 'clusterauth', function($scope, $http, $filter, dcbia, clusterauth) {
 
 	$scope.userscopes = {};

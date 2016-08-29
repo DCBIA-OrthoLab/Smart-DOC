@@ -40,41 +40,58 @@
   <script src="bower_components/three.js/build/three.min.js" ></script>
   <script src="bower_components/three.js/examples/js/controls/TrackballControls.js" ></script>
   <script src="bower_components/three.js/examples/js/loaders/VTKLoader.js" ></script>
-    
-   
-  
 
-  
 
   <!-- Application scripts -->
   <script src="app.js"></script>
+
+
+  <!-- Modules --> 
+  <script src="bower_components/diagnostic-temporo-mandibular/diagnosticTemporoMandibular.module.js"></script>
+  <script src="bower_components/jwt-user-login/jwtUserLogin.module.js"></script>
+  <script src="bower_components/nav-bar/navBar.module.js"></script>
+  <script src="bower_components/clinical-markers/clinicalMarkers.module.js"></script>
+  <script src="bower_components/users-manager/usersManager.module.js"></script>
+  <script src="bower_components/d3-plots/d3Plots.module.js"></script>
+  <script src="bower_components/morphological-data/morphologicalData.module.js"></script>
+  <script src="bower_components/clinical-data/clinicalData.module.js"></script>
+  <script src="bower_components/circle-plot/circlePlot.module.js"></script>
+  <script src="bower_components/box-plot-chart/boxPlot.module.js"></script>
+  <script src="bower_components/home/home.module.js"></script>
+
+
   <!-- Services --> 
-  
   <script src="services/cluster.service.js"></script>
-  <script src="services/dcbia.service.js"></script>
-  <script src="services/cluster.auth.js"></script>
+  <script src="services/dcbia.service.js"></script>  
+  <script src="bower_components/jwt-user-login/jwtUserLogin.service.js"></script>
+
+
   <!-- Controllers --> 
-  <script src="scripts/controllers/home.js"></script>
-  <script src="scripts/controllers/clinicalData.js"></script>
-  <script src="scripts/controllers/morphologicalData.js"></script>
-  <script src="scripts/controllers/users.js"></script>
+  <script src="bower_components/users-manager/usersManager.controller.js"></script>
+  <script src="bower_components/morphological-data/morphologicalData.controller.js"></script>
+  <script src="bower_components/clinical-data/clinicalData.controller.js"></script>   
+  <script src="bower_components/home/home.controller.js"></script>
+
+
   <!-- Directives --> 
-  <script src="scripts/directives/directiveUserLogin.js"></script>
-  <script src="scripts/directives/directiveNavbar.js"></script>
-  <script src="scripts/directives/directiveCirclePlot.js"></script>
-  <script src="scripts/directives/directiveD3Plots.js"></script>
   <script src="scripts/directives/directiveCompareTwoVariables.js"></script>
   <script src="scripts/directives/box.js"></script>
-  <script src="scripts/directives/boxPlot-chart.js"></script>
   <script src="scripts/directives/directiveThreejs.js"></script>
   <script src="scripts/directives/directiveMultiSeriesLineChart.js"></script>
+  <script src="bower_components/jwt-user-login/jwtUserLogin.directive.js"></script>
+  <script src="bower_components/nav-bar/navBar.directive.js"></script>
+  <script src="bower_components/d3-plots/d3Plots.directive.js"></script>
+  <script src="bower_components/circle-plot/circlePlot.directive.js"></script>
+  <script src="bower_components/box-plot-chart/boxPlot.directive.js"></script>
 
 
-  <!-- Directives Forms --> 
-  <script src="scripts/directives/directiveClinicalMarkers.js"></script>
-  <script src="scripts/directives/directiveDiagnosticTemporoMandibular.js"></script>
-  <script src="scripts/directives/directiveTMJSurvey.js"></script>
+  <!-- Directives Forms -->
+<!--  <script src="scripts/directives/directiveClinicalMarkers.js"></script>-->
+<!--  <script src="scripts/directives/directiveDiagnosticTemporoMandibular.js"></script>-->
+<!--  <script src="scripts/directives/directiveTMJSurvey.js"></script>-->
 
+  <script src="bower_components/diagnostic-temporo-mandibular/diagnosticTemporoMandibular.directive.js"></script>
+  <script src="bower_components/clinical-markers/clinicalMarkers.directive.js"></script>
 
 </body>
 </html>

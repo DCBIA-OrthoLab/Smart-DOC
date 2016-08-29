@@ -1,4 +1,4 @@
-angular.module('cTRIVIAL')
+angular.module('diagnostic-temporo-mandibular')
 .directive('diagnosticTemporoMandibular', function($rootScope, $location, $anchorScroll) {
 
 	function link($scope){
@@ -25,7 +25,7 @@ angular.module('cTRIVIAL')
 	    	formData : "=",
 	    	editFields: "="
 	    },
-    	templateUrl: 'views/directives/directiveDiagnosticTemporoMandibular.html'
+    	templateUrl: 'bower_components/diagnostic-temporo-mandibular/diagnosticTemporoMandibular.template.html'
 	}
 
 

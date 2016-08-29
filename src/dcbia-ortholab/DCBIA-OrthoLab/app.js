@@ -5,7 +5,18 @@ angular.module('cTRIVIAL', [
   'ngRoute',
   'ui.bootstrap',
   'smart-table',
-  'file-model'
+  'file-model',
+  'jwt-user-login',
+  'nav-bar',
+  'clinical-markers',
+  'diagnostic-temporo-mandibular',
+  'users-manager',
+  'd3-plots',
+  'morphological-data',
+  'clinical-data',
+  'circle-plot',
+  'box-plot-chart',
+  'home'
 ]).
 config(['$routeProvider', function($routeProvider) {
   $routeProvider
@@ -13,17 +24,17 @@ config(['$routeProvider', function($routeProvider) {
     redirectTo: '/login'
   })
   .when('/login', {
-    templateUrl: 'views/controllers/login.html'
+    templateUrl: 'dcbia-app/login.html'
   })
   .when('/home', {
-    templateUrl: 'views/controllers/home.html'
+    templateUrl: 'bower_components/home/home.template.html'
   })
   .when('/clinicalData', {
-    templateUrl: 'views/controllers/clinicalData.html',
+    templateUrl: 'bower_components/clinical-data/clinicalData.template.html',
     reloadOnSearch: false
   })
   .when('/morphologicalData', {
-    templateUrl: 'views/controllers/morphologicalData.html'
+    templateUrl: 'bower_components/morphological-data/morphologicalData.template.html'
   })
   .when('/importClinicalData', {
     templateUrl: 'views/controllers/importClinicalData.html'
@@ -32,7 +43,7 @@ config(['$routeProvider', function($routeProvider) {
     templateUrl: 'views/controllers/login.html'
   })
   .when('/users', {
-    templateUrl: 'views/controllers/users.html'
+    templateUrl: 'bower_components/users-manager/usersManager.template.html'
   })
   .when('/notFound', {
     templateUrl: 'views/controllers/notFound.html'

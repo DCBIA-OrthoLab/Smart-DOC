@@ -1,0 +1,22 @@
+{
+  "name": "nav-bar",
+  "homepage": "https://github.com/ClementMirabel/shiny-tooth",
+  "description": "Navigation using a navigation bar. Giving access to every pages of the website and the indication of the logged user.",
+  "main": "navBar.module.js",
+  "keywords": [
+    "navigation",
+    "navbar"
+  ],
+  "authors": [
+    "clement.mirabel@gmail.com"
+  ],
+  "license": "Apache-2.0",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}

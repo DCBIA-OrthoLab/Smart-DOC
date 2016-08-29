@@ -1,5 +1,5 @@
 
-angular.module('cTRIVIAL')
+angular.module('nav-bar')
 .directive('navbar', function($routeParams, $location, $rootScope, clusterauth){
 
 	function link($scope,$attrs,$filter){
@@ -29,7 +29,7 @@ angular.module('cTRIVIAL')
 	return {
     	restrict : 'E',
     	link : link,
-    	templateUrl: 'views/directives/directiveNavbar.html'
+    	templateUrl: 'bower_components/nav-bar/navBar.template.html'
 	}
 
 });

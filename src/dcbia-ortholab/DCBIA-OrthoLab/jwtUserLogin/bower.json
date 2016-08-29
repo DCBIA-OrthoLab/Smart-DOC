@@ -1,0 +1,22 @@
+{
+  "name": "jwt-user-login",
+  "homepage": "https://github.com/ClementMirabel/shiny-tooth",
+  "description": "User login using JSON Web Tokens. The directive displays fields to input username and password and stores a JWT in localStorage",
+  "main": "jwtUserLogin.module.js",
+  "keywords": [
+    "JWT",
+    "login"
+  ],
+  "authors": [
+    "clement.mirabel@gmail.com"
+  ],
+  "license": "Apache-2.0",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}

@@ -1,4 +1,4 @@
-angular.module('cTRIVIAL')
+angular.module('box-plot-chart')
 .directive('boxPlotChart', function($compile, $rootScope){
     
     return {

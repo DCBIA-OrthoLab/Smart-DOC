@@ -1,0 +1,22 @@
+{
+  "name": "users-manager",
+  "homepage": "https://github.com/ClementMirabel/shiny-tooth",
+  "description": "Using filters and checkboxes. Enable the admin users to remove other users or manage their scope.",
+  "main": "usersManager.module.js",
+  "keywords": [
+    "users",
+    "manage"
+  ],
+  "authors": [
+    "clement.mirabel@gmail.com"
+  ],
+  "license": "Apache-2.0",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
