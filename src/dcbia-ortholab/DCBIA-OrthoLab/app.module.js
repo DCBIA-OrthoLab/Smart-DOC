@@ -40,13 +40,13 @@ config(['$routeProvider', function($routeProvider) {
     templateUrl: 'views/controllers/importClinicalData.html'
   })
   .when('/login/reset', {
-    templateUrl: 'views/controllers/login.html'
+    templateUrl: 'home/login.html'
   })
   .when('/users', {
     templateUrl: 'bower_components/users-manager/usersManager.template.html'
   })
   .when('/notFound', {
-    templateUrl: 'views/controllers/notFound.html'
+    templateUrl: 'home/notFound.html'
   })
   .otherwise({redirectTo: '/home'});
 }]);
