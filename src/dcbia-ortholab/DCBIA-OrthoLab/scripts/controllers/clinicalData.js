@@ -152,12 +152,34 @@ angular.module('cTRIVIAL')
 		});
 	}
 
+	$scope.clinicalDataCollection.selectForm = function(formId){
+		if($scope.clinicalDataCollection.selectedForm === -1){
+			$scope.clinicalDataCollection.selectedForm = formId;
+		}else if($scope.clinicalDataCollection.selectedForm !== formId && confirm("You will lose the current changes in this form. Do you want to continue?")){
+			$scope.clinicalDataCollection.selectedForm = formId;
+		}
+	}
+
 	$scope.clinicalDataCollection.getClinicalDataCollections();
 
 
 	$scope.clinical = {
 		data: {}
 	};
+
+	$scope.clinical.clearForm = function(force){
+		var tempId = $scope.clinical.data.formId;
+		var clear = false;
+		if(!force){
+			force = confirm("Do you want to clear the current changes?");
+		}
+		if(force){
+			$scope.clinical.data = {};
+			$scope.clinical.data.formId = tempId;
+			$scope.clinical.data.date = new Date();
+		}
+		
+	}
 
 	$scope.clinical.create = function(){
 		var selectedCollection = $scope.clinicalDataCollection.selectedCollection;

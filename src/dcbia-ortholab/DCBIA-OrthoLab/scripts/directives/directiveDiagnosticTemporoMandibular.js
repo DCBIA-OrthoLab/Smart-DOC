@@ -3,7 +3,7 @@ angular.module('cTRIVIAL')
 
 	function link($scope){
 		
-		if(!$scope.editFields){
+		if(!$scope.formData || ($scope.formData && $scope.formData.formId !== 'diagnosticTemporoMandibular')){
 			$scope.formData = {};
 			$scope.formData.formId = 'diagnosticTemporoMandibular';
 			$scope.formData.date = new Date();

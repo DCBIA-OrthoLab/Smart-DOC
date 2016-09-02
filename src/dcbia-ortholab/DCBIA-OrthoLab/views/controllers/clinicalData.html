@@ -157,8 +157,9 @@
 		  			</div>
 		  			<div class="panel panel-default">
 		  				<div class="panel-body">
-		  					<clinical-markers form-data="clinical.dataEdit" edit-fields="true" ng-if="clinical.dataEdit.formId == 'clinicalMarkers'"></clinical-markers>
-		  					<diagnostic-temporo-mandibular form-data="clinical.dataEdit" edit-fields="true" ng-if="clinical.dataEdit.formId == 'diagnosticTemporoMandibular'"></diagnostic-temporo-mandibular>
+		  					<clinical-markers form-data="clinical.dataEdit" ng-if="clinical.dataEdit.formId == 'clinicalMarkers'"></clinical-markers>
+		  					<diagnostic-temporo-mandibular form-data="clinical.dataEdit" ng-if="clinical.dataEdit.formId == 'diagnosticTemporoMandibular'"></diagnostic-temporo-mandibular>
+		  					<tmj-survey form-data="clinical.dataEdit" ng-if="clinical.dataEdit.formId == 'TMJSurvey'"></tmj-survey>
 		  				</div>
 		  			</div>
 
@@ -187,22 +188,27 @@
 			  <div class="panel-body">
 		  		<div class="btn-group">
 
-					 <button type="button" class="btn btn-default" ng-click="clinicalDataCollection.selectedForm = 0">
+					 <button type="button" class="btn btn-default" ng-click="clinicalDataCollection.selectForm(0)">
 					 	<span class="glyphicon glyphicon-list-alt"></span>
 					 	Clinical questionnaire
 					 </button>
 
-					 <button type="button" class="btn btn-default" ng-click="clinicalDataCollection.selectedForm = 1">
+					 <button type="button" class="btn btn-default" ng-click="clinicalDataCollection.selectForm(1)">
 					 	<span class="glyphicon glyphicon-list-alt"></span>
 					 	Quality of life
 					 </button>
 
-					 <label class="btn btn-default" for="clinicalData-file-selector" ng-click="clinicalDataCollection.selectedForm = -1;">
+					 <button type="button" class="btn btn-default" ng-click="clinicalDataCollection.selectForm(2)">
+					 	<span class="glyphicon glyphicon-list-alt"></span>
+					 	TMJ Survey
+					 </button>
+
+					 <label class="btn btn-default" for="clinicalData-file-selector" ng-click="clinicalDataCollection.selectedForm = 100">
 					 	<span class="glyphicon glyphicon-folder-open"></span>
 					    <input id="clinicalData-file-selector" file-model='csv.file' type="file" style="display:none;">
 					</label>
 
-					 <button type="button" class="btn btn-default" ng-click="clinicalDataCollection.showAddClinicalData = false">
+					 <button type="button" class="btn btn-default" ng-click="clinicalDataCollection.showAddClinicalData = false;clinicalDataCollection.selectedForm = -1">
 					 	<span class="glyphicon glyphicon-remove"></span>
 					 	Cancel
 					 </button>
@@ -213,15 +219,20 @@
 		  	<div class="panel panel-info" ng-if="clinicalDataCollection.selectedForm !== -1">
 			  <div class="panel-body">
 			  	<div class="btn-group">
-					<button type="button" class="btn btn-default" ng-click="clinical.create()">
+			  		<button type="button" class="btn btn-default" ng-click="clinical.clearForm(false)">
+						<span class="glyphicon glyphicon-minus"></span>
+						Clear
+					</button>
+					<button type="button" class="btn btn-default" ng-click="clinical.create();clinical.clearForm(true);clinicalDataCollection.selectedForm = -1">
 						<span class="glyphicon glyphicon-save"></span>
 						Submit
 					</button>
 				</div>
 				<clinical-markers form-data="clinical.data" ng-if="clinicalDataCollection.selectedForm == 0"></clinical-markers>
 				<diagnostic-temporo-mandibular form-data="clinical.data" ng-if="clinicalDataCollection.selectedForm == 1"></diagnostic-temporo-mandibular>
+				<tmj-survey form-data="clinical.data" ng-if="clinicalDataCollection.selectedForm == 2"></tmj-survey>
 				<div class="btn-group">
-					<button type="button" class="btn btn-default" ng-click="clinical.create()">
+					<button type="button" class="btn btn-default" ng-click="clinical.create();clinical.clearForm(true);clinicalDataCollection.selectedForm = -1">
 						<span class="glyphicon glyphicon-save"></span>
 						Submit
 					</button>
@@ -229,7 +240,7 @@
 			  </div>
 			</div>
 
-			<div class="panel panel-info" style="overflow:scroll" ng-if="clinicalDataCollection.selectedForm == -1 && csv.selectedCollectionData">
+			<div class="panel panel-info" style="overflow:scroll" ng-if="clinicalDataCollection.selectedForm == 100 && csv.selectedCollectionData">
 		  		<div class="panel-body">
 
 		  			<div class="btn-group col-md-3">
