@@ -23,6 +23,12 @@
 	    <h3 class="panel-title">Would you say your health in general is excellent, very good, good, fair or poor?</h3>
 	  </div>
 	  <div class="panel-body">
+	  	<div class="input-group">
+	      <span class="input-group-addon">
+	        <input type="radio" aria-label="..." ng-model="formData.generalHealth" value="0">
+	      </span>
+	      <label class="form-control" >N/A</label>
+	    </div>
 	    <div class="input-group">
 	      <span class="input-group-addon">
 	        <input type="radio" aria-label="..." ng-model="formData.generalHealth" value="1">
@@ -61,6 +67,12 @@
 			<h3 class="panel-title">Would you say your oral health in general is excellent, very good, good, fair or poor?</h3>
 		</div>
 		<div class="panel-body">
+			<div class="input-group">
+		      <span class="input-group-addon">
+		        <input type="radio" aria-label="..." ng-model="formData.generalOralHealth" value="0">
+		      </span>
+		      <label class="form-control" >N/A</label>
+		    </div>
 			<div class="input-group">
 		      <span class="input-group-addon">
 		        <input type="radio" aria-label="..." ng-model="formData.generalOralHealth" value="1">
@@ -145,6 +157,12 @@
 		<div class="panel-body">
 			<div class="input-group">
 		      <span class="input-group-addon">
+		        <input type="radio" aria-label="..." ng-model="formData.facialPainPersistentRecurrentOneTime" value="0">
+		      </span>
+		      <label class="form-control" >N/A</label>
+		    </div>
+			<div class="input-group">
+		      <span class="input-group-addon">
 		        <input type="radio" aria-label="..." ng-model="formData.facialPainPersistentRecurrentOneTime" value="1">
 		      </span>
 		      <label class="form-control" >Persistent</label>
@@ -169,6 +187,12 @@
 			<h3 class="panel-title">Have you ever gone to a physician, dentist, chiropractor or other health professional for facial ache or pain?</h3>
 		</div>
 		<div class="panel-body">
+			<div class="input-group">
+		      <span class="input-group-addon">
+		        <input type="radio" aria-label="..." ng-model="formData.goneToHealthProfessional" value="0">
+		      </span>
+		      <label class="form-control" >N/A</label>
+		    </div>
 			<div class="input-group">
 		      <span class="input-group-addon">
 		        <input type="radio" aria-label="..." ng-model="formData.goneToHealthProfessional" value="1">
@@ -1779,7 +1803,7 @@
 						<label class="form-control" >3</label>
 
 						<span class="input-group-addon">
-							<input type="radio" aria-label="..." ng-model="formData.lastMonthDistressed" value="4">
+							<input type="radio" aria-label="..." ng-model="formData.lastMonthDistressedNumbnessOrTingling" value="4">
 						</span>
 						<label class="form-control" >4</label>
 				      
@@ -2228,31 +2252,37 @@
 		<div class="panel-body">
 			<div class="input-group">
 		      <span class="input-group-addon">
+		        <input type="radio" aria-label="..." ng-model="formData.takingCareOfHealthOverall" value="0">
+		      </span>
+		      <label class="form-control" >N/A</label>
+		    </div>
+			<div class="input-group">
+		      <span class="input-group-addon">
 		        <input type="radio" aria-label="..." ng-model="formData.takingCareOfHealthOverall" value="1">
 		      </span>
 		      <label class="form-control" >Excellent</label>
 		    </div>
 		    <div class="input-group">
 		      <span class="input-group-addon">
-		        <input type="radio" aria-label="..." ng-model="formData.generalHealth"  value="2">
+		        <input type="radio" aria-label="..." ng-model="formData.takingCareOfHealthOverall"  value="2">
 		      </span>
 		      <label class="form-control" >Very good</label>
 		    </div>
 			<div class="input-group">
 		      <span class="input-group-addon">
-		        <input type="radio" aria-label="..." ng-model="formData.generalHealth"  value="3">
+		        <input type="radio" aria-label="..." ng-model="formData.takingCareOfHealthOverall"  value="3">
 		      </span>
 		      <label class="form-control" >Good</label>
 		    </div>
 		    <div class="input-group">
 		      <span class="input-group-addon">
-		        <input type="radio" aria-label="..." ng-model="formData.generalHealth"  value="4">
+		        <input type="radio" aria-label="..." ng-model="formData.takingCareOfHealthOverall"  value="4">
 		      </span>
 		      <label class="form-control" >Fair</label>
 		    </div>
 		    <div class="input-group">
 		      <span class="input-group-addon">
-		        <input type="radio" aria-label="..." ng-model="formData.generalHealth"  value="5">
+		        <input type="radio" aria-label="..." ng-model="formData.takingCareOfHealthOverall"  value="5">
 		      </span>
 		      <label class="form-control" >Poor</label>
 		    </div>
@@ -2264,6 +2294,12 @@
 			<h3 class="panel-title">How good a job do you feel you are doing in taking care of your oral health?</h3>
 		</div>
 		<div class="panel-body">
+			<div class="input-group">
+		      <span class="input-group-addon">
+		        <input type="radio" aria-label="..." ng-model="formData.takingCareOfOralHealth" value="0">
+		      </span>
+		      <label class="form-control" >N/A</label>
+		    </div>
 			<div class="input-group">
 		      <span class="input-group-addon">
 		        <input type="radio" aria-label="..." ng-model="formData.takingCareOfOralHealth" value="1">
@@ -2304,25 +2340,25 @@
 	  <div class="panel-body">
 	    <div class="input-group">
 	      <span class="input-group-addon">
-	        <input type="radio" aria-label="..." ng-model="formData.painLocation" value="None">
+	        <input type="radio" aria-label="..." ng-model="formData.painLocation" value="0">
 	      </span>
 	      <label class="form-control" >None</label>
 	    </div>
 	    <div class="input-group">
 	      <span class="input-group-addon">
-	        <input type="radio" aria-label="..." ng-model="formData.painLocation"  value="Right">
+	        <input type="radio" aria-label="..." ng-model="formData.painLocation"  value="1">
 	      </span>
 	      <label class="form-control" >Right</label>
 	    </div>
 		<div class="input-group">
 	      <span class="input-group-addon">
-	        <input type="radio" aria-label="..." ng-model="formData.painLocation"  value="Left">
+	        <input type="radio" aria-label="..." ng-model="formData.painLocation"  value="2">
 	      </span>
 	      <label class="form-control" >Left</label>
 	    </div>
 	    <div class="input-group">
 	      <span class="input-group-addon">
-	        <input type="radio" aria-label="..." ng-model="formData.painLocation"  value="Both">
+	        <input type="radio" aria-label="..." ng-model="formData.painLocation"  value="3">
 	      </span>
 	      <label class="form-control" >Both</label>
 	    </div>
