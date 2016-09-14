@@ -1,4 +1,4 @@
-angular.module('cTRIVIAL')
+angular.module('tmj-survey')
 .directive('tmjSurvey', function($rootScope, $location, $anchorScroll) {
 
 	function link($scope){
@@ -25,7 +25,7 @@ angular.module('cTRIVIAL')
 	    	formData : "=",
 	    	editFields: "="
 	    },
-    	templateUrl: 'views/directives/directiveTMJSurvey.html'
+    	templateUrl: 'bower_components/tmj-survey/TMJSurvey.template.html'
 	}
 
 
