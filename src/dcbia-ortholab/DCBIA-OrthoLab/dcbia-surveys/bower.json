@@ -1,14 +1,15 @@
 {
-  "name": "tmj-survey",
-  "homepage": "https://github.com/ClementMirabel/shiny-tooth",
+  "name": "dcbia-surveys",
+  "homepage": "https://github.com/DCBIA/shiny-tooth",
   "description": "A form to fill in order to collect information about TMJ.",
   "main": "TMJSurvey.module.js",
   "keywords": [
-    "form",
-    "TMJ"
+    "forms",
+    "survey",
+    "data acquisition"
   ],
   "authors": [
-    "clement.mirabel@gmail.com"
+    "clement.mirabel@gmail.com", "juanprietob@gmail.com"
   ],
   "license": "Apache-2.0",
   "private": true,

@@ -1,4 +1,4 @@
-angular.module('clinical-markers')
+angular.module('dcbia-surveys')
 .directive('clinicalMarkers', function($rootScope, $location) {
 
 	function link($scope){

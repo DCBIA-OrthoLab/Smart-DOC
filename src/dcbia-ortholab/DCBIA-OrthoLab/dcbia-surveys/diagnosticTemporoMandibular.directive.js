@@ -1,4 +1,4 @@
-angular.module('diagnostic-temporo-mandibular')
+angular.module('dcbia-surveys')
 .directive('diagnosticTemporoMandibular', function($rootScope, $location, $anchorScroll) {
 
 	function link($scope){

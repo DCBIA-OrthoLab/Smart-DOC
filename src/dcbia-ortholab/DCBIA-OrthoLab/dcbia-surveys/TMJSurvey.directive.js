@@ -1,4 +1,4 @@
-angular.module('tmj-survey')
+angular.module('dcbia-surveys')
 .directive('tmjSurvey', function($rootScope, $location, $anchorScroll) {
 
 	function link($scope){
