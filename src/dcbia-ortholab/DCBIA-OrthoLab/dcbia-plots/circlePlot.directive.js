@@ -1,4 +1,4 @@
-angular.module('circle-plot')
+angular.module('dcbia-plots')
 .directive('circlePlot',function($routeParams,$location){
 
 	function link($scope,$attrs,$filter){

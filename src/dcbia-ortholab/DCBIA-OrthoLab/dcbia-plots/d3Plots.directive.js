@@ -1,5 +1,5 @@
 
-angular.module('d3-plots')
+angular.module('dcbia-plots')
 .directive('d3Plots', function($routeParams, $location, $rootScope, clusterauth, dcbia){
 
     function link($scope, element){

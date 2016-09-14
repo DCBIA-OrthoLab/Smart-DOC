@@ -1,1 +1,0 @@
-angular.module('d3-plots', []);
