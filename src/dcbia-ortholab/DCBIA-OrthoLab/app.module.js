@@ -8,8 +8,6 @@ angular.module('cTRIVIAL', [
   'file-model',
   'jwt-user-login',
   'nav-bar',
-  'clinical-markers',
-  'diagnostic-temporo-mandibular',
   'users-manager',
   'd3-plots',
   'morphological-data',
@@ -17,7 +15,7 @@ angular.module('cTRIVIAL', [
   'circle-plot',
   'box-plot-chart',
   'home',
-  'tmj-survey'
+  'dcbia-surveys'
 ]).
 config(['$routeProvider', function($routeProvider) {
   $routeProvider
