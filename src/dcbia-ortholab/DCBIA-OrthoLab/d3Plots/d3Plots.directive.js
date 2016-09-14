@@ -1,5 +1,5 @@
 
-angular.module('cTRIVIAL')
+angular.module('d3-plots')
 .directive('d3Plots', function($routeParams, $location, $rootScope, clusterauth, dcbia){
 
     function link($scope, element){
@@ -223,7 +223,7 @@ angular.module('cTRIVIAL')
         scope: {
             data : "="
         },
-        templateUrl: 'views/directives/directiveD3Plots.html'
+        templateUrl: 'bower_components/d3-plots/d3Plots.template.html'
     }
 
 });

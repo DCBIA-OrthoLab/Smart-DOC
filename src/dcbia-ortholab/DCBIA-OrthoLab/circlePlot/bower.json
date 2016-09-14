@@ -1,0 +1,22 @@
+{
+  "name": "circle-plot",
+  "homepage": "https://github.com/ClementMirabel/shiny-tooth",
+  "description": "",
+  "main": "circlePlot.module.js",
+  "keywords": [
+    "circle",
+    "plot"
+  ],
+  "authors": [
+    "clement.mirabel@gmail.com"
+  ],
+  "license": "Apache-2.0",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}

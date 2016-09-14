@@ -1,0 +1,23 @@
+{
+  "name": "diagnostic-temporo-mandibular",
+  "homepage": "https://github.com/ClementMirabel/shiny-tooth",
+  "description": "A form to fill in order to collection information about clinical data.",
+  "main": "diagnosticTemporoMandibular.module.js",
+  "keywords": [
+    "clinical",
+    "data",
+    "form"
+  ],
+  "authors": [
+    "clement.mirabel@gmail.com"
+  ],
+  "license": "Apache-2.0",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}

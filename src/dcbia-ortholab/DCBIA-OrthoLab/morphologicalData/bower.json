@@ -1,0 +1,23 @@
+{
+  "name": "morphological-data",
+  "homepage": "https://github.com/ClementMirabel/shiny-tooth",
+  "description": "Display of the morphological collections.",
+  "main": "morphologicalData.module.js",
+  "keywords": [
+    "morphological",
+    "data",
+    "collection"
+  ],
+  "authors": [
+    "clement.mirabel@gmail.com"
+  ],
+  "license": "Apache-2.0",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}

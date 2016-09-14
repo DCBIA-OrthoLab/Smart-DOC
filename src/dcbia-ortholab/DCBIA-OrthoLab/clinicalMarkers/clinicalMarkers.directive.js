@@ -1,4 +1,4 @@
-angular.module('cTRIVIAL')
+angular.module('clinical-markers')
 .directive('clinicalMarkers', function($rootScope, $location) {
 
 	function link($scope){
@@ -17,7 +17,7 @@ angular.module('cTRIVIAL')
 	    	formData : "=",
 	    	editFields: "="
 	    },
-    	templateUrl: 'views/directives/directiveClinicalMarkers.html'
+    	templateUrl: 'bower_components/clinical-markers/clinicalMarkers.template.html'
 	}
 
 

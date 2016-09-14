@@ -1,0 +1,22 @@
+{
+  "name": "clinical-markers",
+  "homepage": "https://github.com/ClementMirabel/shiny-tooth",
+  "description": "A form to fill in order to collect information about clinical data.",
+  "main": "clinicalMarkersForm.module.js",
+  "keywords": [
+    "clinical",
+    "form"
+  ],
+  "authors": [
+    "clement.mirabel@gmail.com"
+  ],
+  "license": "Apache-2.0",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
