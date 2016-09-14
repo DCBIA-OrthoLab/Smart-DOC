@@ -1,4 +1,6 @@
-angular.module('dcbia-surveys')
+var dcbiaSurvey = angular.module('dcbia-surveys');
+
+dcbiaSurvey
 .directive('tmjSurvey', function($rootScope, $location, $anchorScroll) {
 
 	function link($scope){
@@ -25,7 +27,7 @@ angular.module('dcbia-surveys')
 	    	formData : "=",
 	    	editFields: "="
 	    },
-    	templateUrl: 'bower_components/tmj-survey/TMJSurvey.template.html'
+    	templateUrl: dcbiaSurvey.paths.root + '/TMJSurvey.template.html'
 	}
 
 
