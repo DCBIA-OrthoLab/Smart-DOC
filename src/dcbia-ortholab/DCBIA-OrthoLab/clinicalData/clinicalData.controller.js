@@ -202,16 +202,21 @@ angular.module('cTRIVIAL')
 	}
 
 	$scope.clinical.deleteAllFiltered = function(clinicalData){
-		Promise.all(_.map(clinicalData, function(item){
-			return dcbia.deleteClinicalData(item._id);
-		}));
+		if(confirm("Do you want to delete the items beign displayed?")){
+			Promise.all(_.map(clinicalData, function(item){
+				return dcbia.deleteClinicalData(item._id);
+			}));
+		}
 	}
 
 	$scope.clinical.delete = function(item){
-		return dcbia.deleteClinicalData(item._id)
-		.then(function(){
-			$scope.clinicalDataCollection.refreshSelectedCollection();
-		});
+		if(confirm("Do you want to delete the current item?")){
+			return dcbia.deleteClinicalData(item._id)
+			.then(function(){
+				$scope.clinicalDataCollection.refreshSelectedCollection();
+			});
+		}
+		
 	}
 
 	$scope.clinical.edit = function(item){
