@@ -16,7 +16,8 @@ angular.module('cTRIVIAL', [
   'clinical-data',
   'circle-plot',
   'box-plot-chart',
-  'home'
+  'home',
+  'tmj-survey'
 ]).
 config(['$routeProvider', function($routeProvider) {
   $routeProvider
