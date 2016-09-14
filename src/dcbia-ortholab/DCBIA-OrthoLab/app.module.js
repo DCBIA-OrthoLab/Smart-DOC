@@ -11,13 +11,11 @@ angular.module('cTRIVIAL', [
   'clinical-markers',
   'diagnostic-temporo-mandibular',
   'users-manager',
-  'd3-plots',
   'morphological-data',
   'clinical-data',
-  'circle-plot',
-  'box-plot-chart',
   'home',
-  'tmj-survey'
+  'tmj-survey',
+  'dcbia-plots'
 ]).
 config(['$routeProvider', function($routeProvider) {
   $routeProvider
