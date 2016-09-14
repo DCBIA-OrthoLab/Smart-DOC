@@ -2451,22 +2451,31 @@
 	  			<input type="radio" aria-label="..." ng-model="formData.openingPattern"  value="0">
 	  		</span>
 	  		<label class="form-control">Straight</label>
-	    </div>
-	    <div class="input-group">
-		    <span class="input-group-addon">
+	  		<span class="input-group-addon">
 					<input type="radio" aria-label="..." ng-model="formData.openingPattern" value="1">
 				</span>
-				<label class="form-control">Right Lateral Deviation (uncorrected) Right Corrected ("S") Deviation</label>
+				<label class="form-control">Uncorrected Right lateral deviation</label>
 			</div>
-			<div class="input-group">
-				<span class="input-group-addon">
+		    <span class="input-group-addon">
 					<input type="radio" aria-label="..." ng-model="formData.openingPattern" value="2">
 				</span>
-				<label class="form-control">Left Lateral Deviation (uncorrected) Left Corrected ("S") Deviation</label>
+				<label class="form-control">Corrected (S) Right lateral deviation</label>
 			</div>
 			<div class="input-group">
 				<span class="input-group-addon">
 					<input type="radio" aria-label="..." ng-model="formData.openingPattern" value="3">
+				</span>
+				<label class="form-control">Uncorrected Left lateral deviation</label>
+			</div>
+			<div class="input-group">
+				<span class="input-group-addon">
+					<input type="radio" aria-label="..." ng-model="formData.openingPattern" value="4">
+				</span>
+				<label class="form-control">Corrected (S) Left lateral deviation</label>
+			</div>
+			<div class="input-group">
+				<span class="input-group-addon">
+					<input type="radio" aria-label="..." ng-model="formData.openingPattern" value="5">
 				</span>
 				<label class="form-control">Other</label>
 				<input type="text" class="form-control" aria-describedby="basic-addon1" ng-model="formData.openingPatternComments">
