@@ -1,7 +1,7 @@
 var dcbiaSurvey = angular.module('dcbia-surveys');
 
 dcbiaSurvey
-.directive('tmjSurvey', function($rootScope, $location, $anchorScroll) {
+.directive('tmjSurvey', function($rootScope, $location, $anchorScroll, clusterauth) {
 
 	function link($scope){
 		
@@ -9,7 +9,6 @@ dcbiaSurvey
 			$scope.formData = {};
 			$scope.formData.formId = 'TMJSurvey';
 			$scope.formData.date = new Date();
-
 
 			//Default values
 			$scope.formData.biteUncomfortable  = 0;
@@ -128,6 +127,11 @@ dcbiaSurvey
 			$scope.formData.excursionsLeftLateral = 0;
 			$scope.formData.excursionsProtrusion = 0;
 			$scope.formData.excursionsMidlineDeviation = 0;
+
+			clusterauth.getUser()
+			.then(function(res){
+				$scope.formData.owner = res.email;
+			})
 		}
 
 		$scope.goToScroll = function(location) {
