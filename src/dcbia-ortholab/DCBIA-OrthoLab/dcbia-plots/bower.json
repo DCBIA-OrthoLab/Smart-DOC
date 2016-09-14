@@ -1,6 +1,6 @@
 {
   "name": "dcbia-plots",
-  "homepage": "https://github.com/ClementMirabel/shiny-tooth",
+  "homepage": "https://github.com/DCBIA/shiny-tooth",
   "description": "",
   "main": "dcbia-plots.module.js",
   "keywords": [
