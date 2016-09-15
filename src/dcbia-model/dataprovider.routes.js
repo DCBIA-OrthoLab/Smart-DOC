@@ -221,7 +221,7 @@ module.exports = function (server, conf) {
 
 	server.route({
 		method: 'GET',
-		path: "/dcbia/morphological/data/owner",
+		path: "/dcbia/clinical/data/owner",
 		config: {
 			auth: {
                 strategy: 'token',
@@ -242,7 +242,7 @@ module.exports = function (server, conf) {
 
 	server.route({
 		method: 'GET',
-		path: "/dcbia/morphological/data/owner/{email}",
+		path: "/dcbia/clinical/data/owner/{email}",
 		config: {
 			auth: {
                 strategy: 'token',
