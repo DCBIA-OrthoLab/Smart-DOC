@@ -219,6 +219,26 @@ module.exports = function (server, conf) {
 	    }
 	});
 
+	server.route({
+		method: 'GET',
+		path: "/dcbia/morphological/data/owner",
+		config: {
+			auth: {
+                strategy: 'token',
+                scope: ['dentist']
+            },
+			handler: handlers.getClinicalDataOwners,
+			validate: {
+			  	query: false,
+			    params: false, 
+			    payload: false
+			},
+			response: {
+				schema: Joi.array().items(clinicaldata)
+			},
+			description: 'Get the job document posted to the database'
+	    }
+	});
 
 	server.route({
 		path: '/dcbia/clinical/data',

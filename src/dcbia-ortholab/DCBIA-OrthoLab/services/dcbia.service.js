@@ -45,6 +45,12 @@ angular.module('cTRIVIAL')
         url: '/dcbia/clinical/collection/data/' + id
       });
     },
+    getClinicalDataOwners: function(){
+      return $http({
+        method: 'GET',
+        url: '/dcbia/clinical/data/owner'
+      });
+    }
     createClinicalData: function (data) {
       return $http({
         method: 'POST',

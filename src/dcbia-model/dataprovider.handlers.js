@@ -184,6 +184,24 @@ module.exports = function (server, conf) {
 		});
 	}
 
+	handler.getClinicalDataOwners = function(req, rep){
+		var credentials = req.auth.credentials;
+		var email = credentials.email;
+
+		var view = '_design/getFormsDoneByUser/_view/items?include_docs=true';
+
+		server.methods.dcbia.getView(view)
+		.then(function(rows){
+			var docs = _.pluck(rows, 'doc');
+			var compactdocs = _.compact(docs);
+			return compactdocs;
+		})
+		.then(rep)
+		.catch(function(e){
+			rep(Boom.wrap(e));
+		});
+	}
+
 
 	handler.getMorphologicalCollections = function(req, rep){
 
