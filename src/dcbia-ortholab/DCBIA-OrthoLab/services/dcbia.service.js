@@ -56,7 +56,7 @@ angular.module('cTRIVIAL')
         method: 'GET',
         url: '/dcbia/clinical/data/owner' + email
       });
-    }
+    },
     createClinicalData: function (data) {
       return $http({
         method: 'POST',
