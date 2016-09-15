@@ -9,13 +9,11 @@ angular.module('cTRIVIAL', [
   'jwt-user-login',
   'nav-bar',
   'users-manager',
-  'd3-plots',
   'morphological-data',
   'clinical-data',
-  'circle-plot',
-  'box-plot-chart',
   'home',
-  'dcbia-surveys'
+  'dcbia-surveys',
+  'dcbia-plots'
 ]).
 config(['$routeProvider', function($routeProvider) {
   $routeProvider

@@ -1,14 +1,14 @@
 {
-  "name": "d3-plots",
-  "homepage": "https://github.com/ClementMirabel/shiny-tooth",
+  "name": "dcbia-plots",
+  "homepage": "https://github.com/DCBIA/shiny-tooth",
   "description": "",
-  "main": "d3Plots.module.js",
+  "main": "dcbia-plots.module.js",
   "keywords": [
     "d3",
-    "plot"
+    "plots"
   ],
   "authors": [
-    "clement.mirabel@gmail.com"
+    "clement.mirabel@gmail.com","juanprietob@gmail.com"
   ],
   "license": "Apache-2.0",
   "private": true,
