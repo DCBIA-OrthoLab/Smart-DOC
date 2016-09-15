@@ -130,7 +130,7 @@ dcbiaSurvey
 
 			clusterauth.getUser()
 			.then(function(res){
-				$scope.formData.owner = res.name;
+				$scope.formData.owner = res.email;
 			})
 		}
 
