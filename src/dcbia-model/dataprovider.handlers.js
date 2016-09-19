@@ -5,6 +5,7 @@ var Boom = require('boom');
 var spawn = require('child_process').spawn;
 var couchUpdateViews = require('couch-update-views');
 var path = require('path');
+var qs = require('querystring');
 
 module.exports = function (server, conf) {
 	
@@ -184,6 +185,33 @@ module.exports = function (server, conf) {
 		});
 	}
 
+	handler.getClinicalDataOwner = function(req, rep){
+		var credentials = req.auth.credentials;
+		var email = credentials.email;
+
+		var useremail = req.query.email;
+
+		var view;
+
+		if(credentials.scope.indexOf('admin') !== -1 && useremail){
+			view = '_design/getFormsDoneByUser/_view/items?key="' + useremail +'"';
+		}else if(credentials.scope.indexOf('admin') !== -1){
+			view = '_design/getFormsDoneByUser/_view/items';
+		}else{
+			view = '_design/getFormsDoneByUser/_view/items?key="' + email +'"';
+		}
+
+		server.methods.dcbia.getView(view)
+		.then(function(rows){
+			var docs = _.pluck(rows, 'value');
+			var compactdocs = _.compact(docs);
+			return compactdocs;
+		})
+		.then(rep)
+		.catch(function(e){
+			rep(Boom.wrap(e));
+		});
+	}
 
 	handler.getMorphologicalCollections = function(req, rep){
 

@@ -64,6 +64,13 @@ module.exports = function (server, conf) {
         	}))
         });
 
+	var dataowned = Joi.object({
+			_id: Joi.string().alphanum().required(),
+			formId: Joi.string().required(),
+			patientId: Joi.any().required(),
+			owner: Joi.string().required()
+		}).unknown();
+
 
 	server.route({
 		path: '/dcbia/clinical/collections',
@@ -219,6 +226,28 @@ module.exports = function (server, conf) {
 	    }
 	});
 
+	server.route({
+		method: 'GET',
+		path: "/dcbia/clinical/data/owner",
+		config: {
+			auth: {
+                strategy: 'token',
+                scope: ['dentist']
+            },
+			handler: handlers.getClinicalDataOwner,
+			validate: {
+			  	query: {
+			    	email: Joi.string().optional()
+			    },
+			    params: false, 
+			    payload: false
+			},
+			response: {
+				schema: Joi.array().items(dataowned)
+			},
+			description: 'Get the job document posted to the database'
+	    }
+	});
 
 	server.route({
 		path: '/dcbia/clinical/data',
