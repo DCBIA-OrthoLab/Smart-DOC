@@ -1,0 +1,9 @@
+{
+    "_id": "_design/getSurvey",
+    "language": "javascript",
+    "views": {
+        "userItems": {
+            "map": "function(doc) {\n\tif(doc.type === \"clinicalData\"){\n\t\temit(doc.owner,{\n\t\t\t\"_id\": doc._id,\n\t\t\t\"formId\": doc.formId,\n\t\t\t\"patientId\": doc.patientId,\n\t\t\t\"owner\": doc.owner\n\t\t});\n\t}\n}"
+        }
+    }
+}
