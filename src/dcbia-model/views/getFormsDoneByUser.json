@@ -1,9 +1,0 @@
-{
-	"_id": "_design/getFormsDoneByUser",
-	"language": "javascript",
-	"views": {
-		"items": {
-			"map": "function(doc) {\n\tif(doc.type === \"clinicalData\"){\n\t\temit(doc.owner, doc);\n\t}\n}"
-		}
-	}
-}
