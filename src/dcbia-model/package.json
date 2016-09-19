@@ -12,7 +12,7 @@
     "joi": "^7.3.0"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "lab -v -m 6000 test.js"
   },
   "keywords": [
     "couchdb",
@@ -22,5 +22,9 @@
     "morphological data"
   ],
   "author": "juanprietob@gmail.com",
-  "license": "Apache-2.0"
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "code": "^3.0.2",
+    "lab": "^11.0.1"
+  }
 }
