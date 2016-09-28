@@ -151,8 +151,12 @@ angular.module('morphological-data')
 	$scope.morphologicalDataCollection.addMorphologicalData = function(){
 		var morphologicalData = {
 			patientId: $scope.morphologicalData.data.patientId,
+			owners: [],
 			type: "morphologicalData"
 		}
+		morphologicalData.owners.push({
+			user: $scope.user.email
+		});
 		dcbia.createMorphologicalData(morphologicalData)
 		.then(function(res){
 			$scope.morphologicalDataCollection.selectedCollection.items.push({
