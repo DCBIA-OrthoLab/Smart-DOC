@@ -149,8 +149,13 @@ angular.module('morphological-data')
 	
 
 	$scope.morphologicalDataCollection.addMorphologicalData = function(){
+		if ($scope.morphologicalData.data.date == undefined) {
+			$scope.morphologicalData.data.date = new Date()
+		}
+		console.log($scope.morphologicalData.data.date)
 		var morphologicalData = {
 			patientId: $scope.morphologicalData.data.patientId,
+			date: $scope.morphologicalData.data.date,
 			owners: [],
 			type: "morphologicalData"
 		}
