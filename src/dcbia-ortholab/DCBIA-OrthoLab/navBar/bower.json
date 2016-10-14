@@ -1,6 +1,6 @@
 {
   "name": "nav-bar",
-  "homepage": "https://github.com/ClementMirabel/shiny-tooth",
+  "homepage": "https://github.com/DCBIA-Ortholab/shiny-tooth",
   "description": "Navigation using a navigation bar. Giving access to every pages of the website and the indication of the logged user.",
   "main": "navBar.module.js",
   "keywords": [
@@ -8,7 +8,8 @@
     "navbar"
   ],
   "authors": [
-    "clement.mirabel@gmail.com"
+    "Juan Carlos Prieto <juanprietob@gmail.com>",
+    "Clement Mirabel <clement.mirabel@gmail.com>"
   ],
   "license": "Apache-2.0",
   "private": true,

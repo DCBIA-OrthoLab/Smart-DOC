@@ -27,11 +27,11 @@ config(['$routeProvider', function($routeProvider) {
     templateUrl: 'bower_components/home/home.template.html'
   })
   .when('/clinicalData', {
-    templateUrl: 'bower_components/clinical-data/clinicalData.template.html',
+    templateUrl: 'bower_components/clinical-data/src/clinicalData.template.html',
     reloadOnSearch: false
   })
   .when('/morphologicalData', {
-    templateUrl: 'bower_components/morphological-data/morphologicalData.template.html'
+    templateUrl: 'bower_components/morphological-data/src/morphologicalData.template.html'
   })
   .when('/importClinicalData', {
     templateUrl: 'views/controllers/importClinicalData.html'
@@ -40,7 +40,7 @@ config(['$routeProvider', function($routeProvider) {
     templateUrl: 'home/login.html'
   })
   .when('/users', {
-    templateUrl: 'bower_components/users-manager/usersManager.template.html'
+    templateUrl: 'bower_components/users-manager/src/usersManager.template.html'
   })
   .when('/notFound', {
     templateUrl: 'home/notFound.html'
