@@ -114,7 +114,7 @@ angular.module('jwt-user-login')
 return {
     restrict : 'E',
     link : link,
-    templateUrl: 'bower_components/jwt-user-login/src/jwtUserLogin.template.html'
+    templateUrl: './src/jwtUserLogin.template.html'
 }
 
 });
