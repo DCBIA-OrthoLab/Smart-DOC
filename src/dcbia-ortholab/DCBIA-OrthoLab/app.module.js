@@ -5,7 +5,7 @@ angular.module('cTRIVIAL', [
   'ngRoute',
   'ui.bootstrap',
   'smart-table',
-  'file-model',
+  'ngFilemodel',
   'jwt-user-login',
   'nav-bar',
   'users-manager',
@@ -24,14 +24,14 @@ config(['$routeProvider', function($routeProvider) {
     templateUrl: 'home/login.html'
   })
   .when('/home', {
-    templateUrl: 'bower_components/home/home.template.html'
+    templateUrl: 'node_modules/home/home.template.html'
   })
   .when('/clinicalData', {
-    templateUrl: 'bower_components/clinical-data/src/clinicalData.template.html',
+    templateUrl: 'node_modules/clinical-data/src/clinicalData.template.html',
     reloadOnSearch: false
   })
   .when('/morphologicalData', {
-    templateUrl: 'bower_components/morphological-data/src/morphologicalData.template.html'
+    templateUrl: 'node_modules/morphological-data/src/morphologicalData.template.html'
   })
   .when('/importClinicalData', {
     templateUrl: 'views/controllers/importClinicalData.html'
@@ -40,7 +40,7 @@ config(['$routeProvider', function($routeProvider) {
     templateUrl: 'home/login.html'
   })
   .when('/users', {
-    templateUrl: 'bower_components/users-manager/src/usersManager.template.html'
+    templateUrl: 'node_modules/users-manager/src/usersManager.template.html'
   })
   .when('/notFound', {
     templateUrl: 'home/notFound.html'

@@ -1,4 +1,4 @@
 var dcbiaPlots = angular.module('dcbia-plots', []);
 dcbiaPlots.paths = {
- 	root: 'bower_components/dcbia-plots/src'
+ 	root: 'node_modules/dcbia-plots/src'
 }

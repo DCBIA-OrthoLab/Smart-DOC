@@ -25,7 +25,7 @@ angular.module('dcbia-surveys')
 	    	formData : "=",
 	    	editFields: "="
 	    },
-    	templateUrl: 'bower_components/diagnostic-temporo-mandibular/diagnosticTemporoMandibular.template.html'
+    	templateUrl: 'node_modules/diagnostic-temporo-mandibular/diagnosticTemporoMandibular.template.html'
 	}
 
 
