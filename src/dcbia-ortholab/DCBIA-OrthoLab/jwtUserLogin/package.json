@@ -1,6 +1,6 @@
 {
   "name": "jwt-user-login",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "User login using JSON Web Tokens. The directive displays fields to input username and password and stores a JWT in localStorage.",
   "main": "jwt-user-login.min.js",
   "scripts": {
