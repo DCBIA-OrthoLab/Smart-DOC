@@ -17,7 +17,7 @@ angular.module('dcbia-surveys')
 	    	formData : "=",
 	    	editFields: "="
 	    },
-    	templateUrl: 'bower_components/clinical-markers/clinicalMarkers.template.html'
+    	templateUrl: 'node_modules/clinical-markers/clinicalMarkers.template.html'
 	}
 
 

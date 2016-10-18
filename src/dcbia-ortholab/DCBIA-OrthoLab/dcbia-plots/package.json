@@ -1,6 +1,6 @@
 {
   "name": "dcbia-plots",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "description": "Regroup some usefull functions in order to plot 3D models.",
   "main": "dcbia-plots.min.js",
   "scripts": {

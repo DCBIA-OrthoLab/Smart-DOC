@@ -1,8 +1,8 @@
 {
-  "name": "dcbia-surveys",
-  "version": "1.0.3",
-  "description": "A form to fill in order to collect information about TMJ.",
-  "main": "dcbia-surveys.min.js",
+  "name": "home",
+  "version": "1.0.0",
+  "description": "dcbia-homepage",
+  "main": "home.module.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -11,15 +11,9 @@
     "url": "git+https://github.com/DCBIA-OrthoLab/shiny-tooth.git"
   },
   "keywords": [
-    "form",
-    "survey",
-    "data",
-    "acquisition"
+    "dashboard"
   ],
-  "author": [
-    "Juan Carlos Prieto <juanprietob@gmail.com>",
-    "Clement Mirabel <clement.mirabel@gmail.com>"
-  ],
+  "author": "Juan Carlos Prieto <juanprietob@gmail.com>",
   "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/DCBIA-OrthoLab/shiny-tooth/issues"

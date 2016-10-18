@@ -29,7 +29,7 @@ angular.module('nav-bar')
 	return {
     	restrict : 'E',
     	link : link,
-    	templateUrl: 'bower_components/nav-bar/src/navBar.template.html'
+    	templateUrl: 'node_modules/nav-bar/src/navBar.template.html'
 	}
 
 });
