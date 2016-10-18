@@ -11,6 +11,7 @@ linkModule(){
 linkModule boxPlot
 linkModule circlePlot
 linkModule clinicalData
+linkModule dcbia-plots
 linkModule d3Plots
 linkModule dcbia-surveys
 linkModule home
