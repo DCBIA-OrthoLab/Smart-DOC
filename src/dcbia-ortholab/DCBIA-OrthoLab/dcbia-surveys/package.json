@@ -1,6 +1,6 @@
 {
   "name": "dcbia-surveys",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "description": "A form to fill in order to collect information about TMJ.",
   "main": "dcbia-surveys.min.js",
   "scripts": {

@@ -1,6 +1,6 @@
 {
   "name": "nav-bar",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "description": "Navigation using a navigation bar. Giving access to every pages of the website and the indication of the logged user.",
   "main": "nav-bar.min.js",
   "scripts": {
