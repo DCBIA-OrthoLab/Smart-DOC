@@ -8,36 +8,56 @@ module.exports = function(grunt) {
                 dest: './src/jwtUserLogin.templates.js'
             }
         },
-        ngAnnotate: {
-		    options: {
-		        singleQuotes: true
-		    },
-            app: {
+        assets:{
+            appJS: ['./src/jwtUserLogin.module.js', 
+            './src/jwtUserLogin.service.js', 
+            './src/jwtUserLogin.directive.js', 
+            './src/jwtUserLogin.templates.js']
+        },
+        concat: {
+            js: { //target
                 files: {
-                    './src/jwtUserLogin.module.minified.js': ['./src/jwtUserLogin.module.js'],
-                    './src/jwtUserLogin.service.minified.js': ['./src/jwtUserLogin.service.js'],
-                    './src/jwtUserLogin.directive.minified.js': ['./src/jwtUserLogin.directive.js'],
-                    './src/jwtUserLogin.templates.minified.js': ['./src/jwtUserLogin.templates.js']
+                    './dist/jwt-user-login.min.js' : '<%= assets.appJS %>'
+                }
+            },
+            dev: {
+                options: {
+                    sourceMap: true
+                },
+                files: {
+                    './dist/jwt-user-login.min.js' : '<%= assets.appJS %>'
                 }
             }
-		},
-		concat: {
-    		js: { //target
-        		src: ['./src/jwtUserLogin.module.minified.js', './src/jwtUserLogin.service.minified.js', './src/jwtUserLogin.directive.minified.js', './src/jwtUserLogin.templates.minified.js'],
-        		dest: './dist/' + name + '.min.js'
-    		},
-            dev: {
-                src: ['./src/jwtUserLogin.module.js', './src/jwtUserLogin.service.js', './src/jwtUserLogin.directive.js', './src/jwtUserLogin.templates.js'],
-                dest: './dist/' + name + '.js',
+        },
+        ngAnnotate: {
+            options: {
+                singleQuotes: true
+            },
+            app: {
+                files: {
+                    './dist/jwt-user-login.min.js': ['./dist/jwt-user-login.min.js']
+                }
             }
-		},
-		uglify: {
-    		js: { //target
-        		src: ['./dist/' + name + '.min.js'],
-        		dest: './dist/' + name + '.min.js'
-    		}
-		},
-        clean: ['./src/*.minified.js', './src/jwtUserLogin.templates.js']   
+        },
+        uglify: {
+            prod: {
+                files: {
+                    './dist/jwt-user-login.min.js': ['./dist/jwt-user-login.min.js']
+                }
+            },
+            dev: {
+                options: {
+                    mangle: false,
+                    compress: false,
+                    sourceMap: true,
+                    sourceMapIncludeSources: true
+                },
+                files: { //target
+                    './dist/jwt-user-login.min.js': ['./dist/jwt-user-login.min.js']
+                }
+            }
+        },
+        clean: ['./src/jwtUserLogin.templates.js']
     });
 
     //load grunt tasks
@@ -48,5 +68,6 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-angular-templates');
 
     //register grunt default task
-    grunt.registerTask('default', ['ngtemplates', 'ngAnnotate', 'concat', 'uglify','clean']);
+    grunt.registerTask('default', ['ngtemplates', 'concat:js', 'ngAnnotate', 'uglify:prod', 'clean']);
+    grunt.registerTask('dev', ['ngtemplates', 'concat:dev', 'ngAnnotate', 'uglify:dev', 'clean']);
 }

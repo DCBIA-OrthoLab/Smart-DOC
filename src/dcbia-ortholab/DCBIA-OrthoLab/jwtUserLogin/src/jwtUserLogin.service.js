@@ -38,11 +38,6 @@ angular.module('jwt-user-login')
         if(rejection.status === 401 && !localStorage.getItem('clusterpost_token')){
           $location.path('/');
         }
-
-        if(rejection.status === 404) {
-          $location.path('/notFound');
-        }
-        
         
         return $q.reject(rejection);
       }
