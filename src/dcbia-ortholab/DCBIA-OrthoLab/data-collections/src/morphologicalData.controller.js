@@ -1,4 +1,4 @@
-angular.module('morphological-data')
+angular.module('data-collections')
 .controller('morphologicalData', ['$scope','$http', 'dcbia', 'clusterauth', function($scope, $http, dcbia, clusterauth) {
 
 	clusterauth.getUser()

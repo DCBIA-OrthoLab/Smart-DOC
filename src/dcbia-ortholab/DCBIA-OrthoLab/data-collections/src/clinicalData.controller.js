@@ -1,5 +1,5 @@
 
-angular.module('cTRIVIAL')
+angular.module('data-collections')
 .controller('clinicalData', ['$scope','$http', 'dcbia', 'clusterauth', function($scope, $http, dcbia, clusterauth) {
 
 
