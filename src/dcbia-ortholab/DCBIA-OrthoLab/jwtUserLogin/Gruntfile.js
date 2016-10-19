@@ -11,7 +11,8 @@ module.exports = function(grunt) {
         assets:{
             appJS: ['./src/jwtUserLogin.module.js', 
             './src/jwtUserLogin.service.js', 
-            './src/jwtUserLogin.directive.js', 
+            './src/jwtUserLogin.directive.js',
+            './src/usersManager.controller.js',
             './src/jwtUserLogin.templates.js']
         },
         concat: {

@@ -1,5 +1,5 @@
 
-angular.module('users-manager')
+angular.module('jwt-user-login')
 .controller('users', ['$scope','$http', '$filter', 'dcbia', 'clusterauth', function($scope, $http, $filter, dcbia, clusterauth) {
 
 	$scope.userscopes = {};
