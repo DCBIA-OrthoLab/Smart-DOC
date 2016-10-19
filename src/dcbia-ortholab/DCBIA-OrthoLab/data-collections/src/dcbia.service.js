@@ -1,4 +1,4 @@
-angular.module('cTRIVIAL')
+angular.module('data-collections')
 .factory('dcbia', function ($q, $http, $location) {
   return {
     getClinicalDataCollections: function(){

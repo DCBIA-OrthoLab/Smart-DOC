@@ -11,6 +11,7 @@ module.exports = function(grunt) {
         assets:{
             appJS: [
             './src/data-collection.module.js',
+            './src/dcbia.service.js',
             './src/clinicalData.controller.js',
             './src/morphologicalData.controller.js',
             './dist/data-collections.templates.js'
