@@ -1,6 +1,4 @@
-var dcbiaSurvey = angular.module('dcbia-surveys');
-
-dcbiaSurvey
+angular.module('dcbia-surveys')
 .directive('tmjSurvey', function($rootScope, $location, $anchorScroll, clusterauth) {
 
 	function link($scope){
@@ -150,7 +148,7 @@ dcbiaSurvey
 	    	formData : "=",
 	    	editFields: "="
 	    },
-    	templateUrl: dcbiaSurvey.paths.root + '/TMJSurvey.template.html'
+    	templateUrl: './src/TMJSurvey.template.html'
 	}
 
 
