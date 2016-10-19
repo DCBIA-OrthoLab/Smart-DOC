@@ -12,7 +12,7 @@ module.exports = function(grunt) {
             appJS: ['./src/jwtUserLogin.module.js', 
             './src/jwtUserLogin.service.js', 
             './src/jwtUserLogin.directive.js',
-            './src/usersManager.controller.js',
+            './src/usersManager.directive.js',
             './src/jwtUserLogin.templates.js']
         },
         concat: {
@@ -51,7 +51,8 @@ module.exports = function(grunt) {
                     mangle: false,
                     compress: false,
                     sourceMap: true,
-                    sourceMapIncludeSources: true
+                    sourceMapIncludeSources: true,
+                    sourceMapIn: './dist/jwt-user-login.min.js.map'
                 },
                 files: { //target
                     './dist/jwt-user-login.min.js': ['./dist/jwt-user-login.min.js']
