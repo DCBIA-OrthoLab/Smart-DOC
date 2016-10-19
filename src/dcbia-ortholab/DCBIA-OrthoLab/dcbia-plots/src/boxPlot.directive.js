@@ -1,6 +1,4 @@
-var dcbiaPlots = angular.module('dcbia-plots');
-
-dcbiaPlots
+angular.module('dcbia-plots')
 .directive('boxPlotChart', function($compile, $rootScope){
     
     return {

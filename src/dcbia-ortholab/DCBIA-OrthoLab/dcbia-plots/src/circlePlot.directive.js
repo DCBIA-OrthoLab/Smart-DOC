@@ -1,6 +1,4 @@
-var dcbiaPlots = angular.module('dcbia-plots');
-
-dcbiaPlots
+angular.module('dcbia-plots')
 .directive('circlePlot',function($routeParams,$location){
 
 	function link($scope,$attrs,$filter){
@@ -1274,7 +1272,7 @@ $scope.packageImports = function (nodes, threshold) {
     	plotData : "="
     },
     link : link,
-    templateUrl: dcbiaPlots.paths.root + 'circlePlot.template.html'
+    templateUrl: './src/circlePlot.template.html'
 
 
   }

@@ -1,5 +1,4 @@
-var dcbiaPlots = angular.module('dcbia-plots');
-dcbiaPlots
+angular.module('dcbia-plots')
 .directive('d3Plots', function($routeParams, $location, $rootScope, clusterauth, dcbia){
 
     function link($scope, element){
@@ -223,7 +222,7 @@ dcbiaPlots
         scope: {
             data : "="
         },
-        templateUrl: dcbiaPlots.paths.root + 'd3Plots.template.html'
+        templateUrl: './src/d3Plots.template.html'
     }
 
 });

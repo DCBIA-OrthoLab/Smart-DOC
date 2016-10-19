@@ -22,5 +22,17 @@
   "bugs": {
     "url": "https://github.com/DCBIA-OrthoLab/shiny-tooth/issues"
   },
-  "homepage": "https://github.com/DCBIA-OrthoLab/shiny-tooth#readme"
+  "homepage": "https://github.com/DCBIA-OrthoLab/shiny-tooth#readme",
+  "devDependencies": {
+    "grunt": "^1.0.1",
+    "grunt-angular-templates": "^1.1.0",
+    "grunt-contrib-clean": "^1.0.0",
+    "grunt-contrib-concat": "^1.0.1",
+    "grunt-contrib-cssmin": "^1.0.2",
+    "grunt-contrib-uglify": "^2.0.0",
+    "grunt-ng-annotate": "^2.0.2"
+  },
+  "dependencies": {
+    "d3": "^4.2.7"
+  }
 }
