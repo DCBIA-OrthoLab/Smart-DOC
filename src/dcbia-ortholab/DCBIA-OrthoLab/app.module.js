@@ -8,9 +8,7 @@ angular.module('cTRIVIAL', [
   'ngFilemodel',
   'jwt-user-login',
   'nav-bar',
-  'users-manager',
-  'morphological-data',
-  'clinical-data',
+  'data-collections',
   'home',
   'dcbia-surveys',
   'dcbia-plots'
@@ -24,14 +22,14 @@ config(['$routeProvider', function($routeProvider) {
     templateUrl: 'home/login.html'
   })
   .when('/home', {
-    templateUrl: 'node_modules/home/home.template.html'
+    templateUrl: 'home/home.template.html'
   })
   .when('/clinicalData', {
-    templateUrl: 'node_modules/clinical-data/src/clinicalData.template.html',
+    templateUrl: './src/clinicalData.template.html',
     reloadOnSearch: false
   })
   .when('/morphologicalData', {
-    templateUrl: 'node_modules/morphological-data/src/morphologicalData.template.html'
+    templateUrl: './src/morphologicalData.template.html'
   })
   .when('/importClinicalData', {
     templateUrl: 'views/controllers/importClinicalData.html'
@@ -40,7 +38,7 @@ config(['$routeProvider', function($routeProvider) {
     templateUrl: 'home/login.html'
   })
   .when('/users', {
-    templateUrl: 'node_modules/users-manager/src/usersManager.template.html'
+    templateUrl: './src/usersManager.template.html'
   })
   .when('/notFound', {
     templateUrl: 'home/notFound.html'

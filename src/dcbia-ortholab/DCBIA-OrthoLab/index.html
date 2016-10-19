@@ -30,17 +30,16 @@
   <!-- In production use: -->
   <script src="node_modules/angular/angular.js"></script>
   <script src="node_modules/angular-route/angular-route.js"></script>
-  <script src="node_modules/angular-bootstrap/ui-bootstrap.min.js" ></script>
   <script src="node_modules/underscore/underscore-min.js" ></script>
   <script src="node_modules/jquery/dist/jquery.min.js" ></script>
-  <script src="node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+  <script src="node_modules/angular-ui-bootstrap/dist/ui-bootstrap.js" ></script>
+  <script src="node_modules/angular-ui-bootstrap/dist/ui-bootstrap-tpls.js" ></script>
   <script src="node_modules/angular-filemodel/angular-filemodel.js"></script>
   <script src="node_modules/angular-smart-table/dist/smart-table.min.js" ></script>
-  <script src="node_modules/d3/build/d3.min.js" ></script>
-  <script src="node_modules/three/three.min.js" ></script>
+  <script src="node_modules/three/build/three.min.js" ></script>
   <script src="node_modules/three/examples/js/controls/TrackballControls.js" ></script>
   <script src="node_modules/three/examples/js/loaders/VTKLoader.js" ></script>
-
+  <script src="data-collections/dist/data-collections.min.js"></script>
 
   <!-- Application scripts -->
   <script src="app.module.js"></script>
@@ -48,28 +47,24 @@
 
   <!-- Modules --> 
 
-  <script src="node_modules/home/home.module.js"></script>
-  <script src="node_modules/dcbia-plots/src/dcbia-plots.min.js"></script>
-  <script src="node_modules/clinical-data/src/clinical-data.min.js"></script>
-  <script src="node_modules/morphological-data/src/morphological-data.min.js"></script>
-  <script src="node_modules/jwt-user-login/dist/jwt-user-login.min.js"></script>
-  <script src="node_modules/nav-bar/src/nav-bar.min.js"></script>
-  <script src="node_modules/dcbia-surveys/src/dcbia-surveys.min.js"></script>
-  <script src="node_modules/dcbia-surveys/src/dcbia-surveys.min.js"></script>
-  <script src="node_modules/users-manager/src/users-manager.min.js"></script>
+  <script src="home/home.module.js"></script>
+  
+  <script src="dcbia-plots/dist/dcbia-plots.min.js"></script>
+
+  
+  <script src="nav-bar/dist/nav-bar.min.js"></script>
+  <script src="jwtUserLogin/dist/jwt-user-login.min.js"></script>
+  
+  <script src="dcbia-surveys/src/dcbia-surveys.min.js"></script>
+  
 
   <!-- Services --> 
-  <script src="services/cluster.service.js"></script>
-  <script src="services/dcbia.service.js"></script>  
   
   <!-- Directives -->
-  <script src="scripts/directives/directiveCompareTwoVariables.js"></script>
-  <script src="scripts/directives/box.js"></script>
   <script src="scripts/directives/directiveThreejs.js"></script>
-  <script src="scripts/directives/directiveMultiSeriesLineChart.js"></script>
 
   <!-- Controllers --> 
-  <script src="node_modules/home/home.controller.js"></script>
+  <script src="home/home.controller.js"></script>
 
 </body>
 </html>
