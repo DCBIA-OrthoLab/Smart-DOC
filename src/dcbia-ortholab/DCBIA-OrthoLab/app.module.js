@@ -31,14 +31,11 @@ config(['$routeProvider', function($routeProvider) {
   .when('/morphologicalData', {
     templateUrl: './src/morphologicalData.template.html'
   })
-  .when('/importClinicalData', {
-    templateUrl: 'views/controllers/importClinicalData.html'
-  })
   .when('/login/reset', {
     templateUrl: 'home/login.html'
   })
   .when('/users', {
-    templateUrl: './src/usersManager.template.html'
+    templateUrl: 'home/users.html'
   })
   .when('/notFound', {
     templateUrl: 'home/notFound.html'
