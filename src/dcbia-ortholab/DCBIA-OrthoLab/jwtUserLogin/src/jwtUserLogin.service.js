@@ -77,12 +77,11 @@ angular.module('jwt-user-login')
           return res.data;
         });
       }
-    },    
-    deleteUser: function(user){
+    },
+    deleteSelf: function(){
       return $http({
         method: 'DELETE',
-        url: '/auth/user',
-        data: user
+        url: '/auth/user'
       });
     },
     login: function(user){
@@ -122,6 +121,13 @@ angular.module('jwt-user-login')
     updateUser: function(user){
       return $http({
         method: 'PUT',
+        url: '/auth/users',
+        data: user
+      });
+    },
+    deleteUser: function(user){
+      return $http({
+        method: 'DELETE',
         url: '/auth/users',
         data: user
       });

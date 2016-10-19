@@ -20,38 +20,23 @@
 				</tr>
 			</thead>
 			<tbody>
-				<tr ng-repeat="row in displayedUsers">
-					<td>{{row.name}}</td>
-					<td>{{row.email}}</td>
-					<td>{{row.type}}</td>
-					<td>
+				<tr ng-repeat="user in displayedUsers">
+					<td>{{user.name}}</td>
+					<td>{{user.email}}</td>
+					<td>{{user.type}}</td>
+					<td ng-repeat="us in userScopes">
 						<div class="input-group">
 					      <span class="input-group-addon">
-					        <input type="checkbox" aria-label="..." ng-model="userscopes[row._id].default" ng-change="addRemoveScope(row)">
+					        <input type="checkbox" aria-label="..." ng-click="addRemoveScope(user, us)" ng-checked="hasScope(user, us)">
 					      </span>
-					      <label class="form-control" >Default</label>
+					      <label class="form-control" >{{ us }}</label>
 					    </div>
 					</td>
 					<td>
-						<div class="input-group">
-					      <span class="input-group-addon">
-					        <input type="checkbox" aria-label="..." ng-model="userscopes[row._id].dentist" ng-change="addRemoveScope(row)">
-					      </span>
-					      <label class="form-control" >Dentist</label>
-					    </div>
-					</td>
-					<td>
-						<div class="input-group">
-					      <span class="input-group-addon">
-					        <input type="checkbox" aria-label="..." ng-model="userscopes[row._id].admin" ng-change="addRemoveScope(row)">
-					      </span>
-					      <label class="form-control" >Admin</label>
-					    </div>
-					</td>
-					<td>
-						<button type="button" class="btn btn-danger" ng-click="deleteUser(row)">
-						 	<span class="glyphicon glyphicon-remove"></span>
-						 </button>
+						<button type="button" ng-click="deleteUser(user)" class="btn btn-sm btn-danger">
+						<i class="glyphicon glyphicon-trash">
+							</i>
+						</button>
 					</td>
 				</tr>
 			</tbody>

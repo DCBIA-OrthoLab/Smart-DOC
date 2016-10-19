@@ -3,31 +3,17 @@ angular.module('jwt-user-login')
 .directive('users', function($routeParams, $location, $rootScope, dcbia, clusterauth) {
 
 	function link($scope,$attrs,$filter){
-		$scope.userscopes = {};
 
 		clusterauth.getUsers()
 		.then(function(res){
 			$scope.userdata = res.data;
-			_.each($scope.userdata, function(u){
-				$scope.userscopes[u._id] = {
-					default: u.scope.indexOf('default') >= 0,
-					dentist: u.scope.indexOf('dentist') >= 0,
-					admin: u.scope.indexOf('admin') >= 0
-				}
-			})
-		})
+		});
 
-		$scope.addRemoveScope = function(user){
-			var scopes = $scope.userscopes[user._id];
-			user.scope = [];
-			if(scopes.default){
-				user.scope.push('default');
-			}
-			if(scopes.dentist){
-				user.scope.push('dentist');
-			}
-			if(scopes.admin){
-				user.scope.push('admin');
+		$scope.addRemoveScope = function(user, scope){
+			if($scope.hasScope(user, scope)){
+				user.scope.splice(user.scope.indexOf(scope), 1);
+			}else{
+				user.scope.push(scope);
 			}
 
 			clusterauth.updateUser(user)
@@ -39,12 +25,31 @@ angular.module('jwt-user-login')
 		}
 
 		$scope.deleteUser = function(user){
-			console.log("TOOD delete", user);
+			if(confirm("Do you want to delete the user?")){
+				clusterauth.deleteUser(user)
+				.then(function(){
+					for(var i = 0; i < $scope.userdata.length; i++){
+						if($scope.userdata[i]._id === user._id){
+							$scope.userdata.splice(i, 1);
+						}
+					}
+				})
+				.catch(console.error);
+			}
+		}
+
+		$scope.hasScope = function(user, scope){
+			return user.scope.indexOf(scope) >= 0;
 		}
 	}
+
+
 	return {
 	    restrict : 'E',
 	    link : link,
+	    scope: {
+	    	userScopes: "="
+	    },
 	    templateUrl: './src/usersManager.template.html'
 	}
 });
