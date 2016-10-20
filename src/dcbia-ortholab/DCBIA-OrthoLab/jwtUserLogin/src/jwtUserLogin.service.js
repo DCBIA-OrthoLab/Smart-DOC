@@ -35,8 +35,12 @@ angular.module('jwt-user-login')
      'responseError': function(rejection) {
         
 
-        if(rejection.status === 401 && !localStorage.getItem('clusterpost_token')){
+        if(rejection.status === 401 && !localStorage.getItem('clusterpost_token') && $location.path() !== '/login'){
           $location.path('/');
+        }
+
+        if(rejection.status === 404){
+          console.error(rejection);
         }
         
         return $q.reject(rejection);

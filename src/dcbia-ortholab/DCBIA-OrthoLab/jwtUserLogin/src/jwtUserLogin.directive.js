@@ -1,5 +1,5 @@
 angular.module('jwt-user-login')
-.directive('userLogin', function($routeParams, $location, $rootScope, clusterauth){
+.directive('userLogin', function($routeParams, $location, $rootScope, $timeout, clusterauth){
 	function link($scope,$attrs,$filter){
 	
 	$scope.showLogin = true;
@@ -7,7 +7,6 @@ angular.module('jwt-user-login')
 	$scope.user = {};
 
 	$scope.resetUser = false;
-
 
 	if($routeParams.token){
 		$scope.showLogin = false;
@@ -17,7 +16,6 @@ angular.module('jwt-user-login')
 	}
 	
 	$scope.createUser = function(){
-		$scope.errorMsg = "";
 		clusterauth.createUser($scope.newUser)
 		.then(function(){
 			return clusterauth.getUser();
@@ -27,34 +25,41 @@ angular.module('jwt-user-login')
 			$location.path('/home');
 		})
 		.catch(function(e){
-			if(e.status === 409)
-			{
-				$scope.errorMsg = "An account already exist with this email address. Login with your account or create a new one with a new email address";
-				//alert("An account already exist with this email address. Recover password or create a new account with a new email address");
+			if(e.status === 409){
+				$('#inputEmailCreate').popover('show');
+				$timeout(function(){
+					$('#inputEmailCreate').popover('hide');
+				}, 6000);
 			}
-			throw e;
 		});
 	}
 
-	$scope.recoverPassword = function(){
-		$scope.errorMsg = "";
-		if(!$scope.user.email)
+	$scope.recoverPassword = function(email, popup){
+		if(!email)
 		{
-			alert("No email address specified in email field.");
-			return false;
+			$scope.inputEmailPopup = 'Please enter your email address';
+			$('#' + popup).popover('show');
+			$timeout(function(){
+				$('#' + popup).popover('hide');
+			}, 6000);
+		}else{
+			clusterauth.sendRecoverPassword({
+				email: email
+			})
+			.then(function(res){
+				alert(res.data);
+			})
+			.catch(function(e){
+				if(e.status === 401)
+				{
+					$scope.inputEmailPopup = 'You need to create an account first.';
+					$('#' + popup).popover('show');
+					$timeout(function(){
+						$('#' + popup).popover('hide');
+					}, 6000);
+				}
+			})
 		}
-		clusterauth.sendRecoverPassword({
-			email: $scope.user.email
-		})
-		.then(function(res){
-			alert(res.data);
-		})
-		.catch(function(e){
-			if(e.status === 401)
-			{
-				$scope.errorMsg = "I don't know who you are, you need to create an account first!"
-			}
-		})
 	}
 
 	$scope.resetPassword = function(){
@@ -71,9 +76,7 @@ angular.module('jwt-user-login')
 				$location.path('/home');
 			})
 			.catch(function(e){
-				alert('Password must contains 6 characters including at least one uppercase letter and one number - special characte allowed')
 				console.error(e);
-				throw e;
 			});
 		}
 		else
@@ -87,6 +90,8 @@ angular.module('jwt-user-login')
 		$scope.errorMsg = "";
 		clusterauth.login($scope.user)
 		.then(function(){
+			$('#loginbutton').popover('hide');
+			$('#inputEmail').popover('hide');
 			return clusterauth.getUser();
 		})
 		.then(function(res){
@@ -96,12 +101,12 @@ angular.module('jwt-user-login')
 		.catch(function(e){
 			if(e.status === 401 && $scope.user.password)
 			{
-				$scope.errorMsg = "Wrong identification - check if email and password are corrects";
-				//alert("Wrong identification - check if email and password are corrects");
+				$('#loginbutton').popover('show');
+				$timeout(function(){
+					$('#loginbutton').popover('hide');
+				}, 6000);
 			}
-			console.log(e);
-
-			throw e;
+			
 		});
 	}
 
