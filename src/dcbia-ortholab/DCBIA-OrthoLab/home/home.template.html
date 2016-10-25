@@ -2,7 +2,19 @@
 <navbar></navbar>
 
 <div ng-controller="home"> 
+	Welcome <b>{{user.name}}</b> !
 
-  Dashboard
-
-<div >
+	<div class="panel panel-default" ng-if="user.scope.length == 3">
+		<div class="panel-body">
+	  		<div class="col-sm-6 col-md-4">
+			  	<div class="thumbnail">
+			  		<div class="caption">
+			  			<canvas id="pieChart" class="chart chart-doughnut"
+			  			chart-data="pieData" chart-labels="pieLabels" chart-options="pieOptions">
+			  			</canvas> 
+			  		</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div >

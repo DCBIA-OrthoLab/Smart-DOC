@@ -6,7 +6,8 @@ angular.module('dcbia-surveys')
 		if(!$scope.formData || ($scope.formData && $scope.formData.formId !== 'TMJSurvey')){
 			$scope.formData = {};
 			$scope.formData.formId = 'TMJSurvey';
-			$scope.formData.date = new Date();
+			var dt = new Date();
+			$scope.formData.date = dt.getFullYear() + "-" + (dt.getMonth() + 1) + "-" + dt.getDate();
 
 			//Default values
 			$scope.formData.biteUncomfortable  = 0;

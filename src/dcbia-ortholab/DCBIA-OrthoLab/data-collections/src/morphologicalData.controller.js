@@ -150,7 +150,8 @@ angular.module('data-collections')
 
 	$scope.morphologicalDataCollection.addMorphologicalData = function(){
 		if ($scope.morphologicalData.data.date == undefined) {
-			$scope.morphologicalData.data.date = new Date()
+			var dt = new Date();
+			$scope.morphologicalData.data.date = dt.getFullYear() + "-" + (dt.getMonth() + 1) + "-" + dt.getDate();
 		}
 		var morphologicalData = {
 			patientId: $scope.morphologicalData.data.patientId,

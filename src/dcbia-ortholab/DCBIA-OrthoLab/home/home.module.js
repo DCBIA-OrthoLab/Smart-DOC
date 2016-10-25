@@ -1,1 +1,1 @@
-angular.module('home', []);
+angular.module('home', ['chart.js']);
