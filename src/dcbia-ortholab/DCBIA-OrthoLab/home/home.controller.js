@@ -25,7 +25,7 @@ angular.module('home')
   };
 
   $scope.progressionChart = {
-    labels: ["Done","Total"],
+    labels: ["Done","Left"],
     data: [0,48],
     options: {
       responsive: true,
@@ -63,8 +63,10 @@ angular.module('home')
     dcbia.getClinicalDataOwners()
       .then(function(res){
         $scope.ownersData = res.data;
+        $scope.progressionChart.data[0]=res.data.length;
+        $scope.progressionChart.data[1]-=res.data.length;
         _.each($scope.ownersData,function(owner){
-          $scope.progressionChart.data[0]+=1;
+          
           index = $scope.surveysPerUserChart.labels.indexOf(owner.owner);
           if( index == -1) {
             $scope.surveysPerUserChart.labels.push(owner.owner);
