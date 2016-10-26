@@ -25,10 +25,10 @@ angular.module('home')
   };
 
   $scope.lineChartData = {
-    selectedDates: 1,
+    selectedDates: 0,
     labels: [],
     series: ["Surveys done"],
-    data: [[65, 59, 80, 81, 56, 55, 40]],
+    data: [[]],
     options: {
       title: {
         text: "Contribution activity",
@@ -37,6 +37,7 @@ angular.module('home')
       }
     }
   };
+
 
   // $scope.pieChartData.getDataOwners = function(){
     dcbia.getClinicalDataOwners()

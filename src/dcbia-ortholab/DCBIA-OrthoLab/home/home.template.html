@@ -14,8 +14,8 @@
 			<button type="button" class="btn btn-default" ng-click="lineChartData.showOneYear()">
 				 	Last year
 			</button>
-	  		<div class="col-sm-6 col-md-12">
-			  	<div class="thumbnail">
+	  		<div class="col-md-12">
+			  	<div class="thumbnail" ng-if="lineChartData.selectedDates!=0">
 			  		<div class="caption">
 			  			<canvas id="lineChart" class="chart chart-line" chart-data="lineChartData.data"
 						chart-labels="lineChartData.labels" chart-series="lineChartData.series" chart-options="lineChartData.options">
