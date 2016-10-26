@@ -7,7 +7,7 @@ angular.module('home')
     $scope.user = res;
   })
 
-  $scope.pieChartData = {
+  $scope.surveysPerUserChart = {
     labels: [],
     data: [],
     options: {
@@ -24,6 +24,26 @@ angular.module('home')
     }
   };
 
+  $scope.progressionChart = {
+    labels: ["Done","Total"],
+    data: [0,48],
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      title: {
+        display: true,
+        text: 'Progression',
+        fontSize: 17
+      },
+      animation:{
+        animateScale:true
+      },
+      rotation: Math.PI,
+      circumference: Math.PI
+    }
+  };
+
+
   $scope.lineChartData = {
     selectedDates: 0,
     labels: [],
@@ -39,18 +59,19 @@ angular.module('home')
   };
 
 
-  // $scope.pieChartData.getDataOwners = function(){
+  // $scope.surveysPerUserChart.getDataOwners = function(){
     dcbia.getClinicalDataOwners()
       .then(function(res){
         $scope.ownersData = res.data;
         _.each($scope.ownersData,function(owner){
-          index = $scope.pieChartData.labels.indexOf(owner.owner);
+          $scope.progressionChart.data[0]+=1;
+          index = $scope.surveysPerUserChart.labels.indexOf(owner.owner);
           if( index == -1) {
-            $scope.pieChartData.labels.push(owner.owner);
-            $scope.pieChartData.data.push(1);
+            $scope.surveysPerUserChart.labels.push(owner.owner);
+            $scope.surveysPerUserChart.data.push(1);
           }
           else{
-            $scope.pieChartData.data[index]+=1;
+            $scope.surveysPerUserChart.data[index]+=1;
           }
         })
     })
