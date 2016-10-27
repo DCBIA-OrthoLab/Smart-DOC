@@ -1,4 +1,4 @@
-angular.module('cTRIVIAL')
+angular.module('dcbiaOrtholab')
 .directive('directiveThreejs', function($routeParams, $location, $rootScope, clusterauth, $window){
 
     function link($scope, element){

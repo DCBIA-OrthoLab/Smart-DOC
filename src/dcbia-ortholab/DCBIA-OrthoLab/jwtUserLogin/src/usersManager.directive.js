@@ -1,6 +1,6 @@
 
 angular.module('jwt-user-login')
-.directive('users', function($routeParams, $location, $rootScope, dcbia, clusterauth) {
+.directive('users', function($routeParams, $location, $rootScope, clusterauth) {
 
 	function link($scope,$attrs,$filter){
 

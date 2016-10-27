@@ -2,12 +2,12 @@
 <!--[if lt IE 7]>      <html lang="en" ng-app="myApp" class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
 <!--[if IE 7]>         <html lang="en" ng-app="myApp" class="no-js lt-ie9 lt-ie8"> <![endif]-->
 <!--[if IE 8]>         <html lang="en" ng-app="myApp" class="no-js lt-ie9"> <![endif]-->
-<!--[if gt IE 8]><!--> <html lang="en" ng-app="cTRIVIAL" class="no-js"> <!--<![endif]-->
+<!--[if gt IE 8]><!--> <html lang="en" ng-app="dcbiaOrtholab" class="no-js"> <!--<![endif]-->
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="app.css" type="text/css">
+  <!-- <link rel="stylesheet" href="app.css" type="text/css"> -->
   <link rel="stylesheet" href="node_modules/angular-ui-bootstrap/dist/ui-bootstrap-csp.css" type="text/css">
   <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css" type="text/css">
   
@@ -15,13 +15,16 @@
   <title>DCBIA-Ortholab</title>
 
 </head>
-<body ng-app="cTRIVIAL">
+<body ng-app="dcbiaOrtholab">
 
   <div class="wrapper">
       <div class="container-fluid">
           <div class="col-md-10 col-md-offset-1">
             <div ng-include src="'header/appHeader.html'" class="row"></div>
-            <div ng-view class="row"></div>
+            <div ng-controller="main">
+              <navbar ng-if="showNavBar"></navbar>
+              <div ng-view class="row"></div>
+            </div>
           </div>
       </div>
       <div class="push"></div>
@@ -37,7 +40,7 @@
   <script src="node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
   <script src="node_modules/angular-ui-bootstrap/dist/ui-bootstrap.js" ></script>
   <script src="node_modules/angular-ui-bootstrap/dist/ui-bootstrap-tpls.js" ></script>
-  <script src="node_modules/angular-filemodel/angular-filemodel.js"></script>
+  <script src="scripts/angular-file-model/angular-file-model.js"></script>
   <script src="node_modules/angular-smart-table/dist/smart-table.min.js" ></script>
   <script src="node_modules/three/build/three.min.js" ></script>
   <script src="node_modules/three/examples/js/controls/TrackballControls.js" ></script>
@@ -47,6 +50,7 @@
 
   <!-- Application scripts -->
   <script src="app.module.js"></script>
+  <script src="index.js"></script>
 
 
   <!-- Modules --> 

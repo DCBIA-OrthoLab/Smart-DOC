@@ -24,13 +24,13 @@
   "dependencies": {
     "angular": "^1.5.8",
     "angular-chart.js": "^1.0.3",
-    "angular-filemodel": "^0.2.0",
     "angular-route": "^1.5.8",
     "angular-smart-table": "^2.1.8",
     "angular-ui-bootstrap": "^2.2.0",
     "bootstrap": "^3.3.7",
     "d3": "^4.2.7",
     "jquery": "^3.1.1",
+    "ng-file-model": "0.0.5",
     "three": "^0.81.2",
     "ui-bootstrap": "^0.1.5",
     "underscore": "^1.8.3"
