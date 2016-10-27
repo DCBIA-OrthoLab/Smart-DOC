@@ -28,6 +28,22 @@ angular.module('home')
           fontSize: 10,
           boxWidth: 25
         }
+      },
+      tooltips:{
+        callbacks: {
+          title: function(tooltipItems, data) {
+            return "";
+          },
+          label: function(tooltipItem, data) {
+            var value = data.datasets[0].data[tooltipItem.index];
+            var total = 0;
+            _.each(data.datasets[0].data,function(items){
+              total += items;
+            })
+            var percentage = Math.round(value / total * 100);
+            return percentage + " %";
+          }
+        }
       }
     }
   };
@@ -88,7 +104,7 @@ angular.module('home')
 
   $scope.topUserData = {
     labels:[],
-    data: [[]],
+    data: [[],[]],
     options:{
       title:{
         text: "Top users",
@@ -105,10 +121,23 @@ angular.module('home')
           }
         }],
         yAxes: [{
+          stacked: true,
           gridLines: {
-            display:false
+            display:false,
           }
         }]
+      },
+      tooltips: {
+        enabled: true,
+        mode: 'single',
+        callbacks: {
+          title: function(tooltipItems, data) {
+            return "";
+          },
+          label: function(tooltipItem, data) {
+            return data.datasets[0].data[tooltipItem.index];
+          }
+        }
       }
     }
   };
@@ -146,6 +175,10 @@ angular.module('home')
         })
         $scope.topUserData.labels = tempArrayLabel;
         $scope.topUserData.data[0] = tempArrayData;
+        for(i=0;i<$scope.topUserData.data[0].length;i++){
+          $scope.topUserData.data[1].push($scope.topUserData.data[0].reduce(function(a, b) { return a + b; }, 0));
+        }
+        console.log($scope.topUserData.data);
     })
   // }
 
