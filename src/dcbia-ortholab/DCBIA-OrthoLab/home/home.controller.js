@@ -1,7 +1,7 @@
 
 angular.module('home')
 .controller('home', ['$scope','$http','dcbia','clusterauth', function($scope, $http, dcbia, clusterauth) {
-  
+
   clusterauth.getUser()
   .then(function(res){
     $scope.user = res;
@@ -20,13 +20,26 @@ angular.module('home')
       },
       animation:{
         animateScale:true
+      },
+      legend: {
+        display: true,
+        position: 'right',
+        labels: {
+          fontSize: 10,
+          boxWidth: 25
+        }
       }
     }
   };
 
   $scope.progressionChart = {
     labels: ["Done","Left"],
-    data: [0,48],
+    data: [0,24],
+    percentage: 0,
+    colors: [
+      "#FF0000",
+      "#DCDCDC"
+    ],
     options: {
       responsive: true,
       maintainAspectRatio: false,
@@ -39,7 +52,19 @@ angular.module('home')
         animateScale:true
       },
       rotation: Math.PI,
-      circumference: Math.PI
+      circumference: Math.PI,
+      tooltips: {
+        enabled: true,
+        mode: 'single',
+        callbacks: {
+          label: function(tooltipItems, data) {
+            var value = data.datasets[0].data[tooltipItems.index];
+            var total = data.datasets[0].data[0] + data.datasets[0].data[1];
+            var percentage = Math.round(value / total * 100);
+            return data.labels[tooltipItems.index] + ": " + percentage + '%';
+          }
+        }
+      },
     }
   };
 
@@ -76,6 +101,10 @@ angular.module('home')
             $scope.surveysPerUserChart.data[index]+=1;
           }
         })
+        $scope.progressionChart.percentage = Math.round($scope.progressionChart.data[0]*100/($scope.progressionChart.data[0]+$scope.progressionChart.data[1]));
+        var green = Math.min(Math.round($scope.progressionChart.percentage*2.4*2),240)
+        var red = Math.min(Math.round(480-$scope.progressionChart.percentage*2.4*2),240)
+        $scope.progressionChart.colors[0] = "#" + red.toString(16) + green.toString(16) + "00";
     })
   // }
 
