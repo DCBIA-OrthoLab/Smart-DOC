@@ -3,7 +3,7 @@
 <body>
 	<div ng-controller="home"> 
 		Welcome <b>{{user.name}}</b> !
-		<div class="panel panel-default">
+		<div class="panel panel-default" ng-if="user.scope.length == 3">
 			<div class="panel-body">
 				<div class="col-sm-6 col-md-2">
 			    	<div class="caption">
