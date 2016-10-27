@@ -23,6 +23,7 @@
   },
   "dependencies": {
     "angular": "^1.5.8",
+    "angular-chart.js": "^1.0.3",
     "angular-filemodel": "^0.2.0",
     "angular-route": "^1.5.8",
     "angular-smart-table": "^2.1.8",

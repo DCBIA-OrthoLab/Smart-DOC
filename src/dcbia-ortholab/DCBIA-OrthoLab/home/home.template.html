@@ -1,8 +1,52 @@
 
 <navbar></navbar>
+<body>
+	<div ng-controller="home"> 
+		Welcome <b>{{user.name}}</b> !
+		<div class="panel panel-default">
+			<div class="panel-body">
+				<button type="button" class="btn btn-default" ng-click="lineChartData.showOneWeek()">
+					 	Last week
+				</button>
+				<button type="button" class="btn btn-default" ng-click="lineChartData.showOneMonth()">
+					 	Last month
+				</button>
+				<button type="button" class="btn btn-default" ng-click="lineChartData.showOneYear()">
+					 	Last year
+				</button>
+		  		<div class="col-md-12">
+				  	<div class="thumbnail" ng-if="lineChartData.selectedDates!=0">
+				  		<div class="caption">
+				  			<canvas id="lineChart" class="chart chart-line" chart-data="lineChartData.data"
+							chart-labels="lineChartData.labels" chart-series="lineChartData.series" chart-options="lineChartData.options">
+							</canvas> 
+				  		</div>
+					</div>
+				</div>
+			</div>
+		</div>
 
-<div ng-controller="home"> 
-
-  Dashboard
-
-<div >
+		<div class="panel panel-default" ng-if="user.scope.length == 3">
+			<div class="panel-body">
+		  		<div class="col-sm-6 col-md-4">
+				  	<div class="thumbnail">
+				  		<div class="caption">
+				  			<canvas id="surveysPerUserChart" class="chart chart-doughnut"
+				  			chart-data="surveysPerUserChart.data" chart-labels="surveysPerUserChart.labels" chart-options="surveysPerUserChart.options">
+				  			</canvas> 
+				  		</div>
+					</div>
+				</div>
+				<div class="col-sm-6 col-md-4">
+				  	<div class="thumbnail">
+				  		<div class="caption">
+				  			<canvas id="progressionChart" class="chart chart-doughnut"
+				  			chart-data="progressionChart.data" chart-colors=progressionChart.colors chart-labels="progressionChart.labels" chart-options="progressionChart.options">
+				  			</canvas> 
+				  		</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div >
+</body>

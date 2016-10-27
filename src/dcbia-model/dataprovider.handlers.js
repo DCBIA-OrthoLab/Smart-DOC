@@ -194,11 +194,11 @@ module.exports = function (server, conf) {
 		var view;
 
 		if(credentials.scope.indexOf('admin') !== -1 && useremail){
-			view = '_design/getFormsDoneByUser/_view/items?key="' + useremail +'"';
+			view = '_design/getSurvey/_view/userItems?key="' + useremail +'"';
 		}else if(credentials.scope.indexOf('admin') !== -1){
-			view = '_design/getFormsDoneByUser/_view/items';
+			view = '_design/getSurvey/_view/userItems';
 		}else{
-			view = '_design/getFormsDoneByUser/_view/items?key="' + email +'"';
+			view = '_design/getSurvey/_view/userItems?key="' + email +'"';
 		}
 
 		server.methods.dcbia.getView(view)

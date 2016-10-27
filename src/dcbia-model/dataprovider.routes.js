@@ -68,7 +68,8 @@ module.exports = function (server, conf) {
 			_id: Joi.string().alphanum().required(),
 			formId: Joi.string().required(),
 			patientId: Joi.any().required(),
-			owner: Joi.string().required()
+			owner: Joi.string().required(),
+			date: Joi.string().required()
 		}).unknown();
 
 
