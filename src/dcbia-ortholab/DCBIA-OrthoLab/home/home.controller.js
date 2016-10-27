@@ -86,6 +86,32 @@ angular.module('home')
     }
   };
 
+  $scope.topUserData = {
+    labels:[],
+    data: [[]],
+    options:{
+      title:{
+        text: "Top users",
+        display: true,
+        fontSize: 17
+      },
+      scales:{
+        xAxes: [{
+          ticks: {
+            display: false
+          },
+          gridLines: {
+            display:false
+          }
+        }],
+        yAxes: [{
+          gridLines: {
+            display:false
+          }
+        }]
+      }
+    }
+  };
 
   // $scope.surveysPerUserChart.getDataOwners = function(){
     dcbia.getClinicalDataOwners()
@@ -93,21 +119,33 @@ angular.module('home')
         $scope.ownersData = res.data;
         $scope.progressionChart.data[0]=res.data.length;
         $scope.progressionChart.data[1]-=res.data.length;
+
         _.each($scope.ownersData,function(owner){
           
           index = $scope.surveysPerUserChart.labels.indexOf(owner.owner);
           if( index == -1) {
             $scope.surveysPerUserChart.labels.push(owner.owner);
+            $scope.topUserData.labels.push(owner.owner);
             $scope.surveysPerUserChart.data.push(1);
+            $scope.topUserData.data[0].push(1);
           }
           else{
             $scope.surveysPerUserChart.data[index]+=1;
+            $scope.topUserData.data[0][index]+=1;
           }
         })
         $scope.progressionChart.percentage = Math.round($scope.progressionChart.data[0]*100/($scope.progressionChart.data[0]+$scope.progressionChart.data[1]));
         var green = Math.min(Math.round($scope.progressionChart.percentage*2.4*2),240)
         var red = Math.min(Math.round(480-$scope.progressionChart.percentage*2.4*2),240)
         $scope.progressionChart.colors[0] = "#" + red.toString(16) + green.toString(16) + "00";
+        var tempArrayData = JSON.parse(JSON.stringify($scope.topUserData.data[0]));
+        var tempArrayLabel = [];
+        tempArrayData.sort().reverse();
+        _.each(tempArrayData,function(item){
+          tempArrayLabel.push($scope.topUserData.labels[$scope.topUserData.data[0].indexOf(item)]);
+        })
+        $scope.topUserData.labels = tempArrayLabel;
+        $scope.topUserData.data[0] = tempArrayData;
     })
   // }
 
