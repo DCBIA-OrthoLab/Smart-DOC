@@ -5,6 +5,22 @@
 		Welcome <b>{{user.name}}</b> !
 		<div class="panel panel-default">
 			<div class="panel-body">
+				<div class="col-sm-6 col-md-2">
+			    	<div class="caption">
+						<span class="glyphicon glyphicon-user"></span> Total Contributors 
+						<p><h2>{{topUserData.data[1].length}}</h2></p>
+					</div>
+				</div>
+				<div class="col-sm-6 col-md-2">
+			    	<div class="caption">
+						<span class="glyphicon glyphicon-list-alt"></span> Total Surveys 
+						<p><h2>{{topUserData.data[1][0]}}</h2></p>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="panel panel-default">
+			<div class="panel-body">
 				<button type="button" class="btn btn-default" ng-click="lineChartData.showOneWeek()">
 					 	Last week
 				</button>

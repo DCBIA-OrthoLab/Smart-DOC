@@ -178,7 +178,6 @@ angular.module('home')
         for(i=0;i<$scope.topUserData.data[0].length;i++){
           $scope.topUserData.data[1].push($scope.topUserData.data[0].reduce(function(a, b) { return a + b; }, 0));
         }
-        console.log($scope.topUserData.data);
     })
   // }
 
