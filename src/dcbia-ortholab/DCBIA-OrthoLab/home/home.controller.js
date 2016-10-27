@@ -57,11 +57,14 @@ angular.module('home')
         enabled: true,
         mode: 'single',
         callbacks: {
-          label: function(tooltipItems, data) {
-            var value = data.datasets[0].data[tooltipItems.index];
+          title: function(tooltipItems, data) {
+            return data.labels[tooltipItems[0].index];
+          },
+          label: function(tooltipItem, data) {
+            var value = data.datasets[0].data[tooltipItem.index];
             var total = data.datasets[0].data[0] + data.datasets[0].data[1];
             var percentage = Math.round(value / total * 100);
-            return data.labels[tooltipItems.index] + ": " + percentage + '%';
+            return percentage + '%';
           }
         }
       },
