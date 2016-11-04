@@ -7,7 +7,10 @@ angular.module('dcbia-surveys')
 			$scope.formData = {};
 			$scope.formData.formId = 'TMJSurvey';
 			var dt = new Date();
-			$scope.formData.date = dt.getFullYear() + "-" + (dt.getMonth() + 1) + "-" + dt.getDate();
+			var year = dt.getFullYear();
+			var month = ((dt.getMonth()+1)>=10)? (dt.getMonth()+1) : '0' + (dt.getMonth()+1);
+			var day = ((dt.getDate())>=10)? (dt.getDate()) : '0' + (dt.getDate());
+			$scope.formData.date = year + "-" + month + "-" + day;
 
 			//Default values
 			$scope.formData.biteUncomfortable  = 0;
@@ -126,6 +129,8 @@ angular.module('dcbia-surveys')
 			$scope.formData.excursionsLeftLateral = 0;
 			$scope.formData.excursionsProtrusion = 0;
 			$scope.formData.excursionsMidlineDeviation = 0;
+			$scope.formData.scope = ["admin","dentist"];
+
 
 			clusterauth.getUser()
 			.then(function(res){

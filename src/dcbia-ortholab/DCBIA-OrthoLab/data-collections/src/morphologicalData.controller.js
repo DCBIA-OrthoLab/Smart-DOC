@@ -152,11 +152,19 @@ angular.module('data-collections')
 
 		$scope.morphologicalDataCollection.addMorphologicalData = function(){
 			if ($scope.morphologicalData.data.date == undefined) {
-				$scope.morphologicalData.data.date = new Date()
+				var dt = new Date();
 			}
+			else{
+				var dt = $scope.morphologicalData.data.date
+			}
+			var year = dt.getFullYear();
+			var month = ((dt.getMonth()+1)>=10)? (dt.getMonth()+1) : '0' + (dt.getMonth()+1);
+			var day = ((dt.getDate())>=10)? (dt.getDate()) : '0' + (dt.getDate());
+			$scope.morphologicalData.data.date = year + "-" + month + "-" + day;
 			var morphologicalData = {
 				patientId: $scope.morphologicalData.data.patientId,
 				date: $scope.morphologicalData.data.date,
+				scope: ["admin","dentist"],
 				owners: [],
 				type: "morphologicalData"
 			}

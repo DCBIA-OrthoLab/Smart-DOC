@@ -112,7 +112,7 @@
 							<tbody>
 								<tr ng-repeat="row in morphologicalDataCollection.displayedCollection">
 									<td ng-repeat="key in morphologicalDataCollection.selectedCollectionDataKeys">
-										<div ng-if="_.isArray(row[key]) && key != 'owners'">
+										<div ng-if="_.isArray(row[key]) && key == 'attachments'">
 											<button type="button" class="btn btn-default" ng-repeat="att in row[key]" ng-click="morphologicalData.viewAttachment(row, att)">
 												<span class="glyphicon glyphicon-eye"></span>{{att}}
 											</button>
@@ -121,9 +121,10 @@
 										<div ng-if="!_.isArray(row[key])">
 											{{row[key]}}
 										</div>
-										<div ng-if="_.isArray(row[key]) && key == 'owners'">
+										<div ng-if="_.isArray(row[key]) && key != 'attachments'">
 											<ul>
-												<li ng-repeat="item in row[key]">{{item.user}}</li>
+												<li ng-repeat="item in row[key]" ng-if="key == 'owners'">{{item.user}}</li>
+												<li ng-repeat="item in row[key]" ng-if="key != 'owners'">{{item}}</li>
 											</ul>
 										</div>
 									</td>
@@ -162,7 +163,7 @@
 					  		</div>
 						  	<div class="input-group">
 					  			<span class="input-group-addon">Date</span>
-					  			<input type="date" class="form-control" placeholder="Date" aria-describedby="basic-addon3" ng-model="morphologicalData.data.date">
+					  			<input type="date" class="form-control" aria-describedby="basic-addon3" ng-model="morphologicalData.data.date">
 					  		</div>
 					  		<div class="input-group">
 						  		<label class="btn btn-default" for="clinicalData-file-selector" ng-click="morphologicalData.selectedForm = -1;">
