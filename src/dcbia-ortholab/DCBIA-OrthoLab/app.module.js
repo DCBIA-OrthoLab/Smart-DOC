@@ -1,11 +1,11 @@
 'use strict';
 
 // Declare app level module which depends on views, and components
-angular.module('cTRIVIAL', [
+angular.module('dcbiaOrtholab', [
   'ngRoute',
   'ui.bootstrap',
   'smart-table',
-  'ngFilemodel',
+  'file-model',
   'jwt-user-login',
   'nav-bar',
   'data-collections',
@@ -25,11 +25,11 @@ config(['$routeProvider', function($routeProvider) {
     templateUrl: 'home/home.template.html'
   })
   .when('/clinicalData', {
-    templateUrl: './src/clinicalData.template.html',
+    templateUrl: './home/clinicalData.template.html',
     reloadOnSearch: false
   })
   .when('/morphologicalData', {
-    templateUrl: './src/morphologicalData.template.html'
+    templateUrl: './home/morphologicalData.template.html'
   })
   .when('/login/reset', {
     templateUrl: 'home/login.html'

@@ -1,6 +1,6 @@
 <div class="ng-col-12 se-slope" >
-  <div class="row">
-    <div id="divlogin" ng-if="showLogin && !resetUser" class="containerLogin">
+  <div style="text-align: center;width: 50%;margin-left: 25%;">
+    <div id="divlogin" ng-if="showLogin && !resetUser">
       <form class="form-login">
         <h2 class="form-login-heading">Please login</h2>
         <label for="inputEmail" class="sr-only">Email address</label>
@@ -15,7 +15,7 @@
       </form>
     </div>
 
-    <div id="divCreate" ng-if="!showLogin && !resetUser" class="containerLogin">
+    <div id="divCreate" ng-if="!showLogin && !resetUser">
       <form class="form-create">
         <h2 class="form-login-heading">Create an account</h2>
         <label for="inputNameCreate" class="sr-only">User Name</label>
@@ -32,7 +32,7 @@
       </form>
     </div>
 
-    <div ng-if="resetUser" class="containerLogin">
+    <div ng-if="resetUser">
       <form class="form-rest-password" >
         <h2 class="form-login-heading">Reset your password</h2>
         <label for="inputPassword0" class="sr-only">Password</label>
@@ -40,7 +40,6 @@
         <label for="inputPassword1" class="sr-only">Confirm Password</label>
         <input id="inputPassword1" class="form-control" placeholder="Confirm assword" required="" type="password" ng-model="resetUser.password1" autocomplete="off">
         <button class="btn btn-lg btn-primary btn-block" type="submit" ng-click="resetPassword()">Reset and Login</button>
-
         <p> <a href="#/welcome">Login page</a> </p>
       </form>
     </div>

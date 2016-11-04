@@ -1,190 +1,184 @@
-<navbar></navbar>
 
-<div ng-controller="morphologicalData"> 
-
-	<div class="row">
-		<div class="panel panel-default">
-	  		<div class="panel-body">
-				<div class="col-md-12">
-					<div class="btn-group">
-					 <button type="button" class="btn btn-default" ng-click="morphologicalDataSectionDisplay.section = 1">
-					 	<span class="glyphicon glyphicon-plus"></span>
-					 	New Collection
-					 </button>
-					</div>
+<div class="row">
+	<div class="panel panel-default">
+  		<div class="panel-body">
+			<div class="col-md-12">
+				<div class="btn-group">
+				 <button type="button" class="btn btn-default" ng-click="morphologicalDataSectionDisplay.section = 1">
+				 	<span class="glyphicon glyphicon-plus"></span>
+				 	New Collection
+				 </button>
 				</div>
 			</div>
 		</div>
 	</div>
+</div>
 
-	<div class="row" ng-if="morphologicalDataSectionDisplay.section == 1">
-		<div class="panel panel-success">
-		  <div class="panel-body">
-		  	<div class="input-group">
-	  			<span class="input-group-addon">Name</span>
-	  			<input type="text" class="form-control" placeholder="Collection name" aria-describedby="basic-addon3" ng-model="morphologicalDataCollection.newCollection.name">
-	  		</div>
-	  		<div class="btn-group">
-				 <button type="button" class="btn btn-default" ng-click="morphologicalDataCollection.create(morphologicalDataCollection.newCollection);morphologicalDataSectionDisplay.section = 0">
-				 	<span class="glyphicon glyphicon-ok"></span>
-				 	Create
-				 </button>
-				 <button type="button" class="btn btn-default" ng-click="morphologicalDataSectionDisplay.section = 0">
-				 	<span class="glyphicon glyphicon-remove"></span>
-				 	Cancel
-				 </button>
+<div class="row" ng-if="morphologicalDataSectionDisplay.section == 1">
+	<div class="panel panel-success">
+	  <div class="panel-body">
+	  	<div class="input-group">
+  			<span class="input-group-addon">Name</span>
+  			<input type="text" class="form-control" placeholder="Collection name" aria-describedby="basic-addon3" ng-model="morphologicalDataCollection.newCollection.name">
+  		</div>
+  		<div class="btn-group">
+			 <button type="button" class="btn btn-default" ng-click="morphologicalDataCollection.create(morphologicalDataCollection.newCollection);morphologicalDataSectionDisplay.section = 0">
+			 	<span class="glyphicon glyphicon-ok"></span>
+			 	Create
+			 </button>
+			 <button type="button" class="btn btn-default" ng-click="morphologicalDataSectionDisplay.section = 0">
+			 	<span class="glyphicon glyphicon-remove"></span>
+			 	Cancel
+			 </button>
+			</div>
+	  </div>
+	</div>
+</div>
+
+<div class="row" ng-if="morphologicalDataSectionDisplay.section == 0">
+	<div class="panel panel-default">
+  		<div class="panel-body">
+  			<div class="col-sm-6 col-md-4">
+				<div ng-class="morphologicalDataCollection.collectionsProperties['defaultMorphologicalDataCollection'].class">
+				    <div class="thumbnail">
+				    	<!-- <img src="" alt=""> -->
+				      <div class="caption">
+				        <h3>{{defaultMorphologicalDataCollection.name}}</h3>
+				        <p>
+				        	<b>Number of items: </b> {{defaultMorphologicalDataCollection.items.length}}
+				        </p>
+			        	<div class="btn-group">
+						 <button type="button" class="btn btn-default" ng-click="morphologicalDataCollection.showSection = 0;morphologicalDataCollection.select(defaultMorphologicalDataCollection)">
+						 	<span class="glyphicon glyphicon-refresh"></span>
+						 </button>
+
+						 <button type="button" class="btn btn-default" ng-click="csv.export(defaultClinicalDataCollection)">
+						 	<span class="glyphicon glyphicon-download"></span>
+						 </button>
+						 
+						</div>
+				      </div>
+				    </div>
 				</div>
-		  </div>
+			</div>
+			<div class="col-sm-6 col-md-4" ng-repeat="collection in morphologicalDataCollection.collections">
+				<div ng-class="morphologicalDataCollection.collectionsProperties[collection._id].class">
+				    <div class="thumbnail">
+				    	<!-- <img src="" alt=""> -->
+				      <div class="caption">
+				        <h3>{{collection.name}}</h3>
+				        <p>
+				        	<b>Number of items: </b> {{collection.items.length}}
+				        </p>
+			        	<div class="btn-group">
+						 <button type="button" class="btn btn-default" ng-click="morphologicalDataCollection.section = 0;morphologicalDataCollection.select(collection)">
+						 	<span class="glyphicon glyphicon-eye-open"></span>
+						 </button>
+						 <button type="button" class="btn btn-default" ng-click="morphologicalDataCollection.section = 1;morphologicalDataCollection.select(collection)">
+						 	<span class="glyphicon glyphicon-plus-sign"></span>
+						 </button>
+
+						 <button type="button" class="btn btn-default" ng-click="morphologicalDataCollection.download(collection)">
+						 	<span class="glyphicon glyphicon-download"></span>
+						 </button>
+
+						 <button type="button" class="btn btn-danger" ng-click="morphologicalDataCollection.delete(collection)">
+						 	<span class="glyphicon glyphicon-remove"></span>
+						 </button>
+
+						</div>
+				      </div>
+				    </div>
+				</div>
+			</div>
 		</div>
 	</div>
+	<div class="panel panel-default" ng-if="morphologicalDataCollection.section != -1">
+  		<div class="panel-body">
+			<div class="row" ng-if="morphologicalDataCollection.section == 0">
+				<div class="panel panel-default">
+		  			<div class="panel-body">
+		  				<table st-table="morphologicalDataCollection.displayedCollection" st-safe-src="morphologicalDataCollection.selectedCollectionData" class="table table-striped">
+							<thead>
+								<tr>
+									<th ng-repeat="key in morphologicalDataCollection.selectedCollectionDataKeys" st-sort="{{key}}">{{key}}</th>
+								</tr>
+								<tr>
+									<th ng-repeat="key in morphologicalDataCollection.selectedCollectionDataKeys">
+										<input st-search="{{key}}" placeholder="search for {{key}}" class="input-sm form-control" type="search"/>
+									</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr ng-repeat="row in morphologicalDataCollection.displayedCollection">
+									<td ng-repeat="key in morphologicalDataCollection.selectedCollectionDataKeys">
+										<div ng-if="_.isArray(row[key]) && key != 'owners'">
+											<button type="button" class="btn btn-default" ng-repeat="att in row[key]" ng-click="morphologicalData.viewAttachment(row, att)">
+												<span class="glyphicon glyphicon-eye"></span>{{att}}
+											</button>
+											
+										</div>
+										<div ng-if="!_.isArray(row[key])">
+											{{row[key]}}
+										</div>
+										<div ng-if="_.isArray(row[key]) && key == 'owners'">
+											<ul>
+												<li ng-repeat="item in row[key]">{{item.user}}</li>
+											</ul>
+										</div>
+									</td>
+									<td>
+										<button type="button" class="btn btn-danger" ng-click="clinical.delete(row)">
+										 	<span class="glyphicon glyphicon-remove"></span>
+										 </button>
+									</td>
+								</tr>
+							</tbody>
+						</table>
 
-	<div class="row" ng-if="morphologicalDataSectionDisplay.section == 0">
-		<div class="panel panel-default">
-	  		<div class="panel-body">
-	  			<div class="col-sm-6 col-md-4">
-					<div ng-class="morphologicalDataCollection.collectionsProperties['defaultMorphologicalDataCollection'].class">
-					    <div class="thumbnail">
-					    	<!-- <img src="" alt=""> -->
-					      <div class="caption">
-					        <h3>{{defaultMorphologicalDataCollection.name}}</h3>
-					        <p>
-					        	<b>Number of items: </b> {{defaultMorphologicalDataCollection.items.length}}
-					        </p>
-				        	<div class="btn-group">
-							 <button type="button" class="btn btn-default" ng-click="morphologicalDataCollection.showSection = 0;morphologicalDataCollection.select(defaultMorphologicalDataCollection)">
-							 	<span class="glyphicon glyphicon-refresh"></span>
-							 </button>
+						<directive-threejs data="morphologicalData.surface" height="400">
+						</directive-threejs>
+		  			</div>
+		  		</div>
+			</div>
 
-							 <button type="button" class="btn btn-default" ng-click="csv.export(defaultClinicalDataCollection)">
-							 	<span class="glyphicon glyphicon-download"></span>
-							 </button>
-							 
+			<div class="row" ng-if="morphologicalDataCollection.section == 1">
+				<div class="panel panel-default">
+		  			<div class="panel-body">
+		  				<div class="panel panel-success">
+						  <div class="panel-body">
+						  	<div class="btn-group">
+								 <button type="button" class="btn btn-default" ng-click="morphologicalDataCollection.addMorphologicalData()">
+								 	<span class="glyphicon glyphicon-plus"></span>Upload
+								 </button>
+								 <button type="button" class="btn btn-default" ng-click="morphologicalDataCollection.section = -1">
+								 	<span class="glyphicon glyphicon-remove"></span>Cancel
+								 </button>
+						  	</div>
+						  
+						  	<div class="input-group">
+					  			<span class="input-group-addon">Id</span>
+					  			<input type="string" class="form-control" placeholder="Patient id (required)" aria-describedby="basic-addon3" ng-model="morphologicalData.data.patientId" ng-readonly="editFields">
+					  		</div>
+						  	<div class="input-group">
+					  			<span class="input-group-addon">Date</span>
+					  			<input type="date" class="form-control" placeholder="Date" aria-describedby="basic-addon3" ng-model="morphologicalData.data.date">
+					  		</div>
+					  		<div class="input-group">
+						  		<label class="btn btn-default" for="clinicalData-file-selector" ng-click="morphologicalData.selectedForm = -1;">
+								 	<span class="glyphicon glyphicon-folder-open"></span>
+								    <input id="clinicalData-file-selector" file-model='morphologicalData.data.file' type="file"  style="display:none;">
+								</label>
 							</div>
-					      </div>
-					    </div>
-					</div>
-				</div>
-				<div class="col-sm-6 col-md-4" ng-repeat="collection in morphologicalDataCollection.collections">
-					<div ng-class="morphologicalDataCollection.collectionsProperties[collection._id].class">
-					    <div class="thumbnail">
-					    	<!-- <img src="" alt=""> -->
-					      <div class="caption">
-					        <h3>{{collection.name}}</h3>
-					        <p>
-					        	<b>Number of items: </b> {{collection.items.length}}
-					        </p>
-				        	<div class="btn-group">
-							 <button type="button" class="btn btn-default" ng-click="morphologicalDataCollection.section = 0;morphologicalDataCollection.select(collection)">
-							 	<span class="glyphicon glyphicon-eye-open"></span>
-							 </button>
-							 <button type="button" class="btn btn-default" ng-click="morphologicalDataCollection.section = 1;morphologicalDataCollection.select(collection)">
-							 	<span class="glyphicon glyphicon-plus-sign"></span>
-							 </button>
-
-							 <button type="button" class="btn btn-default" ng-click="morphologicalDataCollection.download(collection)">
-							 	<span class="glyphicon glyphicon-download"></span>
-							 </button>
-
-							 <button type="button" class="btn btn-danger" ng-click="morphologicalDataCollection.delete(collection)">
-							 	<span class="glyphicon glyphicon-remove"></span>
-							 </button>
-
-							</div>
-					      </div>
-					    </div>
-					</div>
-				</div>
+							<div class="input-group">
+					  			<span class="input-group-addon">Filename</span>
+					  			<input type="text" class="form-control" placeholder="No file selected" aria-describedby="basic-addon3" ng-model="morphologicalData.data.file.name" readonly>
+					  		</div>
+						  </div>
+						</div>
+		  			</div>
+		  		</div>
 			</div>
 		</div>
-		<div class="panel panel-default" ng-if="morphologicalDataCollection.section != -1">
-	  		<div class="panel-body">
-				<div class="row" ng-if="morphologicalDataCollection.section == 0">
-					<div class="panel panel-default">
-			  			<div class="panel-body">
-			  				<table st-table="morphologicalDataCollection.displayedCollection" st-safe-src="morphologicalDataCollection.selectedCollectionData" class="table table-striped">
-								<thead>
-									<tr>
-										<th ng-repeat="key in morphologicalDataCollection.selectedCollectionDataKeys" st-sort="{{key}}">{{key}}</th>
-									</tr>
-									<tr>
-										<th ng-repeat="key in morphologicalDataCollection.selectedCollectionDataKeys">
-											<input st-search="{{key}}" placeholder="search for {{key}}" class="input-sm form-control" type="search"/>
-										</th>
-									</tr>
-								</thead>
-								<tbody>
-									<tr ng-repeat="row in morphologicalDataCollection.displayedCollection">
-										<td ng-repeat="key in morphologicalDataCollection.selectedCollectionDataKeys">
-											<div ng-if="_.isArray(row[key]) && key != 'owners'">
-												<button type="button" class="btn btn-default" ng-repeat="att in row[key]" ng-click="morphologicalData.viewAttachment(row, att)">
-													<span class="glyphicon glyphicon-eye"></span>{{att}}
-												</button>
-												
-											</div>
-											<div ng-if="!_.isArray(row[key])">
-												{{row[key]}}
-											</div>
-											<div ng-if="_.isArray(row[key]) && key == 'owners'">
-												<ul>
-													<li ng-repeat="item in row[key]">{{item.user}}</li>
-												</ul>
-											</div>
-										</td>
-										<td>
-											<button type="button" class="btn btn-danger" ng-click="clinical.delete(row)">
-											 	<span class="glyphicon glyphicon-remove"></span>
-											 </button>
-										</td>
-									</tr>
-								</tbody>
-							</table>
-
-							<directive-threejs data="morphologicalData.surface" height="400">
-							</directive-threejs>
-			  			</div>
-			  		</div>
-				</div>
-
-				<div class="row" ng-if="morphologicalDataCollection.section == 1">
-					<div class="panel panel-default">
-			  			<div class="panel-body">
-			  				<div class="panel panel-success">
-							  <div class="panel-body">
-							  	<div class="btn-group">
-									 <button type="button" class="btn btn-default" ng-click="morphologicalDataCollection.addMorphologicalData()">
-									 	<span class="glyphicon glyphicon-plus"></span>Upload
-									 </button>
-									 <button type="button" class="btn btn-default" ng-click="morphologicalDataCollection.section = -1">
-									 	<span class="glyphicon glyphicon-remove"></span>Cancel
-									 </button>
-							  	</div>
-							  
-							  	<div class="input-group">
-						  			<span class="input-group-addon">Id</span>
-						  			<input type="string" class="form-control" placeholder="Patient id (required)" aria-describedby="basic-addon3" ng-model="morphologicalData.data.patientId" ng-readonly="editFields">
-						  		</div>
-							  	<div class="input-group">
-						  			<span class="input-group-addon">Date</span>
-						  			<input type="date" class="form-control" placeholder="Date" aria-describedby="basic-addon3" ng-model="morphologicalData.data.date">
-						  		</div>
-						  		<div class="input-group">
-							  		<label class="btn btn-default" for="clinicalData-file-selector" ng-click="morphologicalData.selectedForm = -1;">
-									 	<span class="glyphicon glyphicon-folder-open"></span>
-									    <input id="clinicalData-file-selector" file-model='morphologicalData.data.file' type="file"  style="display:none;">
-									</label>
-								</div>
-								<div class="input-group">
-						  			<span class="input-group-addon">Filename</span>
-						  			<input type="text" class="form-control" placeholder="No file selected" aria-describedby="basic-addon3" ng-model="morphologicalData.data.file.name" readonly>
-						  		</div>
-							  </div>
-							</div>
-			  			</div>
-			  		</div>
-				</div>
-			</div>
-		</div>
-
-		
 	</div>
 </div>
