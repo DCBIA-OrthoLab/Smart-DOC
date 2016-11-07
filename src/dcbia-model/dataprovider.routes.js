@@ -73,6 +73,16 @@ module.exports = function (server, conf) {
 			owner: Joi.string().required(),
 			date: Joi.string().required()
 		}).unknown();
+	
+	var project = Joi.object({
+			type: Joi.string().valid('project').required(),
+			name: Joi.string().alphanum().required(),
+			description: Joi.string().alphanum().required(),
+			collections: Joi.array().items(Joi.object().keys({
+				_id: Joi.string().alphanum()
+			})),
+			scope: Joi.string().required()
+		});
 
 
 	server.route({
