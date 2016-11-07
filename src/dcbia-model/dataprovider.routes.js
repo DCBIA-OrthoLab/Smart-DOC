@@ -13,7 +13,8 @@ module.exports = function (server, conf) {
 			_id: Joi.string().alphanum().required(),
 			_rev: Joi.string().required(),
         	type: Joi.string().valid('clinicalData').required(),
-        	patientId: Joi.any().required()
+        	patientId: Joi.any().required(),
+        	scope: Joi.array().required()
         }).unknown();
 
 	var clinicalcollectionpost = Joi.object({
@@ -43,7 +44,8 @@ module.exports = function (server, conf) {
 			_id: Joi.string().alphanum().required(),
 			_rev: Joi.string().required(),
         	type: Joi.string().valid('morphologicalData').required(),
-        	patientId: Joi.any().required()
+        	patientId: Joi.any().required(),
+        	scope: Joi.array().required()
         }).unknown();
 
 	var morphologicalcollectionpost = Joi.object({
