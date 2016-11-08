@@ -306,6 +306,32 @@ module.exports = function (server, conf) {
 		});
 
 	}
+
+	handler.getProjects = function(req, rep){
+		var email = credentials.email;
+		var projectname = req.query.name;
+
+		var view;
+
+		if(credentials.scope.indexOf('dentist')){
+			if(name === ""){
+				'_design/getSurvey/_view/userItems';
+			}else{
+				'_design/getSurvey/_view/userItems?key="' + projectname +'"'; 
+			}
+		}
+
+		server.methods.dcbia.getView(view)
+		.then(function(rows){
+			var docs = _.pluck(rows, 'value');
+			var compactdocs = _.compact(docs);
+			return compactdocs;
+		})
+		.then(rep)
+		.catch(function(e){
+			rep(Boom.wrap(e));
+		});
+	}
 	
 
 	return handler;

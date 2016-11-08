@@ -661,6 +661,29 @@ module.exports = function (server, conf) {
 		    description: 'Add attachment data'
 	    }
 	});
+
+	server.route({
+		method: 'GET',
+		path: "/dcbia/projects",
+		config: {
+			auth: {
+                strategy: 'token',
+                scope: ['dentist']
+            },
+			handler: handlers.getProjects,
+			validate: {
+			  	query: {
+			    	name: Joi.string().optional()
+			    },
+			    params: false, 
+			    payload: false
+			},
+			response: {
+				schema: Joi.array().items(project)
+			},
+			description: 'Get the job document posted to the database'
+	    }
+	});
 	
 
 }

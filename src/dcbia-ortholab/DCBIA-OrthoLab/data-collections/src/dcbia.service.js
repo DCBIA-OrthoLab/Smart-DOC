@@ -160,6 +160,18 @@ angular.module('data-collections')
         method: 'GET',
         url: '/dcbia/morphological/data/patientId/' + id
       });
+    },
+    getProjects: function(){
+      return $http({
+        method: 'GET',
+        url: '/dcbia/projects'
+      });
+    },
+    getProject: function(name){
+      return $http({
+        method: 'GET',
+        url: '/dcbia/projects?=' + name
+      });
     }
   }
 });
