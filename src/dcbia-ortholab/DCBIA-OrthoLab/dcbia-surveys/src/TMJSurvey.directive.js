@@ -129,7 +129,7 @@ angular.module('dcbia-surveys')
 			$scope.formData.excursionsLeftLateral = 0;
 			$scope.formData.excursionsProtrusion = 0;
 			$scope.formData.excursionsMidlineDeviation = 0;
-			$scope.formData.scope = ["admin","dentist"];
+			$scope.formData.scope = ["admin"];
 
 
 			clusterauth.getUser()
