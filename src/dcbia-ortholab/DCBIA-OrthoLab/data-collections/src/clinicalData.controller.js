@@ -176,7 +176,11 @@ angular.module('data-collections')
 			if(force){
 				$scope.clinical.data = {};
 				$scope.clinical.data.formId = tempId;
-				$scope.clinical.data.date = new Date();
+				var dt = new Date();
+				var year = dt.getFullYear();
+				var month = ((dt.getMonth()+1)>=10)? (dt.getMonth()+1) : '0' + (dt.getMonth()+1);
+				var day = ((dt.getDate())>=10)? (dt.getDate()) : '0' + (dt.getDate());
+				$scope.clinical.data.date = year + "-" + month + "-" + day;
 			}
 			
 		}
