@@ -70,6 +70,22 @@ angular.module('data-collections')
 			$scope.morphologicalDataCollection.collectionsProperties[collection._id].class = "alert alert-info";
 		}
 
+		$scope.morphologicalDataCollection.refreshSelectedCollection = function(){
+			$scope.morphologicalDataCollection.select($scope.morphologicalDataCollection.selectedCollection)
+			.then(function(res){
+				return dcbia.getMorphologicalDataCollection($scope.morphologicalDataCollection.selectedCollection._id)
+				.then(function(res){
+					$scope.morphologicalDataCollection.selectedCollection = res.data
+					$scope.morphologicalDataCollection.collections = _.map($scope.morphologicalDataCollection.collections, function(morphologicalDataCollection){
+						if(morphologicalDataCollection._id === $scope.morphologicalDataCollection.selectedCollection._id){
+							return $scope.morphologicalDataCollection.selectedCollection;
+						}
+						return morphologicalDataCollection;
+					});
+				});
+			});
+		};
+
 		$scope.morphologicalDataCollection.getDataCollectionKeys = function(collectiondata){
 			var collectionDataKeys = {};
 			_.each(collectiondata, function(item){
@@ -187,8 +203,13 @@ angular.module('data-collections')
 			
 		}
 
-		$scope.morphologicalData.delete = function(m){
-			console.log(m);
+		$scope.morphologicalData.delete = function(item){
+			if(confirm("Do you want to delete the current item?")){
+				return dcbia.deleteMorphologicalData(item._id)
+				.then(function(){
+					$scope.morphologicalDataCollection.refreshSelectedCollection();
+				});
+			}
 		}
 
 		$scope.morphologicalData.viewAttachment = function(mdata, att){
