@@ -423,6 +423,8 @@ angular.module('data-collections')
 			pom.click();
 			
 		}
+
+		$scope.clinicalDataCollection.getClinicalDataCollections();
 	}
 
 	return {

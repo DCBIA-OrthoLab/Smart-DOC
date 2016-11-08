@@ -180,7 +180,7 @@ angular.module('data-collections')
 			var morphologicalData = {
 				patientId: $scope.morphologicalData.data.patientId,
 				date: $scope.morphologicalData.data.date,
-				scope: ["admin","dentist"],
+				scope: [],
 				owners: [],
 				type: "morphologicalData"
 			}
