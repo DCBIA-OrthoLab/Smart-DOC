@@ -116,7 +116,7 @@ angular.module('dcbia-surveys')
 			$scope.formData.problemOrPreventSwallowing = 0;
 			$scope.formData.problemOrPreventTalking = 0;
 			$scope.formData.problemOrPreventHavingUsualFaceAppearance = 0;
-			$scope.formData.openingPatternComments = 0;
+			$scope.formData.openingPatternComments = "";
 			$scope.formData.verticalRangeUnassistedWOPain = 0;
 			$scope.formData.verticalRangeUnassistedMax = 0;
 			$scope.formData.verticalRangeAssistedMax = 0;

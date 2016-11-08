@@ -2426,17 +2426,20 @@
 	    <h3 class="panel-title">25. Opening Pattern</h3>
 	  </div>
 	  <div class="panel-body">
-	  	<div class="input-group">
-	  		<span class="input-group-addon">
-	  			<input type="radio" aria-label="..." ng-model="formData.openingPattern"  value="0">
-	  		</span>
-	  		<label class="form-control">Straight</label>
-	  		<span class="input-group-addon">
+	  		<div class="input-group">
+	  			<span class="input-group-addon">
+	  				<input type="radio" aria-label="..." ng-model="formData.openingPattern"  value="0">
+	  			</span>
+	  			<label class="form-control">Straight</label>
+	  		</div>
+	  		<div class="input-group">
+	  			<span class="input-group-addon">
 					<input type="radio" aria-label="..." ng-model="formData.openingPattern" value="1">
 				</span>
 				<label class="form-control">Uncorrected Right lateral deviation</label>
 			</div>
-		    <span class="input-group-addon">
+			<div class="input-group">
+		    	<span class="input-group-addon">
 					<input type="radio" aria-label="..." ng-model="formData.openingPattern" value="2">
 				</span>
 				<label class="form-control">Corrected (S) Right lateral deviation</label>
@@ -2457,8 +2460,8 @@
 				<span class="input-group-addon">
 					<input type="radio" aria-label="..." ng-model="formData.openingPattern" value="5">
 				</span>
-				<label class="form-control">Other</label>
-				<input type="text" class="form-control" aria-describedby="basic-addon1" ng-model="formData.openingPatternComments">
+				<span class="input-group-addon">Other type:</span>
+				<input type="text" placeholder="(specify)" class="form-control" aria-describedby="basic-addon3" ng-model="formData.openingPatternComments">
 			</div>
 	  </div>
 	</div>
