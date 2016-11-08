@@ -114,17 +114,17 @@
 	  			<table st-table="clinicalDataCollection.displayedCollection" st-safe-src="clinicalDataCollection.selectedCollectionData" class="table table-striped">
 					<thead>
 						<tr>
-							<th ng-repeat="key in clinicalDataCollection.selectedCollectionDataKeys" st-sort="{{key}}">{{key}}</th>
+							<th ng-repeat="key in clinicalDataCollection.selectedCollectionDataKeys" st-sort="{{key}}" ng-if="key != 'scope'">{{key}}</th>
 						</tr>
 						<tr>
-							<th ng-repeat="key in clinicalDataCollection.selectedCollectionDataKeys">
+							<th ng-repeat="key in clinicalDataCollection.selectedCollectionDataKeys" ng-if="key != 'scope'">
 								<input st-search="{{key}}" placeholder="search for {{key}}" class="input-sm form-control" type="search"/>
 							</th>
 						</tr>
 					</thead>
 					<tbody>
 						<tr ng-repeat="row in clinicalDataCollection.displayedCollection">
-							<td ng-repeat="key in clinicalDataCollection.selectedCollectionDataKeys">{{row[key]}}</td>
+							<td ng-repeat="key in clinicalDataCollection.selectedCollectionDataKeys" ng-if="key != 'scope'">{{row[key]}}</td>
 							<td>
 								<button type="button" class="btn btn-info" ng-click="clinical.showSection = 0;clinical.edit(row)">
 									<span class="glyphicon glyphicon-pencil"></span>
