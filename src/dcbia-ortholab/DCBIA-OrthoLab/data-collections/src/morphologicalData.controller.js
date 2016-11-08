@@ -196,6 +196,7 @@ angular.module('data-collections')
 			})
 			.then(function(res){
 				console.log(res);
+				$scope.morphologicalData.clear();
 			})
 			.catch(function(err){
 				alert(JSON.stringify(err));
@@ -211,6 +212,11 @@ angular.module('data-collections')
 				});
 			}
 		}
+
+		$scope.morphologicalData.clear = function(){
+			$scope.morphologicalData.data = {};
+		}
+	
 
 		$scope.morphologicalData.viewAttachment = function(mdata, att){
 			$scope.morphologicalData.surface = null;
