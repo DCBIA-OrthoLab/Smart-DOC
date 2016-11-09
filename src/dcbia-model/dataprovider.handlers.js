@@ -40,6 +40,23 @@ module.exports = function (server, conf) {
 	handler.getDocument = function(req, rep){
 		
 		server.methods.dcbia.getDocument(req.params.id)
+		.then(function(doc){
+
+			var userScopes = req.auth.credentials.scope;
+			var documentScopes = doc.scope;
+			var isScopeGood = false;
+
+			documentScopes.forEach(function(scope){
+				if(userScopes.indexOf(scope) !== -1){
+					isScopeGood = true;
+				}
+			})
+			if(isScopeGood){
+				return doc;
+			}else{
+				return 0;
+			}
+		})
 		.then(rep)
 		.catch(function(e){
 			rep(Boom.wrap(e));
