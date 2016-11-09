@@ -12,6 +12,33 @@ module.exports = function (server, conf) {
 
 	couchUpdateViews.migrateUp(server.methods.dcbia.getCouchDBServer(), path.join(__dirname, 'views'), true);
 
+	const validateOwnership = function(doc, credentials){
+		return new Promise(function(resolve, reject){
+			if(credentials.scope.indexOf('admin') !== -1 || doc.owner === credentials.email || !doc.scope){
+				resolve(doc);
+			}else if(doc.scope){
+				var authorize = false;
+				for(var i = 0; i < doc.scope.length && !authorize; i++){
+					if(credentials.scope.indexOf(doc.scope[i]) !== -1){
+						authorize = true;
+					}
+				}
+				if(authorize){
+					resolve(doc);
+				}else{
+					reject(Boom.unauthorized("You are not allowed to access this job document!"));
+				}
+			}else{
+				reject(Boom.unauthorized("You are not allowed to access this job document!"));
+			}
+		});
+	}
+
+	server.method({
+	    name: 'dcbia.validateOwnership',
+	    method: validateOwnership,
+	    options: {}
+	});
 
 	var handler = {};
 	/*
@@ -41,21 +68,7 @@ module.exports = function (server, conf) {
 		
 		server.methods.dcbia.getDocument(req.params.id)
 		.then(function(doc){
-
-			var userScopes = req.auth.credentials.scope;
-			var documentScopes = doc.scope;
-			var isScopeGood = false;
-
-			documentScopes.forEach(function(scope){
-				if(userScopes.indexOf(scope) !== -1){
-					isScopeGood = true;
-				}
-			})
-			if(isScopeGood){
-				return doc;
-			}else{
-				return 0;
-			}
+			return server.methods.dcbia.validateOwnership(doc, req.auth.credentials);
 		})
 		.then(rep)
 		.catch(function(e){
@@ -100,6 +113,9 @@ module.exports = function (server, conf) {
 		var name = req.params.name;
 
 		server.methods.dcbia.getDocument(docid)
+		.then(function(doc){
+			return server.methods.dcbia.validateOwnership(doc, req.auth.credentials);
+		})
 		.then(function(doc){
 			if(doc._attachments && doc._attachments[name]){
 				rep.proxy(server.methods.dcbia.getDocumentURIAttachment(docid + "/" + req.params.name));

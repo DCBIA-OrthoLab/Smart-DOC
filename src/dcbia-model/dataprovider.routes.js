@@ -6,7 +6,8 @@ module.exports = function (server, conf) {
 
 	var clinicaldatapost = Joi.object({
         	type: Joi.string().valid('clinicalData').required(),
-        	patientId: Joi.any().required()
+        	patientId: Joi.any().required(),
+        	scope: Joi.array().items(Joi.string()).optional()
         }).unknown();
 
 	var clinicaldata = Joi.object({
@@ -14,7 +15,8 @@ module.exports = function (server, conf) {
 			_rev: Joi.string().required(),
         	type: Joi.string().valid('clinicalData').required(),
         	patientId: Joi.any().required(),
-        	scope: Joi.array().required()
+        	scope: Joi.array().items(Joi.string()).optional(),
+        	owner: Joi.string().email().optional()
         }).unknown();
 
 	var clinicalcollectionpost = Joi.object({
@@ -22,7 +24,9 @@ module.exports = function (server, conf) {
         	type: Joi.string().valid('clinicalDataCollection'),
         	items: Joi.array().items(Joi.object().keys({
         		_id: Joi.string().alphanum().required()
-        	}))
+        	})),
+        	scope: Joi.array().items(Joi.string()).optional(),
+        	owner: Joi.string().email().optional()
         });
 
 	var clinicalcollection = Joi.object({
@@ -32,12 +36,15 @@ module.exports = function (server, conf) {
         	name: Joi.string().required(),
         	items: Joi.array().items(Joi.object().keys({
         		_id: Joi.string().alphanum()
-        	}))
+        	})),
+        	scope: Joi.array().items(Joi.string()).optional(),
+        	owner: Joi.string().email().optional()
         });
 
 	var morphologicaldatapost = Joi.object({
         	type: Joi.string().valid('morphologicalData').required(),
-        	patientId: Joi.any().required()
+        	patientId: Joi.any().required(),
+        	scope: Joi.array().items(Joi.string()).optional()
         }).unknown();
 
 	var morphologicaldata = Joi.object({
@@ -45,7 +52,8 @@ module.exports = function (server, conf) {
 			_rev: Joi.string().required(),
         	type: Joi.string().valid('morphologicalData').required(),
         	patientId: Joi.any().required(),
-        	scope: Joi.array().required()
+        	scope: Joi.array().items(Joi.string()).optional(),
+        	owner: Joi.string().email().optional()
         }).unknown();
 
 	var morphologicalcollectionpost = Joi.object({
@@ -53,7 +61,9 @@ module.exports = function (server, conf) {
         	type: Joi.string().valid('morphologicalDataCollection'),
         	items: Joi.array().items(Joi.object().keys({
         		_id: Joi.string().alphanum().required()
-        	}))
+        	})),
+        	scope: Joi.array().items(Joi.string()).optional(),
+        	owner: Joi.string().email().optional()
         });
 
 	var morphologicalcollection = Joi.object({
@@ -63,7 +73,9 @@ module.exports = function (server, conf) {
         	name: Joi.string().required(),
         	items: Joi.array().items(Joi.object().keys({
         		_id: Joi.string().alphanum()
-        	}))
+        	})),
+        	scope: Joi.array().items(Joi.string()).optional(),
+        	owner: Joi.string().email().optional()
         });
 
 	var dataowned = Joi.object({
@@ -81,7 +93,7 @@ module.exports = function (server, conf) {
 			collections: Joi.array().items(Joi.object().keys({
 				_id: Joi.string().alphanum()
 			})),
-			scope: Joi.string().required()
+			scope: Joi.array().items(Joi.string()).optional()
 		});
 
 
@@ -146,7 +158,7 @@ module.exports = function (server, conf) {
 			response: {
 				schema: clinicalcollection
 			},
-			description: 'Get the job document posted to the database'
+			description: 'Get the a document from the database'
 	    }
 	});
 
