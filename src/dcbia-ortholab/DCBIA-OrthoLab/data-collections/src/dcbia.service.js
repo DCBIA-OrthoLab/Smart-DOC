@@ -170,7 +170,7 @@ angular.module('data-collections')
     getProject: function(name){
       return $http({
         method: 'GET',
-        url: '/dcbia/projects?=' + name
+        url: '/dcbia/projects?name=' + name
       });
     },
     createProject: function (data) {
