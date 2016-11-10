@@ -28,6 +28,7 @@
     "angular-smart-table": "^2.1.8",
     "angular-ui-bootstrap": "^2.2.0",
     "bootstrap": "^3.3.7",
+    "checklist-model": "^0.10.0",
     "d3": "^4.2.7",
     "jquery": "^3.1.1",
     "ng-file-model": "0.0.5",

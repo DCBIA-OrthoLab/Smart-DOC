@@ -17,6 +17,7 @@ angular.module('dcbia-projects')
 				description: ""
 			},
 			projects: [],
+			projectsProperties: {},
 			section: -1
 		};
 
