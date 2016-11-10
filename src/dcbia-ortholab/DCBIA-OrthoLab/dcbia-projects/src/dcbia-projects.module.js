@@ -1,1 +1,1 @@
-angular.module('dcbia-projects', []);
+angular.module('dcbia-projects', ["checklist-model"]);

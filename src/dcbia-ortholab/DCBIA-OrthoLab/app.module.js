@@ -8,11 +8,11 @@ angular.module('dcbiaOrtholab', [
   'file-model',
   'jwt-user-login',
   'nav-bar',
+  'dcbia-projects',
   'data-collections',
   'home',
   'dcbia-surveys',
-  'dcbia-plots',
-  'dcbia-projects'
+  'dcbia-plots'
 ]).
 config(['$routeProvider', function($routeProvider) {
   $routeProvider
