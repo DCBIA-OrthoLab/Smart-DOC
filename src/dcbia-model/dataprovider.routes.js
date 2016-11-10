@@ -14,7 +14,7 @@ module.exports = function (server, conf) {
 			_rev: Joi.string().required(),
         	type: Joi.string().valid('clinicalData').required(),
         	patientId: Joi.any().required(),
-        	scope: Joi.array().required()
+        	scope: Joi.array().optional()
         }).unknown();
 
 	var clinicalcollectionpost = Joi.object({
@@ -45,7 +45,7 @@ module.exports = function (server, conf) {
 			_rev: Joi.string().required(),
         	type: Joi.string().valid('morphologicalData').required(),
         	patientId: Joi.any().required(),
-        	scope: Joi.array().required()
+        	scope: Joi.array().optional()
         }).unknown();
 
 	var morphologicalcollectionpost = Joi.object({
@@ -75,6 +75,7 @@ module.exports = function (server, conf) {
 		}).unknown();
 	
 	var project = Joi.object({
+			_id: Joi.string().alphanum().required(),
 			type: Joi.string().valid('project').required(),
 			name: Joi.string().alphanum().required(),
 			description: Joi.string().alphanum().required(),
@@ -682,10 +683,31 @@ module.exports = function (server, conf) {
             },
 			handler: handlers.getProjects,
 			validate: {
-			  	query: {
-			    	name: Joi.string().optional()
-			    },
+			  	query: false,
 			    params: false, 
+			    payload: false
+			},
+			response: {
+				schema: Joi.array().items(project)
+			},
+			description: 'Get the job document posted to the database'
+	    }
+	});
+
+	server.route({
+		method: 'GET',
+		path: "/dcbia/projects/{name}",
+		config: {
+			auth: {
+                strategy: 'token',
+                scope: ['dentist']
+            },
+			handler: handlers.getProjects,
+			validate: {
+			  	query: false,
+			    params: {
+			    	name: Joi.string()
+			    }, 
 			    payload: false
 			},
 			response: {

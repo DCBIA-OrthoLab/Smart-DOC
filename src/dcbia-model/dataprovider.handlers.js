@@ -311,14 +311,12 @@ module.exports = function (server, conf) {
 
 		var credentials = req.auth.credentials;
 		
-		var view;
-		if(credentials.scope.indexOf('dentist') !== -1){
-			if(name === ""){
-				'_design/getProject/_view/projectItems';
-			}else{
-				'_design/getProject/_view/projectItems?key="' + projectname +'"'; 
-			}
+		var view = '_design/getProject/_view/projectItems';
+
+		if(req.params.name){
+			view += "?" + qs.stringify(keys);
 		}
+		
 		server.methods.dcbia.getView(view)
 		.then(function(rows){
 			var docs = _.pluck(rows, 'value');
