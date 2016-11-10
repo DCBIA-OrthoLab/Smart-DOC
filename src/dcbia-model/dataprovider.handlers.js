@@ -308,19 +308,17 @@ module.exports = function (server, conf) {
 	}
 
 	handler.getProjects = function(req, rep){
-		var email = credentials.email;
-		var projectname = req.query.name;
 
+		var credentials = req.auth.credentials;
+		
 		var view;
-
-		if(credentials.scope.indexOf('dentist')){
+		if(credentials.scope.indexOf('dentist') !== -1){
 			if(name === ""){
-				'_design/getSurvey/_view/userItems';
+				'_design/getProject/_view/projectItems';
 			}else{
-				'_design/getSurvey/_view/userItems?key="' + projectname +'"'; 
+				'_design/getProject/_view/projectItems?key="' + projectname +'"'; 
 			}
 		}
-
 		server.methods.dcbia.getView(view)
 		.then(function(rows){
 			var docs = _.pluck(rows, 'value');
@@ -331,6 +329,7 @@ module.exports = function (server, conf) {
 		.catch(function(e){
 			rep(Boom.wrap(e));
 		});
+	
 	}
 	
 
