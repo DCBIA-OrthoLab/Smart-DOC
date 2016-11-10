@@ -1,1 +1,129 @@
-{{projects}}
+<div class="row">
+	<div class="panel panel-default">
+  		<div class="panel-body">
+			<div class="col-md-12">
+				<div class="btn-group">
+				 <button type="button" class="btn btn-default" ng-click="projects.section = 1">
+				 	<span class="glyphicon glyphicon-plus"></span>
+				 	New Project
+				 </button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="row" ng-if="projects.section == 1">
+	<div class="panel panel-success">
+	  <div class="panel-body">
+	  	<div class="input-group">
+  			<span class="input-group-addon">Name</span>
+  			<input type="text" class="form-control" placeholder="Project name" aria-describedby="basic-addon3" ng-model="projects.newProject.name">
+  		</div>
+  		<div class="input-group">
+  			<span class="input-group-addon">Description</span>
+  			<input type="text" class="form-control" placeholder="Write description of the project" aria-describedby="basic-addon3" ng-model="projects.newProject.description">
+  		</div>
+  		<div class="input-group">
+  			<span class="input-group-addon">User group (Optional)</span>
+  			<input type="text" class="form-control" placeholder="Restrict acces to your project to that group" aria-describedby="basic-addon3" ng-model="projects.newProject.scope">
+  		</div>
+  		<div class="panel panel-default">
+			<div class="panel-heading">
+		    	Add collections to the project:
+		  	</div>
+	  		<div class="panel-body">
+			  	<div class="col-md-6">
+			  		<div class="panel panel-default" style="overflow:scroll">
+						<div class="panel-heading">
+						 	Clinical collections
+						</div>
+				  		<div class="panel-body">
+				  			<table st-table="clinicalDataCollection.collections" st-sort="{{key}}" class="table table-striped">
+								<thead>
+									<tr>
+										<th>
+					        				<input type="checkbox" aria-label="..." ng-model="clinicalCheckBox" ng-value="!clinicalCheckBox" ng-click="clinicalDataCollection.checkAll(clinicalCheckBox)">
+							        	</th>
+										<th>Name</th>
+										<th>Number of items</th>
+										<th>Type</th> 
+									</tr>
+								</thead>
+								<tbody>
+									<tr ng-repeat="collection in clinicalDataCollection.collections">
+										<td>
+					        				<input type="checkbox" aria-label="..." checklist-model="clinicalDataCollection.selectedCollections" checklist-value="collection.name">
+							        	</td>
+							        	<td>
+							        		<button type="button" class="btn btn-default">
+							        			{{collection.name}}
+							        		</button>
+							        	</td>
+							        	<td>
+							        		{{collection.items.length}}
+							        	</td>
+							        	<td>
+							        		{{collection.type}}
+							        	</td>
+									</tr>
+								</tbody>
+							</table>
+				  		</div>
+				  	</div>
+			  	</div>
+			  	<div class="col-md-6">
+				  	<div class="panel panel-default" style="overflow:scroll">
+						<div class="panel-heading">
+						 	Morphological collections
+						</div>
+				  		<div class="panel-body">
+				  			<table st-table="morphologicalDataCollection.collections" st-sort="{{key}}" class="table table-striped">
+								<thead>
+									<tr>
+										<th>
+											<input type="checkbox" aria-label="..." ng-model="morphologicalCheckBox" ng-value="!morphologicalCheckBox" ng-click="morphologicalDataCollection.checkAll(morphologicalCheckBox)">
+							        	</th>
+										<th>Name</th>
+										<th>Number of items</th>
+										<th>Type</th> 
+									</tr>
+								</thead>
+								<tbody>
+									<tr ng-repeat="collection in morphologicalDataCollection.collections">
+										<td>
+					        				<input type="checkbox" aria-label="..." checklist-model="morphologicalDataCollection.selectedCollections" checklist-value="collection.name">
+							        	</td>
+							        	<td>
+							        		<button type="button" class="btn btn-default">
+							        			{{collection.name}}
+							        		</button>
+							        	</td>
+							        	<td>
+							        		{{collection.items.length}}
+							        	</td>
+							        	<td>
+							        		{{collection.type}}
+							        	</td>
+									</tr>
+								</tbody>
+							</table>
+				  		</div>
+				  	</div>
+			  	</div>
+			</div>
+		</div>
+		{{projects.newProject}}
+  		<div class="btn-group">
+			 <button type="button" class="btn btn-default" ng-click="projects.create(projects.newProject);projects.clearForm(true);projects.section = 0">
+			 	<span class="glyphicon glyphicon-ok"></span>
+			 	Create
+			 </button>
+			 <button type="button" class="btn btn-default" ng-click="projects.section = 0;projects.clearForm(false);">
+			 	<span class="glyphicon glyphicon-remove"></span>
+			 	Cancel
+			 </button>
+			</div>
+	  </div>
+	</div>
+</div>
