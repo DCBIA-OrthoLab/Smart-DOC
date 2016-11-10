@@ -172,6 +172,13 @@ angular.module('data-collections')
         method: 'GET',
         url: '/dcbia/projects?=' + name
       });
+    },
+    createProject: function (data) {
+      return $http({
+        method: 'POST',
+        url: '/dcbia/projects',
+        data: data
+      });
     }
   }
 });
