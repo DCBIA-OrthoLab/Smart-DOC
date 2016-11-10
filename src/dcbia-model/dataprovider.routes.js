@@ -81,8 +81,18 @@ module.exports = function (server, conf) {
 			collections: Joi.array().items(Joi.object().keys({
 				_id: Joi.string().alphanum()
 			})),
-			scope: Joi.string().required()
+			scope: Joi.string()
 		});
+
+	var projectpost = Joi.object({
+			name: Joi.string().required(),
+        	type: Joi.string().valid('project').required(),
+        	description: Joi.string().required(),
+        	scope: Joi.string(),
+        	collections: Joi.array().items(Joi.object().keys({
+        		_id: Joi.string().alphanum().required()
+        	}))
+        });
 
 
 	server.route({
@@ -684,6 +694,26 @@ module.exports = function (server, conf) {
 			description: 'Get the job document posted to the database'
 	    }
 	});
-	
+
+	server.route({
+		method: 'POST',
+		path: "/dcbia/projects",
+		config: {
+			auth: {
+                strategy: 'token',
+                scope: ['dentist']
+            },
+			handler: handlers.createDocument,
+			validate: {
+				query: false,
+		        payload: projectpost,
+		        params: false
+			},
+			payload:{
+				output: 'data'
+			},
+			description: 'This route will be used to post job documents to the couch database.'
+		}
+	});
 
 }
