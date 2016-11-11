@@ -716,7 +716,29 @@ module.exports = function (server, conf) {
 			},
 			description: 'Get the job document posted to the database'
 	    }
+	});	
+
+	server.route({
+		path: '/dcbia/projects',
+		method: 'PUT',
+		config: {
+			auth: {
+                strategy: 'token',
+                scope: ['dentist']
+            },
+			handler: handlers.updateDocument,
+			validate: {
+				query: false,
+		        payload: project,
+		        params: false
+			},
+			payload:{
+				output: 'data'
+			},
+			description: 'This route will be used to update a job document in the couch database.'
+		}
 	});
+
 
 	server.route({
 		method: 'POST',
@@ -738,5 +760,29 @@ module.exports = function (server, conf) {
 			description: 'This route will be used to post job documents to the couch database.'
 		}
 	});
+
+	server.route({
+		path: '/dcbia/project/{id}',
+		method: 'DELETE',
+		config: {
+			auth: {
+                strategy: 'token',
+                scope: ['dentist']
+            },
+			handler: handlers.deleteDocument,
+			validate: {
+			  	query: false,
+			    params: {
+			    	id: Joi.string().alphanum().required()
+			    }, 
+			    payload: false
+			},
+			payload:{
+				output: 'data'
+			},
+			description: 'This route will be used to delete job documents from the database'
+		}
+	});
+
 
 }

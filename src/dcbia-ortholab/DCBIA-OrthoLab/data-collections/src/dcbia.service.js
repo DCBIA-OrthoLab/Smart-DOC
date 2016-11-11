@@ -179,6 +179,19 @@ angular.module('data-collections')
         url: '/dcbia/projects',
         data: data
       });
+    },
+    updateProject: function (data) {
+      return $http({
+        method: 'PUT',
+        url: '/dcbia/projects',
+        data: data
+      });
+    },
+    deleteProject: function (id) {
+      return $http({
+        method: 'DELETE',
+        url: '/dcbia/project/' + id
+      });
     }
   }
 });
