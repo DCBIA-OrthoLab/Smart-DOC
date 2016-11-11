@@ -167,10 +167,10 @@ angular.module('data-collections')
         url: '/dcbia/projects'
       });
     },
-    getProject: function(name){
+    getProject: function(id){
       return $http({
         method: 'GET',
-        url: '/dcbia/projects?name=' + name
+        url: '/dcbia/project/' + id
       });
     },
     createProject: function (data) {

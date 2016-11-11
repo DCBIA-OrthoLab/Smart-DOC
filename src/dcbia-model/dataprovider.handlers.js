@@ -308,14 +308,8 @@ module.exports = function (server, conf) {
 	}
 
 	handler.getProjects = function(req, rep){
-
-		var credentials = req.auth.credentials;
 		
 		var view = '_design/getProject/_view/projectItems';
-
-		if(req.params.name){
-			view += "?" + qs.stringify(keys);
-		}
 		
 		server.methods.dcbia.getView(view)
 		.then(function(rows){

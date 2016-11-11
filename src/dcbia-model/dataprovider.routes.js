@@ -76,8 +76,9 @@ module.exports = function (server, conf) {
 	
 	var project = Joi.object({
 			_id: Joi.string().alphanum().required(),
+			_rev: Joi.string(),
 			type: Joi.string().valid('project').required(),
-			name: Joi.string().alphanum().required(),
+			name: Joi.string().required(),
 			description: Joi.string().required(),
 			collections: Joi.array().items(Joi.object().keys({
 				_id: Joi.string().alphanum()
@@ -696,22 +697,22 @@ module.exports = function (server, conf) {
 
 	server.route({
 		method: 'GET',
-		path: "/dcbia/projects/{name}",
+		path: "/dcbia/project/{id}",
 		config: {
 			auth: {
                 strategy: 'token',
                 scope: ['dentist']
             },
-			handler: handlers.getProjects,
+			handler: handlers.getDocument,
 			validate: {
 			  	query: false,
 			    params: {
-			    	name: Joi.string()
+			    	id: Joi.string()
 			    }, 
 			    payload: false
 			},
 			response: {
-				schema: Joi.array().items(project)
+				schema: project
 			},
 			description: 'Get the job document posted to the database'
 	    }
