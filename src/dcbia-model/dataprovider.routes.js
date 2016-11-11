@@ -78,7 +78,7 @@ module.exports = function (server, conf) {
 			_id: Joi.string().alphanum().required(),
 			type: Joi.string().valid('project').required(),
 			name: Joi.string().alphanum().required(),
-			description: Joi.string().alphanum().required(),
+			description: Joi.string().required(),
 			collections: Joi.array().items(Joi.object().keys({
 				_id: Joi.string().alphanum()
 			})),
