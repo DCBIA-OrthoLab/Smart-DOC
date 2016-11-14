@@ -39,6 +39,16 @@ angular.module('data-collections')
 			items: 0
 		}
 
+		$scope.csv = {};
+
+		$scope.$watch('csv.file', function(){
+			if($scope.csv.file){
+				$scope.csv.readFile()
+				.then(function(){
+					$scope.$apply();
+				});
+			}
+		});
 
 		$scope.morphologicalDataCollection.getMorphologicalDataCollections = function(){
 			return dcbia.getMorphologicalDataCollections()
@@ -224,6 +234,81 @@ angular.module('data-collections')
 			 .then(function(res){
 			 	$scope.morphologicalData.surface = res.data;
 			 });
+			
+		}
+
+		$scope.csv.export = function(collection){
+			var prom;
+			if(!$scope.morphologicalDataCollection.selectedCollection || collection._id !== $scope.morphologicalDataCollection.selectedCollection._id){
+				prom = $scope.morphologicalDataCollection.select(collection);
+			}else{
+				prom = Promise.resolve(true);
+			}
+
+			prom
+			.then(function(){
+				var keys = $scope.morphologicalDataCollection.getDataCollectionKeys($scope.morphologicalDataCollection.selectedCollectionData);
+				var csv = keys.toString();
+				csv += '\n';
+
+				_.each($scope.morphologicalDataCollection.selectedCollectionData, function(row, i){
+					_.each(keys, function(key, j){
+						var value;
+						if(Array.isArray(row[key])){
+							var objectKeys = {};						
+							_.each(row[key], function(item,k){
+								if(typeof(item) === "object"){
+									objectKeys = Object.keys(item);
+									_.each(objectKeys,function(key,l){
+										if(k === 0 && l ===0){
+											value = item[key]? item[key]: '';
+										}
+										else{
+											value += ' ' + (item[key]? item[key]: '');
+										}
+									})
+								}else{
+									if(k === 0){
+										value = item? item: '';
+									}else{
+										value += ' ' + (item? item: '');
+									}
+								}
+							})
+						}else{
+							value = row[key]? row[key]: '';
+						}
+						console.log(value)
+						csv += value;
+						if(j < keys.length -1){
+							csv += ","
+						}
+					});
+					if( i < $scope.morphologicalDataCollection.selectedCollectionData.length - 1){
+						csv += "\n";
+					}
+				});
+
+				var filename = $scope.morphologicalDataCollection.selectedCollection.name;
+				if($scope.morphologicalDataCollection.selectedCollection.name.indexOf('csv') === -1){
+					filename += '.csv';
+				}
+
+				return $scope.csv.download(filename, csv);
+			});
+			
+		}
+
+		$scope.csv.download = function(filename, csv){
+
+			var pom = document.createElement('a');
+			var bb = new Blob([csv], {type: 'text/plain'});
+
+			pom.setAttribute('href', window.URL.createObjectURL(bb));
+			pom.setAttribute('download', filename);
+
+			pom.dataset.downloadurl = ['text/plain', pom.download, pom.href].join(':');
+			pom.click();
 			
 		}
 
