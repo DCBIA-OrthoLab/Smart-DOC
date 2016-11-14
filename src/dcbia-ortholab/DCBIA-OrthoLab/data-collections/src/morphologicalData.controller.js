@@ -171,11 +171,6 @@ angular.module('data-collections')
 			
 		}
 
-		$scope.morphologicalDataCollection.download = function(collection){
-			console.log("TODO");
-		}
-		
-
 		$scope.morphologicalDataCollection.addMorphologicalData = function(){
 			if ($scope.morphologicalData.data.date == undefined) {
 				var dt = new Date();
@@ -205,7 +200,6 @@ angular.module('data-collections')
 				return Promise.all([dcbia.addAttachement(res.data.id, $scope.morphologicalData.data.file.name, $scope.morphologicalData.data.file), dcbia.updateMorphologicalDataCollection($scope.morphologicalDataCollection.selectedCollection)]);
 			})
 			.then(function(res){
-				console.log(res);
 				$scope.morphologicalData.clear();
 			})
 			.catch(function(err){
@@ -278,7 +272,6 @@ angular.module('data-collections')
 						}else{
 							value = row[key]? row[key]: '';
 						}
-						console.log(value)
 						csv += value;
 						if(j < keys.length -1){
 							csv += ","
