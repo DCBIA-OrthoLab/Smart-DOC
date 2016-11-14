@@ -304,8 +304,19 @@ angular.module('data-collections')
 			pom.click();
 			
 		}
-
-		$scope.morphologicalDataCollection.getMorphologicalDataCollections();
+		
+		$scope.collectionParameter =  window.location.hash.substr(3 + 'morphologicalData'.length);
+		$scope.morphologicalDataCollection.getMorphologicalDataCollections()
+		.then(function(){
+			if($scope.collectionParameter != ""){
+				_.each($scope.morphologicalDataCollection.collections,function(collection){
+					if($scope.collectionParameter  === collection.name){
+						$scope.morphologicalDataCollection.section = 0;
+						$scope.morphologicalDataCollection.select(collection);
+					}
+				})
+			}
+		});
 
 	}
 

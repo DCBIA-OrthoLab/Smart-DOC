@@ -3,6 +3,7 @@ angular.module('data-collections')
 .directive('clinicalData', function($routeParams, dcbia, clusterauth) {
 
 	function link($scope, $attrs, $filter){
+
 		clusterauth.getUser()
 		.then(function(res){
 			$scope.user = res;
@@ -30,7 +31,7 @@ angular.module('data-collections')
 			name: "All clinical data",
 			type: "clinicalDataCollection",
 			items: 0
-		}
+		};
 
 
 		$scope.clinicalDataCollection.getClinicalDataCollections = function(){
@@ -434,6 +435,20 @@ angular.module('data-collections')
 			pom.click();
 			
 		}
+
+		$scope.collectionParameter =  window.location.hash.substr(3 + 'clinicalData'.length);
+		$scope.clinicalDataCollection.getClinicalDataCollections()
+		.then(function(){
+			if($scope.collectionParameter != ""){
+				_.each($scope.clinicalDataCollection.collections,function(collection){
+					if($scope.collectionParameter  === collection.name){
+						$scope.clinicalDataCollection.showSection = 0;
+						$scope.clinicalDataCollection.select(collection);
+					}
+				})
+			}
+		});
+
 	}
 
 	return {
