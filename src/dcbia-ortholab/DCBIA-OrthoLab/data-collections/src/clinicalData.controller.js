@@ -390,7 +390,18 @@ angular.module('data-collections')
 
 				_.each($scope.clinicalDataCollection.selectedCollectionData, function(row, i){
 					_.each(keys, function(key, j){
-						var value = row[key]? row[key]: '';
+						var value;
+						if(Array.isArray(row[key])){					
+							_.each(row[key], function(item,k){
+								if(k === 0){
+									value = item? item: '';
+								}else{
+									value += ' ' + (item? item: '');
+								}
+							})
+						}else{
+							value = row[key].toString()? row[key].toString(): '';
+						}
 						csv += value;
 						if(j < keys.length -1){
 							csv += ","
