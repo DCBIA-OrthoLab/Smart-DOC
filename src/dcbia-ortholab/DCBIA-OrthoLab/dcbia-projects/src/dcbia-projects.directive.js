@@ -46,6 +46,17 @@ angular.module('dcbia-projects')
 
 		$scope.clinicalCheckBox = false;
 
+		$scope.csv = {};
+
+		$scope.$watch('csv.file', function(){
+			if($scope.csv.file){
+				$scope.csv.readFile()
+				.then(function(){
+					$scope.$apply();
+				});
+			}
+		});
+
 		$scope.projects.getProjects = function(){
 			return dcbia.getProjects()
 			.then(function(res){
@@ -256,6 +267,62 @@ angular.module('dcbia-projects')
             });
             return display;
   		}
+
+		$scope.csv.export = function(project){
+			var prom;
+			if(!$scope.projects.selectedProject || project._id !== $scope.projects.selectedProject._id){
+				prom = $scope.projects.select(project);
+			}else{
+				prom = Promise.resolve(true);
+			}
+
+			prom
+			.then(function(){
+				var keys = $scope.projects.getProjectKeys([$scope.projects.selectedProject]);
+				var csv = 'name:,' + $scope.projects.selectedProject.name + '\n'
+				csv += 'description:,' + $scope.projects.selectedProject.description + '\n'
+				if(keys.indexOf("scope") !== -1){
+					csv += 'scope:,' + $scope.projects.selectedProject.scope + '\n'
+				}
+				csv += '\n';
+				var collectionKeys = ['Name','Number of items','Type']
+				csv += collectionKeys.toString();
+				csv += '\n';
+				_.each($scope.projects.selectedProject.collections, function(collection, i){
+					_.each($scope.clinicalDataCollection.collections, function(clinicalCollection){
+						if(collection._id === clinicalCollection._id){
+							csv += clinicalCollection.name + ',' + clinicalCollection.items.length + ',' + clinicalCollection.type + '\n';
+						}
+					})
+					_.each($scope.morphologicalDataCollection.collections, function(morphologicalDataCollection){
+						if(collection._id === morphologicalDataCollection._id){
+							csv += morphologicalDataCollection.name + ',' + morphologicalDataCollection.items.length + ',' + morphologicalDataCollection.type + '\n';
+						}
+					})
+				})
+
+				var filename = $scope.projects.selectedProject.name;
+				if($scope.projects.selectedProject.name.indexOf('csv') === -1){
+					filename += '.csv';
+				}
+
+				return $scope.csv.download(filename, csv);
+			});
+			
+		}
+
+		$scope.csv.download = function(filename, csv){
+
+			var pom = document.createElement('a');
+			var bb = new Blob([csv], {type: 'text/plain'});
+
+			pom.setAttribute('href', window.URL.createObjectURL(bb));
+			pom.setAttribute('download', filename);
+
+			pom.dataset.downloadurl = ['text/plain', pom.download, pom.href].join(':');
+			pom.click();
+			
+		}
 		
 		$scope.projects.getProjects();
 		$scope.morphologicalDataCollection.getMorphologicalDataCollections();
