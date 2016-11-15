@@ -8,6 +8,11 @@ angular.module('dcbia-projects')
 			$scope.user = res;
 		})
 
+		clusterauth.getScopes()
+		.then(function(res){
+			$scope.userScopes = res.data[0];
+		});
+
 		$scope.projects = {
 			newProject: {
 				collections: [],
@@ -212,6 +217,26 @@ angular.module('dcbia-projects')
 			})
 			return sum;
 		};
+
+		$scope.projects.hasScope = function(project, scope){
+			return project.scope.indexOf(scope) >= 0;
+		}
+
+		$scope.projects.addRemoveScope = function(project, scope){
+
+
+			if($scope.projects.hasScope(project, scope)){
+				project.scope.splice(project.scope.indexOf(scope), 1);
+			}else{
+				project.scope.push(scope);
+			}
+			dcbia.updateProject(project)
+			.then(function(res){
+				return $scope.projects.getProjects();
+			})
+			.catch(console.error);
+
+		}
 
 		$scope.morphologicalDataCollection.getMorphologicalDataCollections = function(){
 			return dcbia.getMorphologicalDataCollections()

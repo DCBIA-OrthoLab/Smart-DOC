@@ -21,50 +21,12 @@
 		</div>
 	</div>
 	<div class="col-md-10">
-		<div class="panel panel-default" style="overflow:scroll">
-			<div class="panel-heading">
-		    	Manage project scopes
-		  	</div>
-	  		<div class="panel-body">
-	  			<div class="panel panel-default">
-		  			<table st-table="projects.displayedProjects" st-safe-src="projects.projects" class="table table-striped">
-						<thead>
-							<tr>
-								<th> Project name </th>
-								<th ng-repeat="us in userScopes.scopes">{{us}}</th>
-							</tr>
-							<tr>
-								<th >
-									<input st-search="name" placeholder="search for project name" class="input-sm form-control" type="search"/>
-								</th>
-								<th colspan="{{userScopes.scopes.length}}">
-									<input st-search="scope" placeholder="search for scope" class="input-sm form-control" type="search"/>
-								</th>
-							</tr>
-						</thead>
-						<tbody>
-							<tr ng-repeat="project in projects.displayedProjects">
-								<td>{{project.name}}</td>
-								<td ng-repeat="us in userScopes.scopes">
-									<input type="checkbox" aria-label="..." ng-click="projects.addRemoveScope(project, us)" ng-checked="projects.hasScope(project, us)">
-								</td>
-							</tr>
-						</tbody>
-					</table>
-				</div>
-	  		</div>
-	  	</div>
-	</div>
-</div>
-<div class="row">
-	<div class="col-md-12">
-		<div class="panel panel-default" style="overflow:scroll">
+		<div class="panel panel-default">
 			<div class="panel-heading">
 		    	Manage user scopes
 		  	</div>
 			<div class="panel-body">
-			  	<div class="panel panel-info">
-
+			  	<div class="panel panel-info" style="overflow:scroll">
 				  	<table st-table="displayedUsers" st-safe-src="userdata" class="table table-striped">
 						<thead>
 							<tr>
