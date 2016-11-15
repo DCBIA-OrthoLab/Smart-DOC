@@ -30,6 +30,7 @@ module.exports = function (server, conf) {
 			_rev: Joi.string().required(),
         	type: Joi.string().valid('clinicalDataCollection').required(),
         	name: Joi.string().required(),
+        	scope: Joi.array().items(Joi.string()).required(),
         	items: Joi.array().items(Joi.object().keys({
         		_id: Joi.string().alphanum()
         	}))
@@ -61,6 +62,7 @@ module.exports = function (server, conf) {
 			_rev: Joi.string().required(),
         	type: Joi.string().valid('morphologicalDataCollection').required(),
         	name: Joi.string().required(),
+        	scope: Joi.array().items(Joi.string()).required(),
         	items: Joi.array().items(Joi.object().keys({
         		_id: Joi.string().alphanum()
         	}))

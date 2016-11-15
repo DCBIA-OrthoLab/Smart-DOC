@@ -272,7 +272,7 @@
 							<td ng-repeat="us in userScopes.scopes">
 								<div class="input-group">
 							      <span class="input-group-addon">
-							        <input type="checkbox" aria-label="..." ng-click="projects.addRemoveScope(project, us)" ng-checked="projects.hasScope(project, us)">
+							        <input type="checkbox" aria-label="..." ng-model='checkbox' ng-true-value="true" ng-false-value="false" ng-click="projects.addRemoveScope(project, us, checkbox)" ng-checked="projects.hasScope(project, us)">
 							      </span>
 							      <label class="form-control" >{{ us }}</label>
 							    </div>

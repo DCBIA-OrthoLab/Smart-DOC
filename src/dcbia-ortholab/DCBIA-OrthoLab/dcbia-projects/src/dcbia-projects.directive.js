@@ -222,9 +222,7 @@ angular.module('dcbia-projects')
 			return project.scope.indexOf(scope) >= 0;
 		}
 
-		$scope.projects.addRemoveScope = function(project, scope){
-
-
+		$scope.projects.addRemoveScope = function(project, scope, checkbox){
 			if($scope.projects.hasScope(project, scope)){
 				project.scope.splice(project.scope.indexOf(scope), 1);
 			}else{
@@ -233,6 +231,58 @@ angular.module('dcbia-projects')
 			dcbia.updateProject(project)
 			.then(function(res){
 				return $scope.projects.getProjects();
+			})
+			.catch(console.error);
+			_.each(project.collections, function(collection){
+				_.each($scope.morphologicalDataCollection.collections, function(items){
+					if(collection._id === items._id){
+						$scope.morphologicalDataCollection.addRemoveScope(items,scope,checkbox,project.name)
+						dcbia.getMorphologicalData(items._id)
+						.then(function(res){
+							$scope.morphological.data = res.data;						
+							_.each($scope.morphological.data, function(data){
+								$scope.morphological.addRemoveScope(data,scope,checkbox,collection.name)
+							})
+						})
+					}
+				});
+				_.each($scope.clinicalDataCollection.collections, function(items){
+					if(collection._id === items._id){
+						$scope.clinicalDataCollection.addRemoveScope(items,scope,checkbox,project.name)
+						dcbia.getClinicalData(items._id)
+						.then(function(res){
+							$scope.clinical.data = res.data;						
+							_.each($scope.clinical.data, function(data){
+								$scope.clinical.addRemoveScope(data,scope,checkbox,collection.name)
+							})
+						})
+					}
+				});
+			});
+
+		}
+
+		$scope.morphologicalDataCollection.addRemoveScope = function(collection, scope, checkbox, projectName){
+			if(collection.scope.indexOf(scope) >= 0 && !checkbox){
+				var removeScope = true;
+				_.each($scope.projects.projects,function(project){
+					_.each(project.collections, function(projectCollection){
+						if((projectCollection._id === collection._id) && (project.name !== projectName)){
+							if(project.scope.indexOf(scope) >= 0){
+								removeScope = false;
+							}
+						}
+					})
+				})
+				if(removeScope){
+					collection.scope.splice(collection.scope.indexOf(scope), 1);
+				}
+			}else if(collection.scope.indexOf(scope) < 0 && checkbox){
+				collection.scope.push(scope);
+			}
+			dcbia.updateMorphologicalDataCollection(collection)
+			.then(function(res){
+				return $scope.morphologicalDataCollection.getMorphologicalDataCollections();
 			})
 			.catch(console.error);
 
@@ -264,6 +314,33 @@ angular.module('dcbia-projects')
             });
             return display;
   		}
+
+		$scope.clinicalDataCollection.addRemoveScope = function(collection, scope, checkbox, projectName){
+
+			if(collection.scope.indexOf(scope) >= 0 && !checkbox){
+				var removeScope = true;
+				_.each($scope.projects.projects,function(project){
+					_.each(project.collections, function(projectCollection){
+						if((projectCollection._id === collection._id) && (project.name !== projectName)){
+							if(project.scope.indexOf(scope) >= 0){
+								removeScope = false;
+							}
+						}
+					})
+				})
+				if(removeScope){
+					collection.scope.splice(collection.scope.indexOf(scope), 1);
+				}
+			}else if(collection.scope.indexOf(scope) < 0 && checkbox){
+				collection.scope.push(scope);
+			}
+			dcbia.updateClinicalDataCollection(collection)
+			.then(function(res){
+				return $scope.clinicalDataCollection.getClinicalDataCollections();
+			})
+			.catch(console.error);
+
+		}
 
 		$scope.clinicalDataCollection.getClinicalDataCollections = function(){
 			return dcbia.getClinicalDataCollections()
@@ -350,6 +427,60 @@ angular.module('dcbia-projects')
 
 		$scope.openWindow = function(collection){
 			window.open('#/' + collection.type.substring(0, collection.type.length - "collection".length) + '#' + collection.name,'_blank');
+		}
+
+		$scope.clinical = {
+			data: {}
+		};
+
+		$scope.morphological = {
+			data: {}
+		};
+
+		$scope.clinical.addRemoveScope = function(data, scope, checkbox, collectionName){
+			if(data.scope.indexOf(scope) >= 0 && !checkbox){
+				var removeScope = true;
+				_.each($scope.clinicalDataCollection.collections,function(collection){
+					_.each(collection.items,function(item){
+						if((item._id === data._id) && (collection.name !== collectionName)){
+							if(collection.scope.indexOf(scope) >= 0){
+								removeScope = false;
+							}
+						}
+					})
+				})
+				if(removeScope){
+					data.scope.splice(data.scope.indexOf(scope), 1);
+				}
+			}else if(data.scope.indexOf(scope) < 0 && checkbox){
+				data.scope.push(scope);
+			}
+			dcbia.updateClinicalData(data)
+			.catch(console.error);
+
+		}
+
+		$scope.morphological.addRemoveScope = function(data, scope, checkbox, collectionName){
+			if(data.scope.indexOf(scope) >= 0 && !checkbox){
+				var removeScope = true;
+				_.each($scope.morphologicalDataCollection.collections,function(collection){
+					_.each(collection.items,function(item){
+						if((item._id === data._id) && (collection.name !== collectionName)){
+							if(collection.scope.indexOf(scope) >= 0){
+								removeScope = false;
+							}
+						}
+					})
+				})
+				if(removeScope){
+					data.scope.splice(data.scope.indexOf(scope), 1);
+				}
+			}else if(data.scope.indexOf(scope) < 0 && checkbox){
+				data.scope.push(scope);
+			}
+			dcbia.updateMorphologicalData(data)
+			.catch(console.error);
+
 		}
 		
 		$scope.projects.getProjects();
