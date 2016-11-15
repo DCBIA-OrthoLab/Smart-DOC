@@ -1,41 +1,107 @@
-
 <div class="row">
-  	<div class="panel panel-info">
+	<div class="col-md-2">
+		<div class="panel panel-default">
+			<div class="panel-heading">
+		    	Manage scopes
+		  	</div>
+	  		<div class="panel-body">
+					<div class="btn-group">
+					<ul class="list-group">
+					  	<li ng-repeat="us in userScopes.scopes" class="list-group-item">{{us}}</li>				 		
+					  	<li class="list-group-item">
+				 			<input type="text" class="form-control" placeholder="Scope" aria-describedby="basic-addon1" ng-model="newScope">
+				 		</li>
+					  	<button type="button" class="list-group-item list-group-item-action active" ng-click="createScope()">
+				 			<span class="glyphicon glyphicon-plus"></span>
+				 			New Scope
+				 		</button>
+				 	</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="col-md-10">
+		<div class="panel panel-default" style="overflow:scroll">
+			<div class="panel-heading">
+		    	Manage project scopes
+		  	</div>
+	  		<div class="panel-body">
+	  			<div class="panel panel-default">
+		  			<table st-table="projects.displayedProjects" st-safe-src="projects.projects" class="table table-striped">
+						<thead>
+							<tr>
+								<th> Project name </th>
+								<th ng-repeat="us in userScopes.scopes">{{us}}</th>
+							</tr>
+							<tr>
+								<th >
+									<input st-search="name" placeholder="search for project name" class="input-sm form-control" type="search"/>
+								</th>
+								<th colspan="{{userScopes.scopes.length}}">
+									<input st-search="scope" placeholder="search for scope" class="input-sm form-control" type="search"/>
+								</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr ng-repeat="project in projects.displayedProjects">
+								<td>{{project.name}}</td>
+								<td ng-repeat="us in userScopes.scopes">
+									<input type="checkbox" aria-label="..." ng-click="projects.addRemoveScope(project, us)" ng-checked="projects.hasScope(project, us)">
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+	  		</div>
+	  	</div>
+	</div>
+</div>
+<div class="row">
+	<div class="col-md-12">
+		<div class="panel panel-default" style="overflow:scroll">
+			<div class="panel-heading">
+		    	Manage user scopes
+		  	</div>
+			<div class="panel-body">
+			  	<div class="panel panel-info">
 
-	  	<table st-table="displayedUsers" st-safe-src="userdata" class="table table-striped">
-			<thead>
-				<tr>
-					<th >
-						<input st-search="name" placeholder="search for username" class="input-sm form-control" type="search"/>
-					</th>
-					<th>
-						<input st-search="email" placeholder="search for email" class="input-sm form-control" type="search"/>
-					</th>
-					<th colspan="3">
-						<input st-search="scope" placeholder="search for scope" class="input-sm form-control" type="search"/>
-					</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr ng-repeat="user in displayedUsers">
-					<td>{{user.name}}</td>
-					<td>{{user.email}}</td>
-					<td ng-repeat="us in userScopes">
-						<div class="input-group">
-					      <span class="input-group-addon">
-					        <input type="checkbox" aria-label="..." ng-click="addRemoveScope(user, us)" ng-checked="hasScope(user, us)">
-					      </span>
-					      <label class="form-control" >{{ us }}</label>
-					    </div>
-					</td>
-					<td>
-						<button type="button" ng-click="deleteUser(user)" class="btn btn-sm btn-danger">
-						<i class="glyphicon glyphicon-trash">
-							</i>
-						</button>
-					</td>
-				</tr>
-			</tbody>
-		</table>
+				  	<table st-table="displayedUsers" st-safe-src="userdata" class="table table-striped">
+						<thead>
+							<tr>
+								<th >
+									<input st-search="name" placeholder="search for username" class="input-sm form-control" type="search"/>
+								</th>
+								<th>
+									<input st-search="email" placeholder="search for email" class="input-sm form-control" type="search"/>
+								</th>
+								<th colspan="{{userScopes.scopes.length}}">
+									<input st-search="scope" placeholder="search for scope" class="input-sm form-control" type="search"/>
+								</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr ng-repeat="user in displayedUsers">
+								<td>{{user.name}}</td>
+								<td>{{user.email}}</td>
+								<td ng-repeat="us in userScopes.scopes">
+									<div class="input-group">
+								      <span class="input-group-addon">
+								        <input type="checkbox" aria-label="..." ng-click="addRemoveScope(user, us)" ng-checked="hasScope(user, us)">
+								      </span>
+								      <label class="form-control" >{{ us }}</label>
+								    </div>
+								</td>
+								<td>
+									<button type="button" ng-click="deleteUser(user)" class="btn btn-sm btn-danger">
+									<i class="glyphicon glyphicon-trash">
+										</i>
+									</button>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
 	</div>
 </div>

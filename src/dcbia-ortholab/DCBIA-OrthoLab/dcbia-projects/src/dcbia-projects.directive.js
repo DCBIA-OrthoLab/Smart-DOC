@@ -13,7 +13,7 @@ angular.module('dcbia-projects')
 				collections: [],
 				type: "project",
 				name: "",
-				scope: "",
+				// scope: "",
 				description: ""
 			},
 			projects: [],
@@ -86,9 +86,9 @@ angular.module('dcbia-projects')
 					}
 				});
 			});
-			if($scope.projects.newProject.scope === ""){
-				delete $scope.projects.newProject.scope;
-			}
+			// if($scope.projects.newProject.scope === ""){
+			// 	delete $scope.projects.newProject.scope;
+			// }
 			dcbia.createProject(newProject)
 			.then(function(res){
 				return $scope.projects.getProjects();
@@ -112,10 +112,9 @@ angular.module('dcbia-projects')
 					}
 				});
 			});
-			if(project.scope === ""){
-				delete project.scope;
-			}
-
+			// if(project.scope === ""){
+			// 	delete project.scope;
+			// }
 			dcbia.updateProject(project)
 			.then(function(res){
 				return $scope.projects.getProjects();
@@ -281,9 +280,9 @@ angular.module('dcbia-projects')
 				var keys = $scope.projects.getProjectKeys([$scope.projects.selectedProject]);
 				var csv = 'name:,' + $scope.projects.selectedProject.name + '\n'
 				csv += 'description:,' + $scope.projects.selectedProject.description + '\n'
-				if(keys.indexOf("scope") !== -1){
-					csv += 'scope:,' + $scope.projects.selectedProject.scope + '\n'
-				}
+				// if(keys.indexOf("scope") !== -1){
+				// 	csv += 'scope:,' + $scope.projects.selectedProject.scope + '\n'
+				// }
 				csv += '\n';
 				var collectionKeys = ['Name','Number of items','Type']
 				csv += collectionKeys.toString();
