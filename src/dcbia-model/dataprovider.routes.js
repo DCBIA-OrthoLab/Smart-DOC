@@ -76,21 +76,21 @@ module.exports = function (server, conf) {
 	
 	var project = Joi.object({
 			_id: Joi.string().alphanum().required(),
-			_rev: Joi.string(),
+			_rev: Joi.string().required(),
 			type: Joi.string().valid('project').required(),
 			name: Joi.string().required(),
 			description: Joi.string().required(),
 			collections: Joi.array().items(Joi.object().keys({
 				_id: Joi.string().alphanum()
 			})),
-			scope: Joi.string()
+			scope: Joi.array().items(Joi.string())
 		});
 
 	var projectpost = Joi.object({
 			name: Joi.string().required(),
         	type: Joi.string().valid('project').required(),
         	description: Joi.string().required(),
-        	scope: Joi.string(),
+        	scope: Joi.array().items(Joi.string()),
         	collections: Joi.array().items(Joi.object().keys({
         		_id: Joi.string().alphanum().required()
         	}))
