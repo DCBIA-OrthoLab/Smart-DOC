@@ -2,6 +2,7 @@ var Hapi = require('hapi');
 var fs = require('fs');
 var good = require('good');
 var path = require('path');
+var request = require("request");
 
 var env = process.env.NODE_ENV;
 
@@ -76,6 +77,24 @@ const startServer = function(cluster){
             throw err; // something bad happened loading the plugin
         }
 
+    });
+
+    request.get("http://localhost:5984/shinytooth/_design/user/_view/scopes", function(err,res,data){
+        if(JSON.parse(res.body).total_rows==0){
+            request({  
+                method: 'POST',
+                uri: 'http://localhost:5984/shinytooth/',
+                body: {
+                    type: 'scopes',
+                    scopes:['default','admin']
+                },
+                json: true 
+            }, function(err,res,data){
+                if(err){
+                    throw err;
+                }
+            });
+        }
     });
     
     server.start(function () {
