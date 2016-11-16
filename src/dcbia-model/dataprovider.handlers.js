@@ -339,6 +339,23 @@ module.exports = function (server, conf) {
 		});
 
 	}
+
+	handler.getProjects = function(req, rep){
+		
+		var view = '_design/getProject/_view/projectItems?include_docs=true';
+		
+		server.methods.dcbia.getView(view)
+		.then(function(rows){
+			var docs = _.pluck(rows, 'doc');
+			var compactdocs = _.compact(docs);
+			return compactdocs;
+		})
+		.then(rep)
+		.catch(function(e){
+			rep(Boom.wrap(e));
+		});
+	
+	}
 	
 
 	return handler;

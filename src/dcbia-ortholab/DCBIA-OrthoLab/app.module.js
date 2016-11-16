@@ -8,6 +8,7 @@ angular.module('dcbiaOrtholab', [
   'file-model',
   'jwt-user-login',
   'nav-bar',
+  'dcbia-projects',
   'data-collections',
   'home',
   'dcbia-surveys',
@@ -30,6 +31,9 @@ config(['$routeProvider', function($routeProvider) {
   })
   .when('/morphologicalData', {
     templateUrl: './home/morphologicalData.template.html'
+  })
+  .when('/projects', {
+    templateUrl: './home/dcbia-projects.template.html'
   })
   .when('/login/reset', {
     templateUrl: 'home/login.html'

@@ -34,6 +34,7 @@ module.exports = function (server, conf) {
 			_rev: Joi.string().required(),
         	type: Joi.string().valid('clinicalDataCollection').required(),
         	name: Joi.string().required(),
+        	scope: Joi.array().items(Joi.string()).required(),
         	items: Joi.array().items(Joi.object().keys({
         		_id: Joi.string().alphanum()
         	})),
@@ -71,6 +72,7 @@ module.exports = function (server, conf) {
 			_rev: Joi.string().required(),
         	type: Joi.string().valid('morphologicalDataCollection').required(),
         	name: Joi.string().required(),
+        	scope: Joi.array().items(Joi.string()).required(),
         	items: Joi.array().items(Joi.object().keys({
         		_id: Joi.string().alphanum()
         	})),
@@ -87,14 +89,26 @@ module.exports = function (server, conf) {
 		}).unknown();
 	
 	var project = Joi.object({
+			_id: Joi.string().alphanum().required(),
+			_rev: Joi.string().required(),
 			type: Joi.string().valid('project').required(),
-			name: Joi.string().alphanum().required(),
-			description: Joi.string().alphanum().required(),
+			name: Joi.string().required(),
+			description: Joi.string().required(),
 			collections: Joi.array().items(Joi.object().keys({
 				_id: Joi.string().alphanum()
 			})),
 			scope: Joi.array().items(Joi.string()).optional()
 		});
+
+	var projectpost = Joi.object({
+			name: Joi.string().required(),
+        	type: Joi.string().valid('project').required(),
+        	description: Joi.string().required(),
+        	scope: Joi.array().items(Joi.string()),
+        	collections: Joi.array().items(Joi.object().keys({
+        		_id: Joi.string().alphanum().required()
+        	}))
+        });
 
 
 	server.route({
@@ -673,6 +687,116 @@ module.exports = function (server, conf) {
 		    description: 'Add attachment data'
 	    }
 	});
-	
+
+	server.route({
+		method: 'GET',
+		path: "/dcbia/projects",
+		config: {
+			auth: {
+                strategy: 'token',
+                scope: ['dentist']
+            },
+			handler: handlers.getProjects,
+			validate: {
+			  	query: false,
+			    params: false, 
+			    payload: false
+			},
+			response: {
+				schema: Joi.array().items(project)
+			},
+			description: 'Get the job document posted to the database'
+	    }
+	});
+
+	server.route({
+		method: 'GET',
+		path: "/dcbia/project/{id}",
+		config: {
+			auth: {
+                strategy: 'token',
+                scope: ['dentist']
+            },
+			handler: handlers.getDocument,
+			validate: {
+			  	query: false,
+			    params: {
+			    	id: Joi.string()
+			    }, 
+			    payload: false
+			},
+			response: {
+				schema: project
+			},
+			description: 'Get the job document posted to the database'
+	    }
+	});	
+
+	server.route({
+		path: '/dcbia/projects',
+		method: 'PUT',
+		config: {
+			auth: {
+                strategy: 'token',
+                scope: ['dentist']
+            },
+			handler: handlers.updateDocument,
+			validate: {
+				query: false,
+		        payload: project,
+		        params: false
+			},
+			payload:{
+				output: 'data'
+			},
+			description: 'This route will be used to update a job document in the couch database.'
+		}
+	});
+
+
+	server.route({
+		method: 'POST',
+		path: "/dcbia/projects",
+		config: {
+			auth: {
+                strategy: 'token',
+                scope: ['dentist']
+            },
+			handler: handlers.createDocument,
+			validate: {
+				query: false,
+		        payload: projectpost,
+		        params: false
+			},
+			payload:{
+				output: 'data'
+			},
+			description: 'This route will be used to post job documents to the couch database.'
+		}
+	});
+
+	server.route({
+		path: '/dcbia/project/{id}',
+		method: 'DELETE',
+		config: {
+			auth: {
+                strategy: 'token',
+                scope: ['dentist']
+            },
+			handler: handlers.deleteDocument,
+			validate: {
+			  	query: false,
+			    params: {
+			    	id: Joi.string().alphanum().required()
+			    }, 
+			    payload: false
+			},
+			payload:{
+				output: 'data'
+			},
+			description: 'This route will be used to delete job documents from the database'
+		}
+	});
+
 
 }
