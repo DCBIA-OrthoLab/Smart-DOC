@@ -135,6 +135,19 @@ angular.module('jwt-user-login')
         url: '/auth/users',
         data: user
       });
+    },
+    getScopes: function(){
+      return $http({
+        method: 'GET',
+        url: '/auth/scopes'
+      });
+    },
+    updateScopes: function(scopes){
+      return $http({
+        method: 'PUT',
+        url: '/auth/scopes',
+        data: scopes
+      });
     }
   }
 })

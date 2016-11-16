@@ -95,6 +95,23 @@ var deleteClinicalData = function (token,id){
     });
 }
 
+var getClinicalDataWithId = function (token,id){
+    return new Promise(function(resolve,reject){
+        var options = {
+            url: getServer() + "/dcbia/clinical/data/" + id,
+            method: 'GET',
+            headers: { "Authorization": "Bearer " + token }
+      }
+        request(options, function(err, res, body){
+            if(err){
+                reject(err);
+            }else{
+                resolve(body);
+            }
+        });
+    });
+}
+
 var getClinicalDataOwners = function(token){
     return new Promise(function(resolve,reject){
         var options = {
@@ -116,7 +133,24 @@ var getClinicalDataOwners = function(token){
 var getClinicalDataOwner = function(token,email){
     return new Promise(function(resolve,reject){
         var options = {
-            url: getServer() + "/dcbia/clinical/data/owner?email=" + email,
+            url: getServer() + '/dcbia/clinical/data/owner?email=' + email,
+            method: 'GET',
+            headers: { "Authorization": "Bearer " + token }
+      }
+
+        request(options, function(err, res, body){
+            if(err){
+                reject(err);
+            }else{
+                resolve(body);
+            }
+        });
+    });
+}
+var getClinicalData = function(token,collectionId){
+    return new Promise(function(resolve,reject){
+        var options = {
+            url: getServer() + '/dcbia/clinical/collection/data/' + collectionId,
             method: 'GET',
             headers: { "Authorization": "Bearer " + token }
       }
@@ -137,14 +171,27 @@ lab.experiment("Test clusterpost auth jwt", function(){
         email: "clement.mirabel@gmail.com",
         password: "Password1234"
     }
+
     var clinicaldatapost = {
         "patientId": "Patient1",
         "type": "clinicalData",
         "formId": "TMJSurvey",
+        "scope": ["dentist"],
+        "date": "2016-12-17",
         "owner": "emailaddress@dentist.com"
     }
 
-    var id = ""
+    var wrongScopeClinicalDatapost = {
+        "patientId": "Patient1",
+        "type": "clinicalData",
+        "formId": "TMJSurvey",
+        "scope": ["wrongScope"],
+        "date": "2016-12-17",
+        "owner": "emailaddress@dentist.com"
+    }
+
+    var id = "";
+    var idWrongScope = "";
 
     lab.test('returns true when new user is login.', function(){
 
@@ -181,6 +228,26 @@ lab.experiment("Test clusterpost auth jwt", function(){
         
     });
 
+    lab.test('returns true when the user scope fits the document scope.', function(){
+        return getClinicalDataWithId(token,id)
+        .then(function(res){
+            Code.expect(JSON.parse(res).hasOwnProperty('error')).to.be.false();
+        });
+        
+    });
+
+    lab.test('returns true when the user scope does not fit the document scope.', function(){
+        createClinicalData(token,wrongScopeClinicalDatapost)
+        .then(function(res){
+            idWrongScope = res["id"];
+        });
+        return getClinicalDataWithId(token,idWrongScope)
+        .then(function(res){
+            Code.expect(JSON.parse(res).hasOwnProperty('error')).to.be.true();
+        });
+        
+    });
+
     lab.test('returns true if the document is deleted.', function(){
         return deleteClinicalData(token,id)
         .then(function(res){
@@ -188,6 +255,14 @@ lab.experiment("Test clusterpost auth jwt", function(){
         });
         
     });
+
+    lab.test('returns true if the document is deleted.', function(){
+        return deleteClinicalData(token,idWrongScope)
+        .then(function(res){
+            Code.expect(JSON.parse(res)["ok"]).to.be.true();
+        }); 
+    });
+    
 
 
     // lab.test('returns true if same user fails to be created.', function(){

@@ -1,0 +1,9 @@
+{
+    "_id": "_design/getProject",
+    "language": "javascript",
+    "views": {
+        "projectItems": {
+            "map": "function(doc) {\n\tif(doc.type === \"project\"){\n\t\temit(doc._id, {\n\t\t\t\"_id\": doc._id,\n\t\t\t\"name\": doc.name,\n\t\t\t\"description\": doc.description,\n\t\t\t\"collections\": doc.collections,\n\t\t\t\"scope\": doc.scope,\n\t\t\t\"type\": doc.type\n\t\t});\n\t}\n}"
+        }
+    }
+}

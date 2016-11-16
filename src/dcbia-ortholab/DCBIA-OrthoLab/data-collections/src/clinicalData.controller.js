@@ -3,6 +3,7 @@ angular.module('data-collections')
 .directive('clinicalData', function($routeParams, dcbia, clusterauth) {
 
 	function link($scope, $attrs, $filter){
+
 		clusterauth.getUser()
 		.then(function(res){
 			$scope.user = res;
@@ -30,7 +31,7 @@ angular.module('data-collections')
 			name: "All clinical data",
 			type: "clinicalDataCollection",
 			items: 0
-		}
+		};
 
 
 		$scope.clinicalDataCollection.getClinicalDataCollections = function(){
@@ -168,15 +169,18 @@ angular.module('data-collections')
 		};
 
 		$scope.clinical.clearForm = function(force){
-			var tempId = $scope.clinical.data.formId;
 			var clear = false;
 			if(!force){
 				force = confirm("Do you want to clear the current changes?");
 			}
 			if(force){
 				$scope.clinical.data = {};
-				$scope.clinical.data.formId = tempId;
-				$scope.clinical.data.date = new Date();
+				$scope.clinical.data.formId = "";
+				var dt = new Date();
+				var year = dt.getFullYear();
+				var month = ((dt.getMonth()+1)>=10)? (dt.getMonth()+1) : '0' + (dt.getMonth()+1);
+				var day = ((dt.getDate())>=10)? (dt.getDate()) : '0' + (dt.getDate());
+				$scope.clinical.data.date = year + "-" + month + "-" + day;
 			}
 			
 		}
@@ -386,7 +390,18 @@ angular.module('data-collections')
 
 				_.each($scope.clinicalDataCollection.selectedCollectionData, function(row, i){
 					_.each(keys, function(key, j){
-						var value = row[key]? row[key]: '';
+						var value;
+						if(Array.isArray(row[key])){					
+							_.each(row[key], function(item,k){
+								if(k === 0){
+									value = item? item: '';
+								}else{
+									value += ' ' + (item? item: '');
+								}
+							})
+						}else{
+							value = row[key].toString()? row[key].toString(): '';
+						}
 						csv += value;
 						if(j < keys.length -1){
 							csv += ","
@@ -419,6 +434,20 @@ angular.module('data-collections')
 			pom.click();
 			
 		}
+
+		$scope.collectionParameter =  window.location.hash.substr(3 + 'clinicalData'.length);
+		$scope.clinicalDataCollection.getClinicalDataCollections()
+		.then(function(){
+			if($scope.collectionParameter != ""){
+				_.each($scope.clinicalDataCollection.collections,function(collection){
+					if($scope.collectionParameter  === collection.name){
+						$scope.clinicalDataCollection.showSection = 0;
+						$scope.clinicalDataCollection.select(collection);
+					}
+				})
+			}
+		});
+
 	}
 
 	return {
