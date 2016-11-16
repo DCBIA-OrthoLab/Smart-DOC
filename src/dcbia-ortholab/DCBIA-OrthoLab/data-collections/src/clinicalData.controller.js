@@ -169,14 +169,13 @@ angular.module('data-collections')
 		};
 
 		$scope.clinical.clearForm = function(force){
-			var tempId = $scope.clinical.data.formId;
 			var clear = false;
 			if(!force){
 				force = confirm("Do you want to clear the current changes?");
 			}
 			if(force){
 				$scope.clinical.data = {};
-				$scope.clinical.data.formId = tempId;
+				$scope.clinical.data.formId = "";
 				var dt = new Date();
 				var year = dt.getFullYear();
 				var month = ((dt.getMonth()+1)>=10)? (dt.getMonth()+1) : '0' + (dt.getMonth()+1);
