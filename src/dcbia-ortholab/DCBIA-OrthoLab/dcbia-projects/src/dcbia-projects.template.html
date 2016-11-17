@@ -85,9 +85,9 @@
 							<tbody>
 								<tr ng-repeat="collection in clinicalDataCollection.collections">
 						        	<td ng-if="clinicalDataCollection.isCollectionInProject(collection)">
-						        		<button type="button" class="btn btn-default" ng-click="openWindow(collection)">
+						        		<a type="button" class="btn btn-default" href="#/clinicalData?collectionId={{collection._id}}" target="blank">
 						        			{{collection.name}}
-						        		</button>
+						        		</a>
 						        	</td>
 						        	<td ng-if="clinicalDataCollection.isCollectionInProject(collection)">
 						        		{{collection.items.length}}
