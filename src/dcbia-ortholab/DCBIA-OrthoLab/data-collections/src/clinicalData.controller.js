@@ -161,7 +161,19 @@ angular.module('data-collections')
 			}
 		}
 
-		$scope.clinicalDataCollection.getClinicalDataCollections();
+		$scope.clinicalDataCollection.getClinicalDataCollections()
+		.then(function(){
+			if($routeParams.collectionId){
+				var col = _.find($scope.clinicalDataCollection.collections, function(col){
+					return col._id === $routeParams.collectionId;
+				});
+				return $scope.clinicalDataCollection.select(col);
+			}
+		})
+		.then(function(){
+			$scope.clinicalDataCollection.showSection = 0;
+		})
+		.catch(console.error);
 
 
 		$scope.clinical = {
@@ -434,19 +446,6 @@ angular.module('data-collections')
 			pom.click();
 			
 		}
-
-		$scope.collectionParameter =  decodeURI(window.location.hash.substr(3 + 'clinicalData'.length));
-		$scope.clinicalDataCollection.getClinicalDataCollections()
-		.then(function(){
-			if($scope.collectionParameter != ""){
-				_.each($scope.clinicalDataCollection.collections,function(collection){
-					if($scope.collectionParameter  === collection.name){
-						$scope.clinicalDataCollection.showSection = 0;
-						$scope.clinicalDataCollection.select(collection);
-					}
-				})
-			}
-		});
 
 	}
 
