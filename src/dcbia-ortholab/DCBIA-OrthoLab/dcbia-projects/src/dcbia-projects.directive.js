@@ -433,10 +433,6 @@ angular.module('dcbia-projects')
 			
 		}
 
-		$scope.openWindow = function(collection){
-			window.open('#/' + collection.type.substring(0, collection.type.length - "collection".length) + '#' + collection.name,'_blank');
-		}
-
 		$scope.clinical = {
 			data: {}
 		};
@@ -497,9 +493,15 @@ angular.module('dcbia-projects')
 
 		}
 		
-		$scope.projects.getProjects();
-		$scope.morphologicalDataCollection.getMorphologicalDataCollections();
-		$scope.clinicalDataCollection.getClinicalDataCollections();
+		$scope.projects.getProjects()
+		.then(function(){
+			return $scope.morphologicalDataCollection.getMorphologicalDataCollections();
+		})
+		.then(function(){
+			return $scope.clinicalDataCollection.getClinicalDataCollections();
+		});
+		
+		
 	}
 
 	return {
