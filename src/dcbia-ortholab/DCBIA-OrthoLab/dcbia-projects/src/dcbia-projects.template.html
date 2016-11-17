@@ -85,9 +85,11 @@
 							<tbody>
 								<tr ng-repeat="collection in clinicalDataCollection.collections">
 						        	<td ng-if="clinicalDataCollection.isCollectionInProject(collection)">
-						        		<button type="button" class="btn btn-default" ng-click="openWindow(collection)">
-						        			{{collection.name}}
-						        		</button>
+						        		<a target="_blank" href="#/clinicalData?collectionId={{collection._id}}">
+							        		<button type="button" class="btn btn-default">
+							        			{{collection.name}}
+							        		</button>
+						        		</a>
 						        	</td>
 						        	<td ng-if="clinicalDataCollection.isCollectionInProject(collection)">
 						        		{{collection.items.length}}
@@ -118,9 +120,11 @@
 							<tbody>
 								<tr ng-repeat="collection in morphologicalDataCollection.collections">
 						        	<td ng-if="morphologicalDataCollection.isCollectionInProject(collection)">
-						        		<button type="button" class="btn btn-default" ng-click="openWindow(collection)">
-						        			{{collection.name}}
-						        		</button>
+						        		<a target="_blank" href="#/morphologicalData?collectionId={{collection._id}}">
+							        		<button type="button" class="btn btn-default">
+							        			{{collection.name}}
+							        		</button>
+						        		</a>
 						        	</td>
 						        	<td ng-if="morphologicalDataCollection.isCollectionInProject(collection)">
 						        		{{collection.items.length}}
@@ -179,10 +183,12 @@
 						        				<input type="checkbox" aria-label="..." checklist-model="clinicalDataCollection.selectedCollections" checklist-value="collection.name">
 								        	</td>
 								        	<td>
-								        		<button type="button" class="btn btn-default" ng-click="openWindow(collection)">
-								        			{{collection.name}}
-								        		</button>
-								        	</td>
+								        		<a target="_blank" href="#/clinicalData?collectionId={{collection._id}}">
+									        		<button type="button" class="btn btn-default">
+								        				{{collection.name}}
+								        			</button>
+							        			</a>
+						        			</td>
 								        	<td>
 								        		{{collection.items.length}}
 								        	</td>
@@ -218,9 +224,11 @@
 						        				<input type="checkbox" aria-label="..." checklist-model="morphologicalDataCollection.selectedCollections" checklist-value="collection.name">
 								        	</td>
 								        	<td>
-								        		<button type="button" class="btn btn-default" ng-click="openWindow(collection)">
+							        		<a target="_blank" href="#/morphologicalData?collectionId={{collection._id}}">
+								        		<button type="button" class="btn btn-default">
 								        			{{collection.name}}
 								        		</button>
+							        		</a>
 								        	</td>
 								        	<td>
 								        		{{collection.items.length}}
@@ -327,9 +335,11 @@
 					        				<input type="checkbox" aria-label="..." checklist-model="clinicalDataCollection.selectedCollections" checklist-value="collection.name">
 							        	</td>
 							        	<td>
-							        		<button type="button" class="btn btn-default" ng-click="openWindow(collection)">
+						        		<a target="_blank" href="#/clinicalData?collectionId={{collection._id}}">
+							        		<button type="button" class="btn btn-default">
 							        			{{collection.name}}
 							        		</button>
+						        		</a>
 							        	</td>
 							        	<td>
 							        		{{collection.items.length}}
@@ -366,9 +376,11 @@
 					        				<input type="checkbox" aria-label="..." checklist-model="morphologicalDataCollection.selectedCollections" checklist-value="collection.name">
 							        	</td>
 							        	<td>
-							        		<button type="button" class="btn btn-default" ng-click="openWindow(collection)">
+						        		<a target="_blank" href="#/morphologicalData?collectionId={{collection._id}}">
+							        		<button type="button" class="btn btn-default">
 							        			{{collection.name}}
 							        		</button>
+						        		</a>
 							        	</td>
 							        	<td>
 							        		{{collection.items.length}}

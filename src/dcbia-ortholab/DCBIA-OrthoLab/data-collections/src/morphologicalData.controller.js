@@ -208,6 +208,22 @@ angular.module('data-collections')
 			
 		}
 
+
+		$scope.morphologicalDataCollection.getMorphologicalDataCollections()
+		.then(function(){
+			if($routeParams.collectionId){
+				var col = _.find($scope.morphologicalDataCollection.collections, function(col){
+					return col._id === $routeParams.collectionId;
+				});
+				return $scope.morphologicalDataCollection.select(col);
+			}
+		})
+		.then(function(){
+			$scope.morphologicalDataCollection.section = 0;
+		})
+		.catch(console.error);
+
+
 		$scope.morphologicalData.delete = function(item){
 			if(confirm("Do you want to delete the current item?")){
 				return dcbia.deleteMorphologicalData(item._id)
@@ -304,19 +320,6 @@ angular.module('data-collections')
 			pom.click();
 			
 		}
-		
-		$scope.collectionParameter =  window.location.hash.substr(3 + 'morphologicalData'.length);
-		$scope.morphologicalDataCollection.getMorphologicalDataCollections()
-		.then(function(){
-			if($scope.collectionParameter != ""){
-				_.each($scope.morphologicalDataCollection.collections,function(collection){
-					if($scope.collectionParameter  === collection.name){
-						$scope.morphologicalDataCollection.section = 0;
-						$scope.morphologicalDataCollection.select(collection);
-					}
-				})
-			}
-		});
 
 	}
 
