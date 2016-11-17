@@ -9,7 +9,8 @@ module.exports = function(grunt) {
             }
         },
         assets:{
-            appJS: ['./src/jwtUserLogin.module.js', 
+            appJS: ['./node_modules/checklist-model/checklist-model.js',
+            './src/jwtUserLogin.module.js', 
             './src/jwtUserLogin.service.js', 
             './src/jwtUserLogin.directive.js',
             './src/usersManager.directive.js',

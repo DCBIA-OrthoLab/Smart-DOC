@@ -30,5 +30,8 @@
   "bugs": {
     "url": "https://github.com/DCBIA-OrthoLab/shiny-tooth/issues"
   },
-  "homepage": "https://github.com/DCBIA-OrthoLab/shiny-tooth#readme"
+  "homepage": "https://github.com/DCBIA-OrthoLab/shiny-tooth#readme",
+  "dependencies": {
+    "checklist-model": "^0.10.0"
+  }
 }
