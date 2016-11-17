@@ -435,7 +435,7 @@ angular.module('data-collections')
 			
 		}
 
-		$scope.collectionParameter =  window.location.hash.substr(3 + 'clinicalData'.length);
+		$scope.collectionParameter =  decodeURI(window.location.hash.substr(3 + 'clinicalData'.length));
 		$scope.clinicalDataCollection.getClinicalDataCollections()
 		.then(function(){
 			if($scope.collectionParameter != ""){

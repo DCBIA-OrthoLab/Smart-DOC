@@ -219,6 +219,9 @@ angular.module('dcbia-projects')
 		};
 
 		$scope.projects.hasScope = function(project, scope){
+			if(project.scope === undefined){
+				project.scope = [];
+			}
 			return project.scope.indexOf(scope) >= 0;
 		}
 
@@ -263,6 +266,9 @@ angular.module('dcbia-projects')
 		}
 
 		$scope.morphologicalDataCollection.addRemoveScope = function(collection, scope, checkbox, projectName){
+			if(collection.scope === undefined){
+				collection.scope = [];
+			}
 			if(collection.scope.indexOf(scope) >= 0 && !checkbox){
 				var removeScope = true;
 				_.each($scope.projects.projects,function(project){
@@ -316,7 +322,9 @@ angular.module('dcbia-projects')
   		}
 
 		$scope.clinicalDataCollection.addRemoveScope = function(collection, scope, checkbox, projectName){
-
+			if(collection.scope === undefined){
+				collection.scope = [];
+			}
 			if(collection.scope.indexOf(scope) >= 0 && !checkbox){
 				var removeScope = true;
 				_.each($scope.projects.projects,function(project){
@@ -438,6 +446,9 @@ angular.module('dcbia-projects')
 		};
 
 		$scope.clinical.addRemoveScope = function(data, scope, checkbox, collectionName){
+			if(data.scope === undefined){
+				data.scope = [];
+			}
 			if(data.scope.indexOf(scope) >= 0 && !checkbox){
 				var removeScope = true;
 				_.each($scope.clinicalDataCollection.collections,function(collection){
@@ -461,6 +472,9 @@ angular.module('dcbia-projects')
 		}
 
 		$scope.morphological.addRemoveScope = function(data, scope, checkbox, collectionName){
+			if(data.scope === undefined){
+				data.scope = [];
+			}
 			if(data.scope.indexOf(scope) >= 0 && !checkbox){
 				var removeScope = true;
 				_.each($scope.morphologicalDataCollection.collections,function(collection){
