@@ -153,7 +153,7 @@ angular.module('data-collections')
 			    	
 			    });
 				$scope.morphologicalDataCollection.selectedCollectionDataKeys = $scope.morphologicalDataCollection.getDataCollectionKeys(selectedCollectionData);
-
+				$scope.morphologicalDataCollection.section = 0;
 
 			})
 			.catch(console.error);
@@ -217,9 +217,6 @@ angular.module('data-collections')
 				});
 				return $scope.morphologicalDataCollection.select(col);
 			}
-		})
-		.then(function(){
-			$scope.morphologicalDataCollection.section = 0;
 		})
 		.catch(console.error);
 
