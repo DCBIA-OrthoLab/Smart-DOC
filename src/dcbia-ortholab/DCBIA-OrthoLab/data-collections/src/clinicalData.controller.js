@@ -107,7 +107,7 @@ angular.module('data-collections')
 				var selectedCollectionData = res.data;
 			    $scope.clinicalDataCollection.selectedCollectionData = selectedCollectionData;
 				$scope.clinicalDataCollection.selectedCollectionDataKeys = $scope.clinicalDataCollection.getDataCollectionKeys(selectedCollectionData);
-
+				$scope.clinicalDataCollection.showSection = 0;
 
 			})
 			.catch(console.error);
@@ -167,11 +167,8 @@ angular.module('data-collections')
 				var col = _.find($scope.clinicalDataCollection.collections, function(col){
 					return col._id === $routeParams.collectionId;
 				});
-				return $scope.clinicalDataCollection.select(col);
+				return $scope.clinicalDataCollection.select(col)
 			}
-		})
-		.then(function(){
-			$scope.clinicalDataCollection.showSection = 0;
 		})
 		.catch(console.error);
 
@@ -202,6 +199,32 @@ angular.module('data-collections')
 			if(!selectedCollection){
 				alert("You need to select a collection first!");
 			}else if($scope.clinical.data){
+				var problemList = ["problemOrPreventChewing", 
+				"problemOrPreventDrinking",
+				"problemOrPreventExercising",
+				"problemOrPreventEatingHardFoods",
+				"problemOrPreventEatingSoftFoods",
+				"problemOrPreventSmilingLaughing",
+				"problemOrPreventSexualActivity",
+				"problemOrPreventCleaningTeethOrFace",
+				"problemOrPreventYawning",
+				"problemOrPreventSwallowing",
+				"problemOrPreventTalking",
+				"problemOrPreventHavingUsualFaceAppearance"];
+				var problemListValues = []
+				_.each(problemList,function(problemName){
+					problemListValues.push($scope.clinical.data[problemName])
+				})
+				if(problemListValues.indexOf(true) !== -1){
+					_.each(problemListValues,function(value,i){
+						if(value){
+							$scope.clinical.data[problemList[i]] = "yes";
+						}else{
+							$scope.clinical.data[problemList[i]] = "no";
+						}
+					})
+				}
+			
 				$scope.clinical.createClinicalData($scope.clinical.data)
 				.then(function(res){
 					selectedCollection.items.push({_id:res.data.id});
