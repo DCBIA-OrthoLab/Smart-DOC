@@ -202,6 +202,33 @@ angular.module('data-collections')
 			if(!selectedCollection){
 				alert("You need to select a collection first!");
 			}else if($scope.clinical.data){
+				var problemList = ["problemOrPreventChewing", 
+				"problemOrPreventDrinking",
+				"problemOrPreventExercising",
+				"problemOrPreventEatingHardFoods",
+				"problemOrPreventEatingSoftFoods",
+				"problemOrPreventSmilingLaughing",
+				"problemOrPreventSexualActivity",
+				"problemOrPreventCleaningTeethOrFace",
+				"problemOrPreventYawning",
+				"problemOrPreventSwallowing",
+				"problemOrPreventTalking",
+				"problemOrPreventHavingUsualFaceAppearance"];
+				var problemListValues = []
+				_.each(problemList,function(problemName){
+					problemListValues.push($scope.clinical.data[problemName])
+				})
+				console.log(problemListValues)
+				if(problemListValues.indexOf(true) !== -1){
+					_.each(problemListValues,function(value,i){
+						if(value){
+							$scope.clinical.data[problemList[i]] = "yes";
+						}else{
+							$scope.clinical.data[problemList[i]] = "no";
+						}
+					})
+				}
+			
 				$scope.clinical.createClinicalData($scope.clinical.data)
 				.then(function(res){
 					selectedCollection.items.push({_id:res.data.id});
