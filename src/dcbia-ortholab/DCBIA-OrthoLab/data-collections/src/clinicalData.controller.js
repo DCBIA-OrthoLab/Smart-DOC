@@ -218,7 +218,6 @@ angular.module('data-collections')
 				_.each(problemList,function(problemName){
 					problemListValues.push($scope.clinical.data[problemName])
 				})
-				console.log(problemListValues)
 				if(problemListValues.indexOf(true) !== -1){
 					_.each(problemListValues,function(value,i){
 						if(value){
