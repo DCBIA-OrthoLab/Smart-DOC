@@ -107,7 +107,6 @@ angular.module('data-collections')
 				var selectedCollectionData = res.data;
 			    $scope.clinicalDataCollection.selectedCollectionData = selectedCollectionData;
 				$scope.clinicalDataCollection.selectedCollectionDataKeys = $scope.clinicalDataCollection.getDataCollectionKeys(selectedCollectionData);
-				$scope.clinicalDataCollection.showSection = 0;
 
 			})
 			.catch(console.error);
@@ -167,6 +166,7 @@ angular.module('data-collections')
 				var col = _.find($scope.clinicalDataCollection.collections, function(col){
 					return col._id === $routeParams.collectionId;
 				});
+				$scope.clinicalDataCollection.showSection = 0;
 				return $scope.clinicalDataCollection.select(col)
 			}
 		})

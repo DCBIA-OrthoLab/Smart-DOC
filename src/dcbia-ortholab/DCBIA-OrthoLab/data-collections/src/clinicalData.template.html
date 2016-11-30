@@ -72,7 +72,7 @@
 				        	<b>Number of items: </b> {{collection.items.length}}
 				        </p>
 			        	<div class="btn-group">
-						 <button type="button" class="btn btn-default" ng-click="clinicalDataCollection.select(collection)">
+						 <button type="button" class="btn btn-default" ng-click="clinicalDataCollection.showSection = 0;clinicalDataCollection.select(collection)">
 						 	<span class="glyphicon glyphicon-eye-open"></span>
 						 </button>
 						 <button type="button" class="btn btn-default" ng-click="clinicalDataCollection.showSection = 1;clinicalDataCollection.addClinicalData(collection)">
@@ -83,7 +83,7 @@
 						 	<span class="glyphicon glyphicon-download"></span>
 						 </button>
 
-						 <button type="button" class="btn btn-default" ng-click="clinicalDataCollection.showSection = 2;clinicalDataCollection.select(collection)">
+						 <button type="button" class="btn btn-default" ng-click="clinicalDataCollection.select(collection);clinicalDataCollection.showSection = 2">
 						 	<span class="glyphicon glyphicon-signal"></span>
 						 </button>
 						 
