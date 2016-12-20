@@ -66,7 +66,10 @@
 			</div>
 		</div>
 	</div>
-	<div class="panel panel-info" ng-if="projects.showSection == 1">
+	<div class="panel panel-default" ng-if="projects.showSection == 1">
+		<div class="panel-heading">
+	    	Project collections
+	  	</div>
 		<div class="panel-body">
 		  	<div class="col-md-6">
 		  		<div class="panel panel-default" style="overflow:scroll">
@@ -78,8 +81,6 @@
 							<thead>
 								<tr>
 									<th>Name</th>
-									<th>Number of items</th>
-									<th>Type</th> 
 								</tr>
 							</thead>
 							<tbody>
@@ -136,6 +137,45 @@
 		  	</div>
 		</div>
 	</div>
+	<div class="panel panel-default" ng-if="projects.showSection == 1">
+		<div class="panel-heading">
+	    	Full data
+	  	</div>
+  		<div class="panel-body">
+  			<div class="panel panel-info">
+	  			<table st-table="projects.displayedProject" st-safe-src="projects.selectedProjectData" class="table table-striped">
+					<thead>
+						<tr>
+							<th ng-repeat="key in projects.selectedProjectDataKeys" st-sort="{{key}}">{{key}}</th>
+						</tr>
+						<!-- <tr> -->
+							<!-- <th ng-repeat="key in clinicalDataCollection.selectedCollectionDataKeys" ng-if="key != 'scope'"> -->
+								<!-- <input st-search="{{key}}" placeholder="search for {{key}}" class="input-sm form-control" type="search"/> -->
+							<!-- </th> -->
+						<!-- </tr> -->
+					</thead>
+					<tbody>
+						<td ng-repeat="key in projects.selectedProjectDataKeys" ng-if="key != 'scope'">
+							<div ng-if="_.isArray(row[key]) && key == 'attachments'">
+								<button type="button" class="btn btn-default" ng-repeat="att in row[key]" ng-click="">
+									<span class="glyphicon glyphicon-eye"></span>{{att}}
+								</button>
+								
+							</div>
+							<div ng-if="!_.isArray(row[key])">
+								{{row[key]}}
+							</div>
+							<div ng-if="_.isArray(row[key]) && key != 'attachments'">
+								<ul>
+									<li ng-repeat="item in row[key]" ng-if="key == 'owners'">{{item.user}}</li>
+								</ul>
+							</div>
+						</td>
+					</tbody>
+				</table>
+			</div>
+  		</div>
+  	</div>
 	<div class="panel panel-info" ng-if="projects.showSection == 2">
 		<div class="panel panel-default">
 		  <div class="panel-body">
@@ -249,7 +289,7 @@
 		  </div>
 		</div>
 	</div>
-	<div class="panel panel-default" style="overflow:scroll">
+	<div class="panel panel-default" style="overflow:scroll" ng-if="projects.showSection == 0">
 		<div class="panel-heading">
 	    	Manage project scopes
 	  	</div>
