@@ -441,7 +441,12 @@ angular.module('data-collections')
 								}
 							})
 						}else{
-							value = row[key].toString()? row[key].toString(): '';
+							if(row[key] === undefined || row[key] === null){
+								value = "";
+							}
+							else{
+								value = row[key].toString()? row[key].toString(): '';
+							}
 						}
 						csv += value;
 						if(j < keys.length -1){
