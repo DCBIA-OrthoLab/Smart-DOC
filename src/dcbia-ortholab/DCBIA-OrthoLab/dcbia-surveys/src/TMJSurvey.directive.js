@@ -43,7 +43,6 @@ angular.module('dcbia-surveys')
 			$scope.formData.jointSoundOpeningLeft = "";
 			$scope.formData.jointSoundOpeningRight = "";
 			$scope.formData.knowAnyoneInFamilyWithDiseases = "";
-			$scope.formData.lastMonthDistressed = "";
 			$scope.formData.lastMonthDistressedAwakeningEarlyMorning = "";
 			$scope.formData.lastMonthDistressedBeingCaughtTrapped = "";
 			$scope.formData.lastMonthDistressedBlamingYourself = "";
