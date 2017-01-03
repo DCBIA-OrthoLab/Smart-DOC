@@ -1,5 +1,5 @@
 angular.module('dcbia-projects')
-.directive('projects', function($routeParams, dcbia, clusterauth) {
+.directive('projects', function($q, $routeParams, dcbia, clusterauth) {
 
 	function link($scope, $attrs, $filter){
 
@@ -157,10 +157,12 @@ angular.module('dcbia-projects')
 		        });
 		        if(morphologicalCollection) $scope.morphologicalDataCollection.selectedCollections.push(morphologicalCollection.name);
 			});
-			$scope.clinical.data = $scope.clinical.getSelectedProjectData();
-			$scope.morphological.data = $scope.morphological.getSelectedProjectData();
-			$scope.projects.selectedProjectData = $scope.projects.mergeCollections($scope.clinical.data,$scope.morphological.data);
-			$scope.projects.selectedProjectDataKeys = $scope.projects.getProjectDataKeys($scope.projects.selectedProjectData);
+			$q.all([$scope.clinical.getSelectedProjectData(),$scope.morphological.getSelectedProjectData()])
+			.then(function(){
+				$scope.projects.selectedProjectData = $scope.projects.mergeCollections($scope.clinical.data,$scope.morphological.data);
+				$scope.projects.selectedProjectDataKeys = $scope.projects.getProjectDataKeys($scope.projects.selectedProjectData);
+				console.log($scope.projects.selectedProjectDataKeys);
+			});
 		};
 
 		$scope.projects.getProjectKeys = function(project){
@@ -501,31 +503,25 @@ angular.module('dcbia-projects')
 		}
 
 		$scope.clinical.getSelectedProjectData = function(){
-			var clinicalData = [];
-			var callback = false;
-			_.each($scope.projects.selectedProject.collections, function(selectedProjectCollection,i) {
-				dcbia.getClinicalData(selectedProjectCollection._id)
-				.then(function(res){
-					clinicalData = (clinicalData.length) ? $scope.projects.mergeCollections(clinicalData,res.data) : res.data;
-					// if(i == $scope.projects.selectedProject.collections.length - 1) callback = true;
+			var mapId = _.map($scope.projects.selectedProject.collections,function(col){ return col._id });
+			return Promise.all(_.map(mapId,dcbia.getClinicalData))
+			.then(function(res) {
+				_.each(res,function(collection){
+					$scope.clinical.data = ($scope.clinical.data.length) ? $scope.projects.mergeCollections($scope.clinical.data,collection.data) : collection.data;
 				})
-				.catch(console.error);
+				return $scope.clinical.data;
 			});
-			// while(!callback);
-			console.log(clinicalData)
-			return clinicalData;
 		}
 
 		$scope.morphological.getSelectedProjectData = function(){
-			var morphologicalData = [];
-			_.each($scope.projects.selectedProject.collections, function(selectedProjectCollection) {
-				dcbia.getMorphologicalData(selectedProjectCollection._id)
-				.then(function(res){
-					morphologicalData = (morphologicalData.length) ? $scope.projects.mergeCollections(morphologicalData,res.data) : res.data;
+			var mapId = _.map($scope.projects.selectedProject.collections,function(col){ return col._id });
+			return Promise.all(_.map(mapId,dcbia.getMorphologicalData))
+			.then(function(res) {
+				_.each(res,function(collection){
+					$scope.morphological.data = ($scope.morphological.data.length) ? $scope.projects.mergeCollections($scope.morphological.data,collection.data) : collection.data;
 				})
-				.catch(console.error);
+				return $scope.morphological.data;
 			});
-			return morphologicalData;
 		}
 
 		$scope.morphological.addRemoveScope = function(data, scope, checkbox, collectionName){
