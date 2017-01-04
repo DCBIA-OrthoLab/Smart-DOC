@@ -13,6 +13,8 @@ angular.module('dcbia-projects')
 			$scope.userScopes = res.data[0];
 		});
 
+		$scope._ = _;
+
 		$scope.projects = {
 			newProject: {
 				collections: [],
@@ -161,7 +163,6 @@ angular.module('dcbia-projects')
 			.then(function(){
 				$scope.projects.selectedProjectData = $scope.projects.mergeCollections($scope.clinical.data,$scope.morphological.data);
 				$scope.projects.selectedProjectDataKeys = $scope.projects.getProjectDataKeys($scope.projects.selectedProjectData);
-				console.log($scope.projects.selectedProjectDataKeys);
 			});
 		};
 
@@ -192,6 +193,24 @@ angular.module('dcbia-projects')
 			if(projectDataKeys._rev){
 				delete projectDataKeys._rev;
 			}
+			if(projectDataKeys.type){
+				delete projectDataKeys.type;
+			}
+			if(projectDataKeys.owner){
+				delete projectDataKeys.owner;
+			}
+			if(projectDataKeys.owners){
+				delete projectDataKeys.owners;
+			}
+			if(projectDataKeys.formId){
+				delete projectDataKeys.formId;
+			}
+			if(projectDataKeys.date){
+				delete projectDataKeys.date;
+			}
+			if(projectDataKeys.scope){
+				delete projectDataKeys.scope;
+			}						
 			return _.keys(projectDataKeys);
 		}
 
@@ -518,6 +537,15 @@ angular.module('dcbia-projects')
 			return Promise.all(_.map(mapId,dcbia.getMorphologicalData))
 			.then(function(res) {
 				_.each(res,function(collection){
+				    collection.data = _.map(collection.data, function(d){
+				    	if(d._attachments){
+				    		_.extend(d, {
+				    			attachments: _.keys(d._attachments)
+				    		});
+				    	}
+				    	delete d._attachments;
+				    	return d;
+				    });
 					$scope.morphological.data = ($scope.morphological.data.length) ? $scope.projects.mergeCollections($scope.morphological.data,collection.data) : collection.data;
 				})
 				return $scope.morphological.data;
