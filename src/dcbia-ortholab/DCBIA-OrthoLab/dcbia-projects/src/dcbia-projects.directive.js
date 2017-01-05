@@ -19,6 +19,7 @@ angular.module('dcbia-projects')
 			newProject: {
 				collections: [],
 				type: "project",
+				patients: "",
 				name: "",
 				// scope: "",
 				description: ""
@@ -234,7 +235,8 @@ angular.module('dcbia-projects')
 					collections: [],
 					type: "project",
 					name: "",
-					scope: "",
+					patients: "",
+					// scope: "",
 					description: ""
 				};
 				$scope.morphologicalDataCollection.selectedCollections = [];
@@ -444,6 +446,7 @@ angular.module('dcbia-projects')
 				var keys = $scope.projects.getProjectKeys([$scope.projects.selectedProject]);
 				var csv = 'name:,' + $scope.projects.selectedProject.name + '\n'
 				csv += 'description:,' + $scope.projects.selectedProject.description + '\n'
+				csv += 'patients:,' + $scope.projects.selectedProject.patients + '\n'
 				// if(keys.indexOf("scope") !== -1){
 				// 	csv += 'scope:,' + $scope.projects.selectedProject.scope + '\n'
 				// }
