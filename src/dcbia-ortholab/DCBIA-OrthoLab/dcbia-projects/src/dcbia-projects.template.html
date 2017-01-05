@@ -137,46 +137,117 @@
 		  	</div>
 		</div>
 	</div>
-	<div class="panel panel-default" ng-if="projects.showSection == 1">
+	<div class="panel panel-default" style="overflow:scroll" ng-if="projects.showSection == 1">
 		<div class="panel-heading">
 	    	Full data
 	  	</div>
-	  	<div class="panel panel-default" style="overflow:scroll">
-	  		<div class="panel-body">
-	  			<table st-table="projects.displayedProject" st-safe-src="projects.selectedProjectData" class="table table-striped">
-					<thead>
-						<tr>
-							<th ng-repeat="key in projects.selectedProjectDataKeys" st-sort="{{key}}">{{key}}</th>
-						</tr>
-						<tr>
-							<th ng-repeat="key in projects.selectedProjectDataKeys">
-								<input st-search="{{key}}" placeholder="search for {{key}}" class="input-sm form-control" type="search"/>
-							</th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr ng-repeat="row in projects.displayedProject">
-							<td ng-repeat="key in projects.selectedProjectDataKeys">
-								<div ng-if="_.isArray(row[key]) && key == 'attachments'">
-									<button type="button" class="btn btn-default" ng-repeat="att in row[key]" ng-click="">
-										<span class="glyphicon glyphicon-eye"></span>{{att}}
-									</button>
-									
-								</div>
-								<div ng-if="!_.isArray(row[key])">
-									{{row[key]}}
-								</div>
-								<div ng-if="_.isArray(row[key]) && key != 'attachments'">
-									<ul>
-										<li ng-repeat="item in row[key]" ng-if="key == 'owners'">{{item.user}}</li>
-									</ul>
-								</div>
-							</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-  		</div>
+  		<div class="panel-body">
+  			<table st-table="projects.displayedProject" st-safe-src="projects.selectedProjectData" class="table table-striped">
+				<thead>
+					<tr>
+						<th ng-repeat="key in projects.selectedProjectDataKeys" st-sort="{{key}}">{{key}}</th>
+					</tr>
+					<tr>
+						<th ng-repeat="key in projects.selectedProjectDataKeys">
+							<input st-search="{{key}}" placeholder="search for {{key}}" class="input-sm form-control" type="search"/>
+						</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-repeat="row in projects.displayedProject">
+						<td ng-repeat="key in projects.selectedProjectDataKeys">
+							<div ng-if="_.isArray(row[key]) && key == 'attachments'">
+								<button type="button" class="btn btn-default" ng-repeat="att in row[key]" ng-click="">
+									<span class="glyphicon glyphicon-eye"></span>{{att}}
+								</button>
+								
+							</div>
+							<div ng-if="!_.isArray(row[key])">
+								{{row[key]}}
+							</div>
+							<div ng-if="_.isArray(row[key]) && key != 'attachments'">
+								<ul>
+									<li ng-repeat="item in row[key]" ng-if="key == 'owners'">{{item.user}}</li>
+								</ul>
+							</div>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+	<div class="panel panel-default" ng-if="projects.showSection == 1">
+		<div class="panel-heading">
+	    	Data analysis
+	  	</div>
+  		<div class="panel-body" class="col-md-12">
+	        <div class="col-md-6">
+	            <div class="btn-group">
+	                 <button type="button" class="btn btn-default" ng-click="projects.analysis.selectedVariables=projects.selectedProjectDataKeys">
+	                    <span class="glyphicon glyphicon-plus"></span>
+	                    Add all
+	                 </button>
+
+	                 <button type="button" class="btn btn-default" ng-click="projects.analysis.selectedVariables=[]">
+	                    <span class="glyphicon glyphicon-remove"></span>
+	                    Remove all
+	                 </button>
+	            </div>
+
+	            <table st-table="multiSeries.displayedKeys" st-safe-src="projects.selectedProjectDataKeys" class="table table-striped">
+	                <thead>
+	                    <tr>
+	                        <th colspan="2">
+	                            <input st-search="" placeholder="search by variable name" class="form-control" type="search"/>
+	                        </th>
+	                    </tr>
+	                </thead>
+	                <tbody>
+	                    <tr ng-repeat="row in multiSeries.displayedKeys">
+	                        <td>
+	                            <div class="input-group">
+	                            	<input type="checkbox" aria-label="..." checklist-model="projects.analysis.selectedVariables" checklist-value="row">
+	                            </div>
+	                        </td>
+	                        <td>{{row}}</td>
+	                    </tr>
+	                </tbody>
+	            </table>
+	        </div>
+	        <div class="col-md-6">
+	            <div class="btn-group">
+	                 <button type="button" class="btn btn-default" ng-click="projects.analysis.selectedPatients=projects.selectedProjectPatients">
+	                    <span class="glyphicon glyphicon-plus"></span>
+	                    Add all
+	                 </button>
+
+	                 <button type="button" class="btn btn-default" ng-click="projects.analysis.selectedPatients=[]">
+	                    <span class="glyphicon glyphicon-remove"></span>
+	                    Remove all
+	                 </button>
+	            </div>
+
+	            <table st-table="multiSeries.displayedSubjects" st-safe-src="projects.selectedProjectPatients" class="table table-striped">
+	                <thead>
+	                    <tr>
+	                        <th colspan="2">
+	                            <input st-search="" placeholder="search by patientId " class="input-sm form-control" type="search"/>
+	                        </th>
+	                    </tr>
+	                </thead>
+	                <tbody>
+	                    <tr ng-repeat="row in multiSeries.displayedSubjects">
+	                        <td>
+	                            <div class="input-group">
+	                            <input type="checkbox" aria-label="..." checklist-model="projects.analysis.selectedPatients" checklist-value="row">
+	                            </div>
+	                        </td>
+	                        <td>{{row}}</td>
+	                    </tr>
+	                </tbody>
+	            </table>  
+	        </div>
+	    </div>
   	</div>
 	<div class="panel panel-info" ng-if="projects.showSection == 2">
 		<div class="panel panel-default">
