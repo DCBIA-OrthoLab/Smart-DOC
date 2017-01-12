@@ -7,7 +7,7 @@
 	  		<div class="panel-body">
 					<div class="btn-group">
 					<ul class="list-group">
-					  	<li ng-repeat="us in userScopes.scopes" class="list-group-item">{{us}}</li>				 		
+					  	<li ng-repeat="us in userScopes" class="list-group-item">{{us}}</li>				 		
 					  	<li class="list-group-item">
 				 			<input type="text" class="form-control" placeholder="Scope" aria-describedby="basic-addon1" ng-model="newScope">
 				 		</li>
@@ -36,7 +36,7 @@
 								<th>
 									<input st-search="email" placeholder="search for email" class="input-sm form-control" type="search"/>
 								</th>
-								<th colspan="{{userScopes.scopes.length}}">
+								<th colspan="{{userScopes.length}}">
 									<input st-search="scope" placeholder="search for scope" class="input-sm form-control" type="search"/>
 								</th>
 							</tr>
@@ -45,7 +45,7 @@
 							<tr ng-repeat="user in displayedUsers">
 								<td>{{user.name}}</td>
 								<td>{{user.email}}</td>
-								<td ng-repeat="us in userScopes.scopes">
+								<td ng-repeat="us in userScopes">
 									<div class="input-group">
 								      <span class="input-group-addon">
 								        <input type="checkbox" aria-label="..." ng-click="addRemoveScope(user, us)" ng-checked="hasScope(user, us)">

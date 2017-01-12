@@ -10,22 +10,36 @@ angular.module('jwt-user-login')
 
 		clusterauth.getScopes()
 		.then(function(res){
-			$scope.userScopes = res.data[0];
+			$scope.appScopes = res.data[0];
+			$scope.userScopes = $scope.appScopes.scopes;
+		})
+		.catch(function(e){
+			console.error(e);
 		});
 
 		$scope.newScope = "";
 
 		$scope.createScope = function(){
 			if($scope.newScope != ""){
-				$scope.userScopes.scopes.push($scope.newScope);
-				$scope.newScope = "";
-				clusterauth.updateScopes($scope.userScopes)
-				.then(function(res){
-					clusterauth.getScopes().
-					then(function(res){
-						$scope.userScopes = res.data[0];
+				if(!$scope.appScopes){
+					$scope.appScopes = {
+						"type": "scopes",
+						"scopes": $scope.userScopes
+					}
+				}
+				if($scope.appScopes.scopes.indexOf($scope.newScope) == -1){
+					$scope.appScopes.scopes.push($scope.newScope);
+					$scope.newScope = "";
+
+					clusterauth.updateScopes($scope.appScopes)
+					.then(function(res){
+						return clusterauth.getScopes();
 					})
-				});
+					.then(function(res){
+						$scope.appScopes = res.data[0];
+						$scope.userScopes = $scope.appScopes.scopes;
+					});
+				}
 			}
 		}
 
@@ -37,9 +51,14 @@ angular.module('jwt-user-login')
 				user.scope.push(scope);
 			}
 
-			clusterauth.updateUser(user)
+			return clusterauth.updateUser(user)
 			.then(function(res){
-				console.log(res);
+				_.each($scope.userdata, function(us){
+					if(us.email === user.email){
+						us._rev = res.data.rev;
+					}
+				});
+
 			})
 			.catch(alert)
 
