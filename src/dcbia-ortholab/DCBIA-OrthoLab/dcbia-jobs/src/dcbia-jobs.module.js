@@ -1,1 +1,1 @@
-angular.module('dcbia-jobs', []);
+angular.module('dcbia-jobs', ["clusterpost-list"]);
