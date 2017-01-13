@@ -7,7 +7,7 @@
 		"lout": {},
 		"h2o2": {},
 		"hapi-auth-jwt": {},
-		"hapi-jwt-couch": {
+		"clusterpost-auth": {
 			"privateKey": "generateARandomKey",
 			"saltRounds": 10,
 			"algorithm": { 
@@ -40,7 +40,17 @@
 				"hostname": "http://localhost:5984",
 				"database": "shinytooth"
 			},
-			"namespace": "dcbia"
+			"namespace": ["dcbia", "clusterprovider"]
+		},
+		"clusterpost-provider": {
+			"executionservers" : {
+				"localhost" : {
+					"hostname" : "localhost", 
+					"user" : "prieto",
+					"identityfile" : "/Users/prieto/.ssh/id_rsa",
+					"sourcedir" : "/Users/prieto/NetBeansProjects/install/clusterpost-execution-shiny"
+				}
+			}
 		},
 		"dcbia-model": {},
 		"dcbia-ortholab": {}
