@@ -61,6 +61,7 @@ const startServer = function(cluster){
         }
     });
 
+    
     server.method({
         name: 'getCluster',
         method: function(){
@@ -68,6 +69,7 @@ const startServer = function(cluster){
         },
         options: {}
     });
+    
 
     server.register(plugins, function(err){
         if (err) {
@@ -79,6 +81,8 @@ const startServer = function(cluster){
     server.start(function () {
         server.log('info', 'Server running at: ' + server.info.uri);
     });
+
+
 }
 
 if(env === 'production'){
@@ -87,7 +91,7 @@ if(env === 'production'){
 
     if (cluster.isMaster) {
       // Fork workers.
-      for (var i = 0; i < numCPUs; i++) {
+      for (var i = 0; i < 1; i++) {
         cluster.fork();
       }
 
@@ -102,4 +106,3 @@ if(env === 'production'){
 
     startServer();
 }
-

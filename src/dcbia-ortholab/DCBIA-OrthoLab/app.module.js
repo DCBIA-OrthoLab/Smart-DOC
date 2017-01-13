@@ -12,7 +12,8 @@ angular.module('dcbiaOrtholab', [
   'data-collections',
   'home',
   'dcbia-surveys',
-  'dcbia-plots'
+  'dcbia-plots',
+  'clusterpost-list'
 ]).
 config(['$routeProvider', function($routeProvider) {
   $routeProvider
@@ -40,6 +41,9 @@ config(['$routeProvider', function($routeProvider) {
   })
   .when('/users', {
     templateUrl: 'home/users.html'
+  })
+  .when('/tasks', {
+    templateUrl: 'home/tasks.html'
   })
   .when('/notFound', {
     templateUrl: 'home/notFound.html'
