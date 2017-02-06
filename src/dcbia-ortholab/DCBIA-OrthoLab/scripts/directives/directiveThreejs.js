@@ -21,10 +21,10 @@ angular.module('dcbiaOrtholab')
 		var controls = new THREE.TrackballControls( camera, child );
 
 		controls.rotateSpeed = 5.0;
-		controls.zoomSpeed = 5;
+		controls.zoomSpeed = 0.5;
 		controls.panSpeed = 2;
 
-		controls.noZoom = false;
+		controls.noZoom = true;
 		controls.noPan = false;
 
 		controls.staticMoving = true;
@@ -44,6 +44,9 @@ angular.module('dcbiaOrtholab')
 	    
 
 	    $scope.loadMesh = function(data){
+    		if(scene.children[1]){
+    			scene.remove(scene.children[1]);
+    		}
 	    	var loader = new THREE.VTKLoader();
 			var geometry = loader.parse( data);
 
@@ -54,6 +57,7 @@ angular.module('dcbiaOrtholab')
 
 			var mesh = new THREE.Mesh( geometry, material );
 			scene.add( mesh );
+			controls.noZoom = false;
 			
 	    }
 	    
