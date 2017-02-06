@@ -218,9 +218,12 @@ angular.module('data-collections')
 		$scope.clinical.deleteAllFiltered = function(clinicalData){
 			if(confirm("Do you want to delete the items beign displayed?")){
 				Promise.all(_.map(clinicalData, function(item){
+					$scope.clinicalDataCollection.selectedCollection.items.splice(_.findIndex($scope.clinicalDataCollection.selectedCollection.items,{"_id":item._id}),1);
 					return dcbia.deleteClinicalData(item._id);
 				}));
 			}
+			$scope.clinicalDataCollection.update($scope.clinicalDataCollection.selectedCollection);
+			$scope.clinicalDataCollection.select($scope.clinicalDataCollection.selectedCollection);
 		}
 
 		$scope.clinical.delete = function(item){
