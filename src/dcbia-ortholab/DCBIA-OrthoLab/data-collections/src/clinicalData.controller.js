@@ -395,7 +395,11 @@ angular.module('data-collections')
 						rowclone.formId = "imported-csv";
 					}
 					if(rowclone.date === undefined){
-						rowclone.date = new Date();
+						var dt = new Date();
+						var year = dt.getFullYear();
+						var month = ((dt.getMonth()+1)>=10)? (dt.getMonth()+1) : '0' + (dt.getMonth()+1);
+						var day = ((dt.getDate())>=10)? (dt.getDate()) : '0' + (dt.getDate());
+						rowclone.date = year + "-" + month + "-" + day;
 					}
 					return $scope.clinical.createClinicalData(rowclone);
 					
