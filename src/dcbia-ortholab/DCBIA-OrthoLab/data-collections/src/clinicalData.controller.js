@@ -218,9 +218,12 @@ angular.module('data-collections')
 		$scope.clinical.deleteAllFiltered = function(clinicalData){
 			if(confirm("Do you want to delete the items beign displayed?")){
 				Promise.all(_.map(clinicalData, function(item){
+					$scope.clinicalDataCollection.selectedCollection.items.splice(_.findIndex($scope.clinicalDataCollection.selectedCollection.items,{"_id":item._id}),1);
 					return dcbia.deleteClinicalData(item._id);
 				}));
 			}
+			$scope.clinicalDataCollection.update($scope.clinicalDataCollection.selectedCollection);
+			$scope.clinicalDataCollection.select($scope.clinicalDataCollection.selectedCollection);
 		}
 
 		$scope.clinical.delete = function(item){
@@ -392,7 +395,11 @@ angular.module('data-collections')
 						rowclone.formId = "imported-csv";
 					}
 					if(rowclone.date === undefined){
-						rowclone.date = new Date();
+						var dt = new Date();
+						var year = dt.getFullYear();
+						var month = ((dt.getMonth()+1)>=10)? (dt.getMonth()+1) : '0' + (dt.getMonth()+1);
+						var day = ((dt.getDate())>=10)? (dt.getDate()) : '0' + (dt.getDate());
+						rowclone.date = year + "-" + month + "-" + day;
 					}
 					return $scope.clinical.createClinicalData(rowclone);
 					

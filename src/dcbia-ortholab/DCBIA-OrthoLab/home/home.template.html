@@ -2,7 +2,7 @@
 	<div ng-controller="home">
 		<div class="row"> 
 			Welcome <b>{{user.name}}</b> !
-			<div class="panel panel-default" ng-if="user.scope.length == 3">
+			<div class="panel panel-default" ng-if="user.scope.indexOf('admin') !== -1">
 				<div class="panel-body">
 					<div class="col-sm-6 col-md-2">
 				    	<div class="caption">
