@@ -34,7 +34,8 @@ const startServer = function(cluster){
     server.connection({ 
         host: conf.host,
         port: conf.port,
-        tls: tls
+        tls: tls,
+        labels: 'web'
     });
 
     var plugins = [];
@@ -77,9 +78,9 @@ const startServer = function(cluster){
         }
 
     });
-    
+
     server.start(function () {
-        server.log('info', 'Server running at: ' + server.info.uri);
+        server.log('info', 'Server running at: ' + server.select('web').info.uri);
     });
 
 
