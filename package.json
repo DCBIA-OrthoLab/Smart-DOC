@@ -29,6 +29,7 @@
     "couch-update-views": "^1.0.4",
     "dcbia-model": "file:src/dcbia-model",
     "dcbia-ortholab": "file:src/dcbia-ortholab",
+    "dcbia-websocket": "file:src/dcbia-websocket",
     "good": "^6.6.0",
     "good-console": "^5.3.1",
     "good-file": "^5.1.2",
