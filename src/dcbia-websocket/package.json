@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
-    "websocket": "^1.0.24"
+    "nes": "^6.4.0"
   },
   "devDependencies": {},
   "scripts": {
