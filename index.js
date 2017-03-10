@@ -35,7 +35,12 @@ const startServer = function(cluster){
         host: conf.host,
         port: conf.port,
         tls: tls,
-        labels: 'web'
+        labels: ['website']
+    });
+    server.connection({ 
+        host: conf.host,
+        port: conf.port + 1,
+        labels: ['websocket']
     });
 
     var plugins = [];
@@ -80,7 +85,8 @@ const startServer = function(cluster){
     });
 
     server.start(function () {
-        server.log('info', 'Server running at: ' + server.select('web').info.uri);
+        server.log('info', 'Server running at: ' + server.select('website').info.uri);
+        server.log('info', 'Websocket is listening port: ' + server.select('websocket').info.port);
     });
 
 

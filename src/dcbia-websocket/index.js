@@ -1,24 +1,17 @@
 exports.register = function (server, options, next) {
-    var Nes = require('nes');
-    const srv = server.connection({port:80,host:'localhost',labels:'wesocket'});
-    console.log("Websocket is listening on port 80.")
-    srv.register(Nes, function (err) {
-        srv.route({
-            method: 'GET',
-            path: '/h',
-            config: {
-                id: 'hello',
-                handler: function (request, reply) {
-                    return reply('world!');
-                }
-            }
-        });
+    var io = require('socket.io')(server.select('websocket').listener);
+    io.on('connection', function (socket) {
+
+        console.log('New connection!');
+
+        socket.on('hello', Handlers.hello);
+        socket.on('newMessage', Handlers.newMessage);
+        socket.on('goodbye', Handlers.goodbye);
     });
 
-    return next();
+    next();
 };
 
 exports.register.attributes = {
-    pkg: require('./package.json'),
-    connections: false
+    pkg: require('./package.json')
 };

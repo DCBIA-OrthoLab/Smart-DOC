@@ -4,7 +4,6 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
-    "nes": "^6.4.0"
   },
   "devDependencies": {},
   "scripts": {
