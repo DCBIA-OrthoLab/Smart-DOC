@@ -1,9 +1,11 @@
+#!/usr/bin/env python
+
 import autobahn.asyncio.websocket as websocket
 
 class MyClientProtocol(websocket.WebSocketClientProtocol):
 
    def onOpen(self):
-      self.sendMessage(u"Hello, world!".encode('utf8'))
+      self.sendMessage(u"newMessage".encode('utf8'))
 
    def onMessage(self, payload, isBinary):
       if isBinary:
@@ -22,7 +24,7 @@ if __name__ == '__main__':
     factory.protocol = MyClientProtocol
 
     loop = asyncio.get_event_loop()
-    coro = loop.create_connection(factory, 'ws://localhost:1337', 1337)
+    coro = loop.create_connection(factory, '127.0.0.1',8181)
     loop.run_until_complete(coro)
     loop.run_forever()
     loop.close()
