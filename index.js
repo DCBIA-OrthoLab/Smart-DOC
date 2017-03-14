@@ -39,7 +39,7 @@ const startServer = function(cluster){
     });
     server.connection({ 
         host: conf.host,
-        port: conf.port + 1,
+        port: 8181,
         labels: ['websocket']
     });
 
