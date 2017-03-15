@@ -1,13 +1,10 @@
-exports.register = function (server, options, next) {
-    var io = require('socket.io')(server.select('websocket').listener);
-    io.on('connection', function (socket) {
+exports.register = function (server, conf, next) {
+	
+	const SocketIO = require('socket.io');
+    var server_socket = server.select(conf.connection_label);
+    const io = SocketIO.listen(server_socket.listener);
 
-        console.log('New connection!');
-
-        socket.on('hello', Handlers.hello);
-        socket.on('newMessage', Handlers.newMessage);
-        socket.on('goodbye', Handlers.goodbye);
-    });
+    require('./websocket.routes')(server, io, conf);
 
     next();
 };
