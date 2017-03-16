@@ -21,5 +21,6 @@ class Namespace(BaseNamespace):
     def on_execute_task(self, *args):
         print('executing task', args)
 
-socketIO = SocketIO('localhost', 8181, Namespace)
+socketIO = SocketIO('localhost:8180/suscribe', 8180, Namespace)
+#socketIO = SocketIO('localhost:8181', 8181, Namespace)
 socketIO.wait()

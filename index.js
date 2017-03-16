@@ -53,7 +53,7 @@ const startServer = function(cluster){
                         "cert": "/path/to/key"
                     }
                 },
-                "socket": {
+                "websocket": {
                     "host": conf.host,
                     "port": conf.port + 1
                 }
@@ -87,15 +87,32 @@ const startServer = function(cluster){
     plugins.push({
         register: good,
         options: {
-            reporters: [
-            {
-                reporter: require('good-console'),
-                events: { log: '*', response: '*' }
-            }, {
-                reporter: require('good-file'),
-                events: { ops: '*' },
-                config: 'all.log'
-            }]
+            reporters: {
+                myConsoleReporter: [{
+                    module: 'good-squeeze',
+                    name: 'Squeeze',
+                    args: [{ log: '*', response: '*' }]
+                },
+                {
+                    module: 'dcbia-good',
+                    name: 'Filter',
+                    args: [{ log: '*', response: '*' }]
+                },
+                {
+                    module: 'good-console'
+                }, 'stdout'],
+                myFileReporter: [{
+                    module: 'good-squeeze',
+                    name: 'Squeeze',
+                    args: [{ ops: '*' }]
+                }, {
+                    module: 'good-squeeze',
+                    name: 'SafeJson'
+                }, {
+                    module: 'good-file',
+                    args: ['all.log']
+                }]
+            }
         }
     });
 
