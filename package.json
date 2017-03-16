@@ -28,6 +28,7 @@
     "clusterpost-provider": "^1.2.6",
     "couch-provider": "^1.0.2",
     "couch-update-views": "^1.0.4",
+    "dcbia-good": "^1.0.0",
     "dcbia-model": "file:src/dcbia-model",
     "dcbia-ortholab": "file:src/dcbia-ortholab",
     "dcbia-websocket": "file:src/dcbia-websocket",
