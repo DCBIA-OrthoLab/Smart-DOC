@@ -342,8 +342,7 @@ angular.module('data-collections')
 		  		return '';	
 		  	}
 		    return index == 0 ? letter.toLowerCase() : letter.toUpperCase();
-		  }).replace(/\s+/g, '')
-		  .replace(/-/g, '');
+		  }).replace(/\s+|[-()\/]/g, '');
 		}
 
 		$scope.csv.JSON = function(csv){
