@@ -90,7 +90,7 @@ angular.module('dcbia-projects')
 			});
 			_.each($scope.morphologicalDataCollection.selectedCollections, function(collection){
 				_.each($scope.morphologicalDataCollection.collections, function(items){
-					if(collection === items.name){
+					if(collection === items.name || collection === items._id){
 						$scope.projects.newProject.collections.push({"_id": items._id})
 					}
 				});
@@ -106,24 +106,10 @@ angular.module('dcbia-projects')
 		};
 
 		$scope.projects.update = function(project){
-			project.collections = [];
-			_.each($scope.clinicalDataCollection.selectedCollections, function(collection){
-				_.each($scope.clinicalDataCollection.collections, function(items){
-					if(collection === items.name){
-						project.collections.push({"_id": items._id})
-					}
-				});
-			});
-			_.each($scope.morphologicalDataCollection.selectedCollections, function(collection){
-				_.each($scope.morphologicalDataCollection.collections, function(items){
-					if(collection === items.name){
-						project.collections.push({"_id": items._id})
-					}
-				});
-			});
-			// if(project.scope === ""){
-			// 	delete project.scope;
-			// }
+			project.collections = {
+				clinicalDataCollection: $scope.clinicalDataCollection.selectedCollections,
+				morphologicalDataCollection: $scope.morphologicalDataCollection.selectedCollections
+			}
 			dcbia.updateProject(project)
 			.then(function(res){
 				return $scope.projects.getProjects();
@@ -150,23 +136,94 @@ angular.module('dcbia-projects')
 			$scope.projects.projectsProperties[project._id].class = "alert alert-info";
 			$scope.clinicalDataCollection.selectedCollections = [];
 			$scope.morphologicalDataCollection.selectedCollections = [];
-			_.each($scope.projects.selectedProject.collections, function(selectedProjectCollection){
-		        var clinicalCollection = _.find($scope.clinicalDataCollection.collections, function(clinicalCollection) {
-		            return clinicalCollection["_id"] === selectedProjectCollection["_id"];
-		        });
-		        if(clinicalCollection) $scope.clinicalDataCollection.selectedCollections.push(clinicalCollection.name);
-		       	var morphologicalCollection = _.find($scope.morphologicalDataCollection.collections, function(morphologicalCollection) {
-		            return morphologicalCollection["_id"] === selectedProjectCollection["_id"];
-		        });
-		        if(morphologicalCollection) $scope.morphologicalDataCollection.selectedCollections.push(morphologicalCollection.name);
-			});
-			$q.all([$scope.clinical.getSelectedProjectData(),$scope.morphological.getSelectedProjectData()])
-			.then(function(){
-				$scope.projects.selectedProjectData = $scope.projects.mergeCollections($scope.clinical.data,$scope.morphological.data);
-				$scope.projects.selectedProjectDataKeys = $scope.projects.getProjectDataKeys($scope.projects.selectedProjectData);
-				$scope.projects.selectedProjectPatients = _.map($scope.projects.selectedProjectData, function(item){ return item.patientId; });
-			});
+
+			if(_.isObject($scope.projects.selectedProject.collections)){
+				$scope.clinicalDataCollection.selectedCollections = $scope.projects.selectedProject.collections.clinicalDataCollection;
+				$scope.morphologicalDataCollection.selectedCollections = $scope.projects.selectedProject.collections.morphologicalDataCollection;
+
+				return Promise.all([
+					Promise.all(_.map($scope.clinicalDataCollection.selectedCollections, dcbia.getClinicalData))
+					.then(function(res){
+						var merged = [];
+						_.each( _.compact(_.pluck(res, "data")), function(coll){
+							merged = $scope.projects.mergeCollections(merged, coll);
+						})						
+						return merged;
+					}),
+					Promise.all(_.map($scope.morphologicalDataCollection.selectedCollections, dcbia.getMorphologicalData))
+					.then(function(res){						
+						var merged = [];
+						_.each( _.compact(_.pluck(res, "data")), function(coll){
+							merged = $scope.projects.mergeCollections(merged, coll);
+						})						
+						return merged;
+					})
+				])
+				.then(function(res){					
+					$scope.projects.selectedProjectData = $scope.projects.mergeCollections(res[0], res[1]);
+					$scope.projects.selectedProjectDataKeys = $scope.projects.getProjectDataKeys($scope.projects.selectedProjectData);
+					$scope.projects.selectedProjectPatients = _.map($scope.projects.selectedProjectData, function(item){ return item.patientId; });
+				});
+
+			}else{
+
+				//DEPRECATED
+				_.each($scope.projects.selectedProject.collections, function(selectedProjectCollection){
+			        var clinicalCollection = _.find($scope.clinicalDataCollection.collections, function(clinicalCollection) {
+			            return clinicalCollection["_id"] === selectedProjectCollection["_id"];
+			        });
+			        if(clinicalCollection) $scope.clinicalDataCollection.selectedCollections.push(clinicalCollection.name);
+			       	var morphologicalCollection = _.find($scope.morphologicalDataCollection.collections, function(morphologicalCollection) {
+			            return morphologicalCollection["_id"] === selectedProjectCollection["_id"];
+			        });
+			        if(morphologicalCollection) $scope.morphologicalDataCollection.selectedCollections.push(morphologicalCollection.name);
+				});
+				$q.all([$scope.clinical.getSelectedProjectData(),$scope.morphological.getSelectedProjectData()])
+				.then(function(){
+					$scope.projects.selectedProjectData = $scope.projects.mergeCollections($scope.clinical.data,$scope.morphological.data);
+					$scope.projects.selectedProjectDataKeys = $scope.projects.getProjectDataKeys($scope.projects.selectedProjectData);
+					$scope.projects.selectedProjectPatients = _.map($scope.projects.selectedProjectData, function(item){ return item.patientId; });
+				});
+
+			}
 		};
+
+		$scope.projects.saveSubset = function(){			
+			
+			if(!$scope.projects.analysis.name || $scope.projects.analysis.name == ""){
+				$scope.projects.analysis.name = "Subset " + Date();
+			}
+			$scope.projects.analysis.collections = $scope.projects.selectedProject.collections;
+
+			if(!$scope.projects.selectedProject.analyses){
+				$scope.projects.selectedProject.analyses = [];
+			}
+
+			var found = false;
+			for(var i = 0; i < $scope.projects.selectedProject.analyses.length && !found; i++){
+				var analysis = $scope.projects.selectedProject.analyses[i];
+				if(analysis.name == $scope.projects.analysis.name){
+					$scope.projects.selectedProject.analyses[i] = _.clone($scope.projects.analysis);
+					found = true;
+				}
+			}
+
+			if(!found){
+				$scope.projects.selectedProject.analyses.push(_.clone($scope.projects.analysis));
+			}
+
+			dcbia.updateProject($scope.projects.selectedProject);
+
+		}
+
+		$scope.projects.showSubset = function(index){
+			$scope.projects.analysis = _.clone($scope.projects.selectedProject.analyses[index]);
+		}
+
+		$scope.projects.removeSubset = function(index){
+			$scope.projects.selectedProject.analyses.splice(index, 1);
+			dcbia.updateProject($scope.projects.selectedProject);
+		}		
 
 		$scope.projects.getProjectKeys = function(project){
 			var projectKeys = {};
@@ -220,8 +277,9 @@ angular.module('dcbia-projects')
 			return dcbia.getProject(project._id)
 			.then(function(res){
 				var selectedProject = res.data;
-				$scope.projects.selectProject(selectedProject);
 				$scope.projects.selectedProjectKeys = $scope.projects.getProjectKeys([selectedProject]);
+				return $scope.projects.selectProject(selectedProject);
+				
 			})
 			.catch(console.error);
 		};
@@ -311,14 +369,43 @@ angular.module('dcbia-projects')
 		}
 
 		$scope.projects.mergeCollections = function(collection1, collection2){
-			_.each(collection2, function(col) {
-			        var mergedCollection = _.find(collection1, function(mergedCollection) {
-			            return mergedCollection["patientId"] === col["patientId"];
-			        });
+			_.each(collection2, function(col2) {
 
-			        mergedCollection ? _.extend(mergedCollection, col) : collection1.push(col);
+				if(col2 && col2._attachments && col2._id){
+					var att = {};
+					att[col2._id] = col2._attachments;
+
+					col2.attachments = att;
+					delete col2._attachments;
+				}
+				if(col2._id){
+					delete col2._id;
+				}
+				if(col2._rev){
+					delete col2._rev;
+				}
+				if(col2.owners){
+					delete col2.owners;
+				}
+				if(col2.owner){
+					delete col2.owner;
+				}
+				
+		        var mergedCollection = _.find(collection1, function(mergedCollection) {
+		            return mergedCollection["patientId"] === col2["patientId"];
+		        });			        
+		        mergedCollection ? _.extend(mergedCollection, col2) : collection1.push(col2);		        
 			});
+			_.each(collection1, function(col1){
+				if(col1.type !== "mergedCollection"){
+					col1.type = "mergedCollection";
+				}
+			})
 			return collection1;
+		}
+
+		$scope.morphologicalDataCollection.downloadAttachment = function(keycoll, filename, att){
+			console.log(keycoll, filename, att);
 		}
 
 		$scope.morphologicalDataCollection.addRemoveScope = function(collection, scope, checkbox, projectName){
@@ -362,7 +449,7 @@ angular.module('dcbia-projects')
 			$scope.morphologicalDataCollection.selectedCollections = [];
 			if(checkbox){
 				_.each($scope.morphologicalDataCollection.collections,function(collection){
-					$scope.morphologicalDataCollection.selectedCollections.push(collection.name);
+					$scope.morphologicalDataCollection.selectedCollections.push(collection._id);
             	});
 			}
   		};
@@ -370,7 +457,7 @@ angular.module('dcbia-projects')
     	$scope.morphologicalDataCollection.isCollectionInProject = function(collection){
   			var display = false;
   			_.each($scope.morphologicalDataCollection.selectedCollections,function(selectedCollection){
-  				if(collection.name === selectedCollection){
+  				if(collection.name === selectedCollection || collection._id === selectedCollection){
   					display = true;
   				}
             });
@@ -418,7 +505,7 @@ angular.module('dcbia-projects')
 			$scope.clinicalDataCollection.selectedCollections = [];
 			if(checkbox){
 				_.each($scope.clinicalDataCollection.collections,function(collection){
-					$scope.clinicalDataCollection.selectedCollections.push(collection.name);
+					$scope.clinicalDataCollection.selectedCollections.push(collection._id);
             	});
 			}
   		};
@@ -426,7 +513,7 @@ angular.module('dcbia-projects')
   		$scope.clinicalDataCollection.isCollectionInProject = function(collection){
   			var display = false;
   			_.each($scope.clinicalDataCollection.selectedCollections,function(selectedCollection){
-  				if(collection.name === selectedCollection){
+  				if(collection.name === selectedCollection || collection._id === selectedCollection){
   					display = true;
   				}
             });
@@ -529,28 +616,32 @@ angular.module('dcbia-projects')
 			var mapId = _.map($scope.projects.selectedProject.collections,function(col){ return col._id });
 			return Promise.all(_.map(mapId,dcbia.getClinicalData))
 			.then(function(res) {
+				$scope.clinical.data = [];
 				_.each(res,function(collection){
-					$scope.clinical.data = ($scope.clinical.data.length) ? $scope.projects.mergeCollections($scope.clinical.data,collection.data) : collection.data;
+					$scope.clinical.data = $scope.projects.mergeCollections($scope.clinical.data,collection.data);
 				})
 				return $scope.clinical.data;
 			});
 		}
 
+
+
 		$scope.morphological.getSelectedProjectData = function(){
 			var mapId = _.map($scope.projects.selectedProject.collections,function(col){ return col._id });
 			return Promise.all(_.map(mapId,dcbia.getMorphologicalData))
 			.then(function(res) {
+				$scope.morphological.data = [];
 				_.each(res,function(collection){
-				    collection.data = _.map(collection.data, function(d){
-				    	if(d._attachments){
-				    		_.extend(d, {
-				    			attachments: _.keys(d._attachments)
-				    		});
-				    	}
-				    	delete d._attachments;
-				    	return d;
-				    });
-					$scope.morphological.data = ($scope.morphological.data.length) ? $scope.projects.mergeCollections($scope.morphological.data,collection.data) : collection.data;
+				    // collection.data = _.map(collection.data, function(d){
+				    // 	if(d._attachments){
+				    // 		_.extend(d, {
+				    // 			attachments: _.keys(d._attachments)
+				    // 		});
+				    // 	}
+				    // 	delete d._attachments;
+				    // 	return d;
+				    // });
+					$scope.morphological.data = $scope.projects.mergeCollections($scope.morphological.data,collection.data);
 				})
 				return $scope.morphological.data;
 			});
