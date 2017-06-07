@@ -22,9 +22,9 @@
     "url": "https://github.com/DCBIA-OrthoLab/shiny-tooth/issues"
   },
   "dependencies": {
-    "angular": "^1.5.8",
+    "angular": "1.5.8",
     "angular-chart.js": "^1.0.3",
-    "angular-route": "^1.5.8",
+    "angular-route": "1.5.8",
     "angular-smart-table": "^2.1.8",
     "angular-ui-bootstrap": "^2.2.0",
     "bootstrap": "^3.3.7",
@@ -32,15 +32,16 @@
     "clusterpost-list": "1.0.8",
     "d3": "^4.2.7",
     "jquery": "^3.1.1",
+    "json2csv": "^3.7.3",
     "ng-file-model": "0.0.5",
     "three": "^0.81.2",
     "ui-bootstrap": "^0.1.5",
     "underscore": "^1.8.3"
   },
   "devDependencies": {
-    "grunt": "^1.0.1",
-    "grunt-contrib-watch": "^1.0.0",
-    "grunt-run-grunt": "^0.1.4"
+    "grunt": "1.0.1",
+    "grunt-contrib-watch": "1.0.0",
+    "grunt-run-grunt": "0.1.4"
   },
   "homepage": "https://github.com/DCBIA-OrthoLab/shiny-tooth#readme"
 }

@@ -17,6 +17,7 @@ module.exports = function(grunt) {
                 './dcbia-plots/Gruntfile.js',
                 './dcbia-surveys/Gruntfile.js',
                 './jwtUserLogin/Gruntfile.js',
+                './dcbia-jobs/Gruntfile.js',
                 './nav-bar/Gruntfile.js']
             },
             dev: {
@@ -35,6 +36,7 @@ module.exports = function(grunt) {
                 './dcbia-plots/Gruntfile.js',
                 './dcbia-surveys/Gruntfile.js',
                 './jwtUserLogin/Gruntfile.js',
+                './dcbia-jobs/Gruntfile.js',
                 './nav-bar/Gruntfile.js']
             },
         },
@@ -50,6 +52,7 @@ module.exports = function(grunt) {
                 './dcbia-plots/src/*.html',
                 './dcbia-surveys/src/*.html',
                 './jwtUserLogin/src/*.html',
+                './dcbia-jobs/src/*.html',
                 './nav-bar/src/*.html'],
                 tasks: ['run_grunt:dev']
             },
@@ -59,6 +62,7 @@ module.exports = function(grunt) {
                 './dcbia-plots/src/*.css',
                 './dcbia-surveys/src/*.css',
                 './jwtUserLogin/src/*.css',
+                './dcbia-jobs/src/*.css',
                 './nav-bar/src/*.css'],
                 tasks: ['run_grunt:dev']
             },
@@ -68,6 +72,7 @@ module.exports = function(grunt) {
                 './dcbia-plots/src/*.js',
                 './dcbia-surveys/src/*.js',
                 './jwtUserLogin/src/*.js',
+                './dcbia-jobs/src/*.js',
                 './nav-bar/src/*.js'],
                 tasks: ['run_grunt:dev']
             },

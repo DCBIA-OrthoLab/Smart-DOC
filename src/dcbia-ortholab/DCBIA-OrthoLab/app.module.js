@@ -9,6 +9,7 @@ angular.module('dcbiaOrtholab', [
   'jwt-user-login',
   'nav-bar',
   'dcbia-projects',
+  'dcbia-jobs',
   'data-collections',
   'home',
   'dcbia-surveys',
