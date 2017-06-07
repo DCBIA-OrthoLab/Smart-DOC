@@ -10,9 +10,9 @@ module.exports = function(grunt) {
         },
         assets:{
             appJS: [
-            './src/dcbia-jobs.module.js',
-            './src/dcbia-jobs.directive.js',
-            './dist/dcbia-jobs.templates.js'
+            './src/dcbia-jobs.module.js',            
+            './src/dcbia-mfsda.directive.js',
+            './dist/dcbia-jobs.templates.js'            
             ]
         },
         concat: {
