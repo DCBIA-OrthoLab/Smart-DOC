@@ -2,10 +2,18 @@ linkModule(){
 	module=$1
 
 	cd $module
-	echo npm link
+	npm link
 	modname=$(node -e "var fs = require('fs'); var a = JSON.parse(fs.readFileSync('package.json')); console.log(a.name); process.exit('success')")
 	cd ..
-	echo bower link $modname 
+	npm link $modname 
 }
 
 linkModule home
+linkModule data-collections
+linkModule dcbia-jobs
+linkModule dcbia-plots
+linkModule dcbia-projects
+linkModule dcbia-surveys
+linkModule jwtUserLogin
+linkModule nav-bar
+npm install

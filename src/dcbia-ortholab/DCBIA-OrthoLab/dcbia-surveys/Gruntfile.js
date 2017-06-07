@@ -87,7 +87,7 @@ module.exports = function(grunt) {
 
 
     //register grunt default task
-    grunt.registerTask('default', [ 'ngtemplates', 'concat:prod', 'ngAnnotate', 'uglify:prod', 'cssmin', 'clean']);
+    grunt.registerTask('default', [ 'ngtemplates', 'concat:prod', 'ngAnnotate', 'cssmin', 'clean']);
     //register dev task
-    grunt.registerTask('dev', [ 'ngtemplates', 'concat:dev', 'ngAnnotate', 'uglify:dev', 'cssmin', 'clean']);
+    grunt.registerTask('dev', [ 'ngtemplates', 'concat:dev', 'ngAnnotate', 'cssmin', 'clean']);
 }
