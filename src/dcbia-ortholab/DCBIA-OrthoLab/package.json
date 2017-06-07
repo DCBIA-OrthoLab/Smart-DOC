@@ -29,7 +29,7 @@
     "angular-ui-bootstrap": "^2.2.0",
     "bootstrap": "^3.3.7",
     "checklist-model": "^0.10.0",
-    "clusterpost-list": "1.0.8",
+    "clusterpost-list": "^1.2.0",
     "d3": "^4.2.7",
     "jquery": "^3.1.1",
     "json2csv": "^3.7.3",
