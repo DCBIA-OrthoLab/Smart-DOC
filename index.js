@@ -24,56 +24,19 @@ const startServer = function(cluster){
     
     var server = new Hapi.Server();
 
-    if(conf.connections){
-        Object.keys(conf.connections).forEach(function(connection_label){
-            var connection = conf.connections[connection_label];
-            if(connection.tls){
-                const tls = {
-                    key: fs.readFileSync(connection.tls.key),
-                    cert: fs.readFileSync(connection.tls.cert)
-                }
-            }
-            
-            server.connection({ 
-                host: connection.host,
-                port: connection.port,
-                labels: [connection_label],
-                tls: tls
-            });
-        });
-
-    }else{
-        console.log("Please modify your configuration file by adding a connections section. (tls is optional to enable a secure connection)", JSON.stringify({
-            "connections": {
-                "http": {
-                    "host": conf.host,
-                    "port": conf.port,
-                    "tls": {
-                        "key": "/path/to/key",
-                        "cert": "/path/to/key"
-                    }
-                },
-                "websocket": {
-                    "host": conf.host,
-                    "port": conf.port + 1
-                }
-            },
-            "plugins": "..."
-        }, null, 4));
-
-        if(conf.tls && conf.tls.key && conf.tls.cert){
-            const tls = {
-              key: fs.readFileSync(conf.tls.key),
-              cert: fs.readFileSync(conf.tls.cert)
-            };
-        }
-
-        server.connection({ 
-            host: conf.host,
-            port: conf.port,
-            tls: tls
-        });
+    var tls;
+    if(conf.tls && conf.tls.key && conf.tls.cert){
+        tls = {
+          key: fs.readFileSync(conf.tls.key),
+          cert: fs.readFileSync(conf.tls.cert)
+        };
     }
+
+    server.connection({ 
+        host: conf.host,
+        port: conf.port,
+        tls: tls
+    });
 
     var plugins = [];
 
