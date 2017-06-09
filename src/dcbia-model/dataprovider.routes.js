@@ -95,10 +95,11 @@ module.exports = function (server, conf) {
 			name: Joi.string().required(),
 			patients: Joi.string().alphanum().required(),
 			description: Joi.string().required(),
-			collections: Joi.array().items(Joi.object().keys({
+			collections: Joi.allow(Joi.array().items(Joi.object().keys({
 				_id: Joi.string().alphanum()
-			})),
-			scope: Joi.array().items(Joi.string()).optional()
+			})), Joi.object().optional()),
+			scope: Joi.array().items(Joi.string()).optional(),
+			analyses: Joi.array().items(Joi.object()).optional()
 		});
 
 	var projectpost = Joi.object({
