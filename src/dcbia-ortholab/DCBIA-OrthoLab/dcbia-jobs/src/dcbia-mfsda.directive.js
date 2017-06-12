@@ -215,18 +215,37 @@ angular.module('dcbia-jobs')
 
 		$scope.projects.getProjectItems = function(project){
 			var sum = 0;
-			_.each(project.collections,function(collection){
-				_.each($scope.clinicalDataCollection.collections,function(clinicalCollection){
-					if(collection._id == clinicalCollection._id){
-						sum += clinicalCollection.items.length;
+			if(_.isObject(project.collections) && !_.isArray(project.collections)){
+				_.each(project.collections.clinicalDataCollection, function(cdcid){
+					var collection = _.find($scope.clinicalDataCollection.collections, function(clinicalCollection){
+						return cdcid === clinicalCollection._id;
+					});
+					if(collection){
+						sum+= collection.items.length;
 					}
-				})
-				_.each($scope.morphologicalDataCollection.collections,function(morphologicalDataCollection){
-					if(collection._id == morphologicalDataCollection._id){
-						sum += morphologicalDataCollection.items.length;
+				});
+				_.each(project.collections.morphologicalDataCollection, function(mcid){
+					var collection = _.find($scope.morphologicalDataCollection.collections, function(morphologicalCollection){
+						return mcid === morphologicalCollection._id;
+					});
+					if(collection){
+						sum+= collection.items.length;
 					}
+				});
+			}else{
+				_.each(project.collections,function(collection){
+					_.each($scope.clinicalDataCollection.collections,function(clinicalCollection){
+						if(collection._id == clinicalCollection._id){
+							sum += clinicalCollection.items.length;
+						}
+					})
+					_.each($scope.morphologicalDataCollection.collections,function(morphologicalDataCollection){
+						if(collection._id == morphologicalDataCollection._id){
+							sum += morphologicalDataCollection.items.length;
+						}
+					})
 				})
-			})
+			}
 			return sum;
 		};		
 
