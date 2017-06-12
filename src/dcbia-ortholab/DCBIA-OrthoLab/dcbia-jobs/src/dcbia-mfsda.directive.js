@@ -562,6 +562,21 @@ angular.module('dcbia-jobs')
   				data: covariatesType
   			});
 
+  			filelistobj.push({
+  				name: "shapeData.txt"
+  			});
+
+  			filelistobj.push({
+  				name: "covariates.txt"
+  			});
+
+  			filelistobj.push({
+  				name: "covariatesInterest.txt"
+  			});
+
+  			filelistobj.push({
+  				name: "covariatesType.txt"
+  			});
   			
   			mfsda.inputs = filelistobj;
   			if(template.length == 1){

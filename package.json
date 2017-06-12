@@ -25,7 +25,7 @@
   "homepage": "https://github.com/DCBIA-OrthoLab/shiny-tooth#readme",
   "dependencies": {
     "clusterpost-auth": "^2.0.1",
-    "clusterpost-provider": "^1.2.6",
+    "clusterpost-provider": "^2.1.0",
     "couch-provider": "^1.0.2",
     "couch-update-views": "^1.0.4",
     "dcbia-good": "^1.0.0",
