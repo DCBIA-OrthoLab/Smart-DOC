@@ -447,13 +447,13 @@ angular.module('dcbia-jobs')
   					_.each(val, function(v){
   						job.jobparameters.push({
 	  						name: v,
-	  						key: "-" + key
-	  					})
-  					})
+	  						flag: "-" + key
+	  					});
+  					});
   				}else{
   					job.jobparameters.push({
   						name: val,
-  						key: "-" + key
+  						flag: "-" + key
   					});
   				}
   			})
