@@ -2,6 +2,10 @@ angular.module('dcbia-jobs')
 .directive('dcbiaMfsda', function($routeParams, dcbia, clusterauth, clusterpostService) {
 
 	function link($scope, $attrs, $filter){
+
+		var minimist = require('minimist');
+		var stringArgv = require('string-argv');
+
 		clusterauth.getUser()
 		.then(function(res){
 			$scope.user = res;
@@ -370,7 +374,11 @@ angular.module('dcbia-jobs')
 		}
 		
 		$scope.clusterpost = {};
-		$scope.mfsda = {};
+		$scope.mfsda = {
+			editJobParameters: true,
+			jobParameters: $scope.jobParameters
+		};
+
 		$scope.mfsda.submitJob = function(){
 
 	// -shapeData <filename, .txt list with vtk filenames, 1 file per line>
@@ -385,7 +393,7 @@ angular.module('dcbia-jobs')
 	// mfsda.covariateInterest 
 	// mfsda.covariatesType 
 	// mfsda.shapes = filelistobj;
-	// mfsda.template = template;
+	// mfsda.template = template;			
 
 			var mfsda = $scope.mfsda.getData();			
 
@@ -430,6 +438,25 @@ angular.module('dcbia-jobs')
   				type: "tar.gz"
   			}]
   			job.userEmail = $scope.user.email;
+  			job.jobparameters = [];
+
+  			var jobParameters = minimist(stringArgv($scope.mfsda.jobParameters));
+
+  			_.each(jobParameters, function(val, key){
+  				if(_.isArray(val)){
+  					_.each(val, function(v){
+  						job.jobparameters.push({
+	  						name: v,
+	  						key: "-" + key
+	  					})
+  					})
+  				}else{
+  					job.jobparameters.push({
+  						name: val,
+  						key: "-" + key
+  					});
+  				}
+  			})
 
   			return clusterpostService.createAndSubmitJob(job, _.pluck(mfsda.data, "name"), _.pluck(mfsda.data, "data"))
   			.then(function(res){
@@ -561,6 +588,10 @@ angular.module('dcbia-jobs')
   				name: "covariatesType.txt",
   				data: covariatesType
   			});
+  			
+  			if(template.length == 1){
+  				filelistobj.push(template[0]);
+  			}
 
   			filelistobj.push({
   				name: "shapeData.txt"
@@ -577,11 +608,8 @@ angular.module('dcbia-jobs')
   			filelistobj.push({
   				name: "covariatesType.txt"
   			});
-  			
+
   			mfsda.inputs = filelistobj;
-  			if(template.length == 1){
-  				mfsda.inputs.push(template[0]);
-  			}
 
   			return mfsda;
   		}
@@ -703,6 +731,9 @@ angular.module('dcbia-jobs')
 	return {
 		restrict : 'E',
 	    link : link,
+	    scope: {
+	    	jobParameters: "="
+	    },
 	    templateUrl: './src/dcbia-mfsda.template.html'
 	}
 
