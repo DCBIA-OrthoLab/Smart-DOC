@@ -489,21 +489,8 @@ angular.module('dcbia-jobs')
   			$scope.mfsda.showWarningTemplate = false;
 
   			var covariateName = _.clone($scope.projects.analysis.selectedProjectDataKeys);
-  			var covariate = _.clone($scope.projects.analysis.selectedProjectData);
-  			var covariatekeys = [];
-  			_.each(covariate, function(cov){
-  				var keys = _.keys(cov);
-  				covariatekeys = _.union(covariatekeys, keys);
-  			});
-  			covariate = _.map(covariate, function(cov){
-  				_.each(covariatekeys, function(covkey){
-  					if(cov[covkey] === undefined){
-  						cov[covkey] = 0;
-  					}
-  				});
-  				return cov;
-  			});
-  			
+  			var covariate = _.clone($scope.projects.analysis.selectedProjectData); 			 			
+
 
   			var mapnames = {};
 
@@ -533,6 +520,19 @@ angular.module('dcbia-jobs')
 					})
   				}
   			});
+
+
+  			covariate = _.compact(_.map(covariate, function(cov){
+  				if(!cov.isTemplate){
+  					_.each(covariateName, function(covkey){
+	  					if(cov[covkey] === undefined){
+	  						cov[covkey] = 0;
+	  					}
+	  				});
+	  				return cov;
+  				}
+  				return null;
+  			}));
   			
   			var template = _.compact(_.flatten(templates));
   			if(template.length != 1){
@@ -543,6 +543,7 @@ angular.module('dcbia-jobs')
   			covariateName.splice(0, 0, 'group');
   			covariateName.splice(_.indexOf(covariateName, 'patientId'), 1);
   			covariateName.splice(_.indexOf(covariateName, 'attachments'), 1);
+  			covariateName.splice(_.indexOf(covariateName, 'template'), 1);
   			
   			try {
 				var result = json2csv({ data: covariate, fields: covariateName}).split('\n');
