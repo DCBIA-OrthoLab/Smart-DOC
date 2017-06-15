@@ -383,15 +383,15 @@ angular.module('dcbia-jobs')
 
 	// -shapeData <filename, .txt list with vtk filenames, 1 file per line>
 	// -coordData <filename, .vtk shape template>
-	// -covariates <filename, .txt with covariates dim = n x p0 (comma separated or tabulation, without header, the first column is the group)>
+	// -covariate <filename, .txt with covariate dim = n x p0 (comma separated or tabulation, without header, the first column is the group)>
 	// -covariateInterest <filename, .txt (dim = 1xp0 vector comma separated, 1 or 0 value to indicate covariate of interest)>
 	// -covariateType <filename, .txt (dim= 1xsum(covariateInterest) vector comma separated, 1 or 0 to indicate type of covariate double or int)>
 	// -outputDir <output directory>
 	// mfsda.shapeData 
 	// mfsda.coordData 
-	// mfsda.covariates 
+	// mfsda.covariate 
 	// mfsda.covariateInterest 
-	// mfsda.covariatesType 
+	// mfsda.covariateType 
 	// mfsda.shapes = filelistobj;
 	// mfsda.template = template;			
 
@@ -413,8 +413,8 @@ angular.module('dcbia-jobs')
   					name: mfsda.template.name,
   				},
   				{
-  					flag: "-covariates",
-  					name: "covariates.txt"
+  					flag: "-covariate",
+  					name: "covariate.txt"
   				},
   				{
   					flag: "-covariateInterest",
@@ -427,6 +427,10 @@ angular.module('dcbia-jobs')
   				{
   					flag: "-outputDir",
   					name: "./output"
+  				},
+  				{
+  					flag: "-exportJSON",
+  					name: ""
   				}
   			];
 
@@ -435,8 +439,16 @@ angular.module('dcbia-jobs')
   			job.executionserver = $scope.clusterpost.selectedServer.name;
   			job.outputs = [{
   				name: "output",
-  				type: "tar.gz"
-  			}]
+  				type: "tar.gz",  				
+  			},
+  			{
+  				name: "stdout.out",
+  				type: "file"
+  			},
+  			{
+  				name: "stderr.err",
+  				type: "file"
+  			}];
   			job.userEmail = $scope.user.email;
   			job.jobparameters = [];
 
@@ -476,11 +488,11 @@ angular.module('dcbia-jobs')
   			var mfsda = {};
   			$scope.mfsda.showWarningTemplate = false;
 
-  			var covariatesName = _.clone($scope.projects.analysis.selectedProjectDataKeys);
-  			var covariates = _.clone($scope.projects.analysis.selectedProjectData);
+  			var covariateName = _.clone($scope.projects.analysis.selectedProjectDataKeys);
+  			var covariate = _.clone($scope.projects.analysis.selectedProjectData);
   			var mapnames = {};
 
-  			var templates = _.map(covariates, function(cov){
+  			var templates = _.map(covariate, function(cov){
   				if(cov.isTemplate){
   					return _.map(cov.attachments, function(att, colid){
 						return _.map(att, function(a, name){
@@ -513,25 +525,25 @@ angular.module('dcbia-jobs')
   				return;
   			}
 
-  			covariatesName.splice(0, 0, 'group');
-  			covariatesName.splice(_.indexOf(covariatesName, 'patientId'), 1);
-  			covariatesName.splice(_.indexOf(covariatesName, 'attachments'), 1);
+  			covariateName.splice(0, 0, 'group');
+  			covariateName.splice(_.indexOf(covariateName, 'patientId'), 1);
+  			covariateName.splice(_.indexOf(covariateName, 'attachments'), 1);
   			
   			try {
-				var result = json2csv({ data: covariates, fields: covariatesName}).split('\n');
+				var result = json2csv({ data: covariate, fields: covariateName}).split('\n');
 				result.splice(0,1);
-				covariatescsv = result.join('\n');
+				covariatecsv = result.join('\n');
 			} catch (err) {
 				// Errors are thrown for bad options, or if the data is empty and no fields are provided. 
 				// Be sure to provide fields if it is possible that your data array will be empty. 
 				console.error(err);
 			}
 
-  			var covariatesInterest = _.map(covariatesName, function(){
+  			var covariateInterest = _.map(covariateName, function(){
   				return "1";
   			}).join(",");
-  			var covariatesType = _.map(covariatesName, function(cn){
-  				var data = _.pluck(covariates, cn);
+  			var covariateType = _.map(covariateName, function(cn){
+  				var data = _.pluck(covariate, cn);
   				var datatype = _.map(data, function(d){
   					if(_.isNumber(d)){
   						return Number.isInteger(d);
@@ -541,7 +553,7 @@ angular.module('dcbia-jobs')
   				return Number(!eval(datatype.join("&&")));
   			}).join(",");
   			
-  			var filelistobj = _.compact(_.flatten(_.map(covariates, function(cov){
+  			var filelistobj = _.compact(_.flatten(_.map(covariate, function(cov){
   				if(!cov.isTemplate){
   					return _.compact(_.flatten(_.map(cov.attachments, function(att, colid){
 						return _.map(att, function(a, name){
@@ -576,18 +588,18 @@ angular.module('dcbia-jobs')
   			});
 
   			mfsda.data.push({
-  				name: "covariates.txt",
-  				data: covariatescsv
+  				name: "covariate.txt",
+  				data: covariatecsv
   			});
 
   			mfsda.data.push({
-  				name: "covariatesInterest.txt",
-  				data: covariatesInterest
+  				name: "covariateInterest.txt",
+  				data: covariateInterest
   			});
 
   			mfsda.data.push({
-  				name: "covariatesType.txt",
-  				data: covariatesType
+  				name: "covariateType.txt",
+  				data: covariateType
   			});
   			
   			if(template.length == 1){
@@ -599,15 +611,15 @@ angular.module('dcbia-jobs')
   			});
 
   			filelistobj.push({
-  				name: "covariates.txt"
+  				name: "covariate.txt"
   			});
 
   			filelistobj.push({
-  				name: "covariatesInterest.txt"
+  				name: "covariateInterest.txt"
   			});
 
   			filelistobj.push({
-  				name: "covariatesType.txt"
+  				name: "covariateType.txt"
   			});
 
   			mfsda.inputs = filelistobj;
