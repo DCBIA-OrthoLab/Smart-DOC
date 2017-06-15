@@ -410,7 +410,7 @@ angular.module('dcbia-jobs')
   				},
   				{
   					flag: "-coordData",
-  					name: "template.vtk",
+  					name: mfsda.template.name,
   				},
   				{
   					flag: "-covariates",
@@ -510,6 +510,7 @@ angular.module('dcbia-jobs')
   			var template = _.compact(_.flatten(templates));
   			if(template.length != 1){
   				$scope.mfsda.showWarningTemplate = true;
+  				return;
   			}
 
   			covariatesName.splice(0, 0, 'group');
@@ -610,6 +611,7 @@ angular.module('dcbia-jobs')
   			});
 
   			mfsda.inputs = filelistobj;
+  			mfsda.template = template[0];
 
   			return mfsda;
   		}
