@@ -490,6 +490,21 @@ angular.module('dcbia-jobs')
 
   			var covariateName = _.clone($scope.projects.analysis.selectedProjectDataKeys);
   			var covariate = _.clone($scope.projects.analysis.selectedProjectData);
+  			var covariatekeys = [];
+  			_.each(covariate, function(cov){
+  				var keys = _.keys(cov);
+  				covariatekeys = _.union(covariatekeys, keys);
+  			});
+  			covariate = _.map(covariate, function(cov){
+  				_.each(covariatekeys, function(covkey){
+  					if(cov[covkey] === undefined){
+  						cov[covkey] = 0;
+  					}
+  				});
+  				return cov;
+  			});
+  			
+
   			var mapnames = {};
 
   			var templates = _.map(covariate, function(cov){
