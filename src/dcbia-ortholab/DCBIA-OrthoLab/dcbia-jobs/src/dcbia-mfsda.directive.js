@@ -355,6 +355,11 @@ angular.module('dcbia-jobs')
 			$scope.projects.analysis.selectedProjectData = selectedProjectData;
 			$scope.projects.analysis.selectedProjectDataKeys = analysis.selectedVariables;
 
+			var indexgroup = $scope.projects.analysis.selectedProjectDataKeys.indexOf('group');
+			if(indexgroup !== 0){
+				$scope.projects.analysis.selectedProjectDataKeys.splice(indexgroup, 1);
+			}			
+
 			// $scope.projects.selectedProjectData;
 			// projects.analysis.selectedPatients.indexOf(row.patientId)>-1">
 			// 			<td ng-repeat="key in projects.analysis.selectedVariables
