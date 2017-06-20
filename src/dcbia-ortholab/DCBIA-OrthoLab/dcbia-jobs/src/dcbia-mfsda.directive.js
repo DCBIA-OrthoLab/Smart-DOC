@@ -464,7 +464,7 @@ angular.module('dcbia-jobs')
   				path: "./output/efit.json"
   			},
   			{
-  				name: "efit.mat",
+  				name: "pvalues.json",
   				type: "file",
   				path: "./output/pvalues.json"
   			}];
