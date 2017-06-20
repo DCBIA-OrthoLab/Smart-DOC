@@ -357,8 +357,12 @@ angular.module('dcbia-jobs')
 
 			var indexgroup = $scope.projects.analysis.selectedProjectDataKeys.indexOf('group');
 			if(indexgroup !== 0){
-				$scope.projects.analysis.selectedProjectDataKeys.splice(indexgroup, 1);
-			}			
+				$scope.projects.analysis.hasGroup = true;
+				$scope.projects.analysis.selectedProjectDataKeys.splice(indexgroup, 1);//Remove group
+				$scope.projects.analysis.selectedProjectDataKeys.splice(0,0,'group');//Add group first
+			}else{
+				$scope.projects.analysis.hasGroup = false;
+			}
 
 			// $scope.projects.selectedProjectData;
 			// projects.analysis.selectedPatients.indexOf(row.patientId)>-1">
@@ -453,6 +457,16 @@ angular.module('dcbia-jobs')
   			{
   				name: "stderr.err",
   				type: "file"
+  			},
+  			{
+  				name: "efit.json",
+  				type: "file",
+  				path: "./output/efit.json"
+  			},
+  			{
+  				name: "efit.mat",
+  				type: "file",
+  				path: "./output/pvalues.json"
   			}];
   			job.userEmail = $scope.user.email;
   			job.jobparameters = [];
@@ -544,11 +558,21 @@ angular.module('dcbia-jobs')
   				$scope.mfsda.showWarningTemplate = true;
   				return;
   			}
+  			
+  			var covariateNameIndex = _.indexOf(covariateName, 'patientId')
+  			if(_.indexOf(covariateName, 'patientId') != -1){
+  				covariateName.splice(covariateNameIndex, 1);
+  			}
 
-  			covariateName.splice(0, 0, 'group');
-  			covariateName.splice(_.indexOf(covariateName, 'patientId'), 1);
-  			covariateName.splice(_.indexOf(covariateName, 'attachments'), 1);
-  			covariateName.splice(_.indexOf(covariateName, 'template'), 1);
+  			var covariateNameIndex = _.indexOf(covariateName, 'attachments')
+  			if(_.indexOf(covariateName, 'attachments') != -1){
+  				covariateName.splice(covariateNameIndex, 1);
+  			}
+
+  			var covariateNameIndex = _.indexOf(covariateName, 'template')
+  			if(_.indexOf(covariateName, 'template') != -1){
+  				covariateName.splice(covariateNameIndex, 1);
+  			}
   			
   			try {
 				var result = json2csv({ data: covariate, fields: covariateName}).split('\n');
@@ -647,6 +671,21 @@ angular.module('dcbia-jobs')
   			mfsda.template = template[0];
 
   			return mfsda;
+  		}
+
+  		$scope.mfsda.jobCallback = function(job){
+  			
+  			$scope.mfsda.vtkUrl = job;
+
+  			return Promise.all([
+  				clusterpostService.getAttachment(job._id, "efit.json", "json"),
+  				clusterpostService.getAttachment(job._id, "pvalues.json", "json")
+  				])
+  			.then(function(res){
+  				var data = _.pluck(res, "data");
+  				
+  			})
+  			.catch(console.error)
   		}
 
 		$scope.csv.export = function(project){

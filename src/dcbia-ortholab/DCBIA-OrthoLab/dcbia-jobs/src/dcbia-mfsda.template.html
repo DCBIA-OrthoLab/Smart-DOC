@@ -1,172 +1,185 @@
-<div ng-if="projects.section == 0">
-	<div class="panel panel-default">
-  		<div class="panel-body">  			
-			<div class="col-sm-6 col-md-4" ng-repeat="project in projects.projects">
-				<div ng-class="projects.projectsProperties[project._id].class">
-				    <div class="thumbnail">
-				      <div class="caption">
-				        <h3>{{project.name}}</h3>
-				        <p>
-				        	<b>Number of items: </b> {{projects.getProjectItems(project)}}
-				        </p>
-			        	<div class="btn-group">
-						 <button type="button" class="btn btn-default" ng-click="projects.showSection = 1;projects.select(project)">
-						 	<span class="glyphicon glyphicon-eye-open"></span>
-						 </button>
+<uib-tabset active="activeTab">
+	<uib-tab heading="Create task" index="0">
+		<div ng-if="projects.section == 0">
+			<div class="panel panel-default">
+		  		<div class="panel-body">  			
+					<div class="col-sm-6 col-md-4" ng-repeat="project in projects.projects">
+						<div ng-class="projects.projectsProperties[project._id].class">
+						    <div class="thumbnail">
+						      <div class="caption">
+						        <h3>{{project.name}}</h3>
+						        <p>
+						        	<b>Number of items: </b> {{projects.getProjectItems(project)}}
+						        </p>
+					        	<div class="btn-group">
+								 <button type="button" class="btn btn-default" ng-click="projects.showSection = 1;projects.select(project)">
+								 	<span class="glyphicon glyphicon-eye-open"></span>
+								 </button>
+								</div>
+						      </div>
+						    </div>
 						</div>
-				      </div>
-				    </div>
+					</div>
+				</div>
+			</div>
+			<div class="panel panel-default" style="overflow:scroll" ng-if="projects.showSection == 1">
+				<div class="panel-heading">
+			    	Saved subsets
+			  	</div>
+			  	<div class="panel-body">
+			  		<table st-table="projects.displayedAnalyses" st-safe-src="projects.selectedProject.analyses" class="table table-striped">
+			            <thead>
+			                <tr>
+			                    <th colspan="2">
+			                        <input st-search="" placeholder="search by name" class="input-sm form-control" type="search"/>
+			                    </th>	                    
+			                </tr>
+			            </thead>
+			            <tbody>
+			                <tr ng-repeat="(index, analysis) in projects.displayedAnalyses">
+			                    <td>
+			                        {{analysis.name}}
+			                    </td>
+			                    <td>
+			                        <button type="button" class="btn btn-info" ng-click="projects.showSubset(index)">
+			                			<span class="glyphicon glyphicon-eye-open"></span>
+			             			</button>
+			                    </td>                        
+			                </tr>
+			            </tbody>
+			        </table>
+			  	</div>
+			</div>
+			<div class="panel panel-default" style="overflow:scroll" ng-if="projects.showSection == 1">
+				<div class="panel-heading">
+			    	Subset
+			  	</div>		  	
+				<div class="panel-body">
+					<div class="input-group">
+			  			<span class="input-group-addon">Name</span>
+			  			<input type="text" class="form-control" placeholder="Subset name" aria-describedby="basic-addon3" ng-model="projects.analysis.name">
+		  			</div>  				    
+					<table st-table="projects.analysis.selectedProjectDataDisplayed" st-safe-src="projects.analysis.selectedProjectData" class="table table-striped">
+						<thead>
+							<tr>
+								<th colspan="2" st-sort="{{key}}" ng-if="projects.analysis.hasGroup">group</th>
+								<th colspan="1" st-sort="{{key}}">Template</th>
+								<th colspan="2" ng-repeat="key in projects.analysis.selectedProjectDataKeys" st-sort="{{key}}">{{key}}</th>
+							</tr>
+							<tr>
+								<th colspan="2" ng-if="projects.analysis.hasGroup">
+									<div class="input-group">							
+										<span class="input-group-btn">
+											<button type="button" class="btn btn-sm btn-info" ng-click="projects.setGroupProjectDataDisplayed()" >
+					                			<span class="glyphicon glyphicon-ok"></span>
+					             			</button>
+										</span>
+										<input placeholder="Set group" class="input-sm form-control" type="number" ng-model="projects.analysis.group"/>
+									</div>
+								</th>
+								<th colspan="1"></th>
+								<th colspan="2" ng-repeat="key in projects.analysis.selectedProjectDataKeys">
+									<input st-search="{{key}}" placeholder="search by {{key}}" class="input-sm form-control" type="search" ng-if="key!='attachments'" />
+									<div class="input-group" ng-if="key=='attachments'">
+										<span class="input-group-btn">
+								  			<button type="button" class="btn btn-sm btn-info" ng-click="projects.selectVisibleAttachments(true)">
+					                			<span class="glyphicon glyphicon-ok"></span>
+					             			</button>
+					             			<button type="button" class="btn btn-sm btn-danger" ng-click="projects.selectVisibleAttachments(false)">
+					                			<span class="glyphicon glyphicon-remove"></span>
+					             			</button>
+							  			</span>
+										<input placeholder="search for attachments" class="input-sm form-control" ng-model="projects.analysis.attachmentsRegex" type="search" />
+							  		</div>
+								</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr ng-repeat="row in projects.analysis.selectedProjectDataDisplayed">
+								<td colspan="2" ng-if="projects.analysis.hasGroup"><input placeholder="group" class="input-sm form-control" ng-model="row.group" type="number"/></td>
+								<td colspan="1"><input type="checkbox" aria-label="..." ng-model="row.isTemplate"></td>
+								<td colspan="2" ng-repeat="key in projects.analysis.selectedProjectDataKeys">
+									<div ng-if="key == '_attachments'">
+										<button type="button" class="btn btn-default" ng-repeat="(key, att) in row[key]" ng-click="morphologicalDataCollection.downloadAttachment(row._id, key, att)">
+											<span class="glyphicon glyphicon-eye"></span>{{att}}
+										</button>
+									</div>
+									<div ng-if="key == 'attachments'">
+										<div ng-repeat="(keycoll, collattachments) in row[key]">
+											<div class="input-group" ng-repeat="(keyatt, att) in projects.getFilteredAttachments(collattachments)">
+												<span class="input-group-addon">
+													<input type="checkbox" aria-label="..." ng-model="att.selected">
+												</span>
+												<label class="form-control" >{{keyatt}}</label>
+										    </div>
+										</div>
+									</div>
+									<div ng-if="!_.isArray(row[key]) && key != '_attachments' && key != 'attachments'">
+										{{row[key]}}
+									</div>
+									<div ng-if="_.isArray(row[key]) && key != '_attachments' && key != 'attachments'">
+										<ul>
+											<li ng-repeat="item in row[key]" ng-if="key == 'owners'">{{item.user}}</li>
+										</ul>
+									</div>
+								</td>						
+							</tr>
+						</tbody>
+					</table>
+
+					<div class="alert alert-warning" role="alert" ng-if="mfsda.showWarningTemplate">
+						You have selected more than 1 or no template for the MFSDA statistical analysis. <br>				
+					</div>
+					<br>
+					<div class="row">
+					  <div class="col-md-6">
+					    <div class="input-group">
+							<span class="input-group-addon" id="basic-addon1">Task name</span>
+							<input type="text" class="form-control" placeholder="MFSDA task name" aria-describedby="basic-addon3" ng-model="mfsda.name">
+					    </div>
+					  </div>
+					  <div class="col-md-6">
+					    <div class="input-group">
+					    	<span class="input-group-addon" id="basic-addon1">Execution server</span>
+					    	<select class="form-control"  ng-model="clusterpost.selectedServer" ng-options="server.name for server in clusterpost.servers"></select>
+					    </div>
+					  </div>
+					</div>
+					<br>
+					<div class="row">
+						<div class="col-md-12">
+							<div class="input-group">
+								<span class="input-group-btn">
+									<button class="btn btn-default" type="button" ng-click="mfsda.editJobParameters=!mfsda.editJobParameters"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span></button>
+								</span>				
+								<input type="text" class="form-control" placeholder="Additional job parameters" aria-describedby="basic-addon3" ng-model="mfsda.jobParameters" ng-readonly="mfsda.editJobParameters">
+				  			</div>
+				  		</div>
+			  		</div>
+			  		<br>
+			  		<div class="row">
+			  			<div class="col-md-12">
+				  			<span class="input-group-btn">
+								<button type="button" class="btn btn-success" ng-click="mfsda.submitJob()">
+									<span class="glyphicon glyphicon-ok"></span>
+								</button>
+								<button type="button" class="btn btn-info" ng-click="mfsda.download()">
+									<span class="glyphicon glyphicon-download"></span>
+								</button>		  			
+				  			</span>
+				  		</div>
+			  		</div>
 				</div>
 			</div>
 		</div>
-	</div>
-	<div class="panel panel-default" style="overflow:scroll" ng-if="projects.showSection == 1">
-		<div class="panel-heading">
-	    	Saved subsets
-	  	</div>
-	  	<div class="panel-body">
-	  		<table st-table="projects.displayedAnalyses" st-safe-src="projects.selectedProject.analyses" class="table table-striped">
-	            <thead>
-	                <tr>
-	                    <th colspan="2">
-	                        <input st-search="" placeholder="search by name" class="input-sm form-control" type="search"/>
-	                    </th>	                    
-	                </tr>
-	            </thead>
-	            <tbody>
-	                <tr ng-repeat="(index, analysis) in projects.displayedAnalyses">
-	                    <td>
-	                        {{analysis.name}}
-	                    </td>
-	                    <td>
-	                        <button type="button" class="btn btn-info" ng-click="projects.showSubset(index)">
-	                			<span class="glyphicon glyphicon-eye-open"></span>
-	             			</button>
-	                    </td>                        
-	                </tr>
-	            </tbody>
-	        </table>
-	  	</div>
-	</div>
-	<div class="panel panel-default" style="overflow:scroll" ng-if="projects.showSection == 1">
-		<div class="panel-heading">
-	    	Subset
-	  	</div>		  	
-		<div class="panel-body">
-			<div class="input-group">
-	  			<span class="input-group-addon">Name</span>
-	  			<input type="text" class="form-control" placeholder="Subset name" aria-describedby="basic-addon3" ng-model="projects.analysis.name">
-  			</div>  				    
-			<table st-table="projects.analysis.selectedProjectDataDisplayed" st-safe-src="projects.analysis.selectedProjectData" class="table table-striped">
-				<thead>
-					<tr>
-						<th colspan="2" st-sort="{{key}}">group</th>
-						<th colspan="1" st-sort="{{key}}">Template</th>
-						<th colspan="2" ng-repeat="key in projects.analysis.selectedProjectDataKeys" st-sort="{{key}}">{{key}}</th>
-					</tr>
-					<tr>
-						<th colspan="2">
-							<div class="input-group">							
-								<span class="input-group-btn">
-									<button type="button" class="btn btn-sm btn-info" ng-click="projects.setGroupProjectDataDisplayed()" >
-			                			<span class="glyphicon glyphicon-ok"></span>
-			             			</button>
-								</span>
-								<input placeholder="Set group" class="input-sm form-control" type="number" ng-model="projects.analysis.group"/>
-							</div>
-						</th>
-						<th colspan="1"></th>
-						<th colspan="2" ng-repeat="key in projects.analysis.selectedProjectDataKeys">
-							<input st-search="{{key}}" placeholder="search by {{key}}" class="input-sm form-control" type="search" ng-if="key!='attachments'" />
-							<div class="input-group" ng-if="key=='attachments'">
-								<span class="input-group-btn">
-						  			<button type="button" class="btn btn-sm btn-info" ng-click="projects.selectVisibleAttachments(true)">
-			                			<span class="glyphicon glyphicon-ok"></span>
-			             			</button>
-			             			<button type="button" class="btn btn-sm btn-danger" ng-click="projects.selectVisibleAttachments(false)">
-			                			<span class="glyphicon glyphicon-remove"></span>
-			             			</button>
-					  			</span>
-								<input placeholder="search for attachments" class="input-sm form-control" ng-model="projects.analysis.attachmentsRegex" type="search" />
-					  		</div>
-						</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr ng-repeat="row in projects.analysis.selectedProjectDataDisplayed">
-						<td colspan="2"><input placeholder="group" class="input-sm form-control" ng-model="row.group" type="number"/></td>
-						<td colspan="1"><input type="checkbox" aria-label="..." ng-model="row.isTemplate"></td>
-						<td colspan="2" ng-repeat="key in projects.analysis.selectedProjectDataKeys">
-							<div ng-if="key == '_attachments'">
-								<button type="button" class="btn btn-default" ng-repeat="(key, att) in row[key]" ng-click="morphologicalDataCollection.downloadAttachment(row._id, key, att)">
-									<span class="glyphicon glyphicon-eye"></span>{{att}}
-								</button>
-							</div>
-							<div ng-if="key == 'attachments'">
-								<div ng-repeat="(keycoll, collattachments) in row[key]">
-									<div class="input-group" ng-repeat="(keyatt, att) in projects.getFilteredAttachments(collattachments)">
-										<span class="input-group-addon">
-											<input type="checkbox" aria-label="..." ng-model="att.selected">
-										</span>
-										<label class="form-control" >{{keyatt}}</label>
-								    </div>
-								</div>
-							</div>
-							<div ng-if="!_.isArray(row[key]) && key != '_attachments' && key != 'attachments'">
-								{{row[key]}}
-							</div>
-							<div ng-if="_.isArray(row[key]) && key != '_attachments' && key != 'attachments'">
-								<ul>
-									<li ng-repeat="item in row[key]" ng-if="key == 'owners'">{{item.user}}</li>
-								</ul>
-							</div>
-						</td>						
-					</tr>
-				</tbody>
-			</table>
-
-			<div class="alert alert-warning" role="alert" ng-if="mfsda.showWarningTemplate">
-				You have selected more than 1 or no template for the MFSDA statistical analysis. <br>				
-			</div>
-			<br>
-			<div class="row">
-			  <div class="col-md-6">
-			    <div class="input-group">
-					<span class="input-group-addon" id="basic-addon1">Task name</span>
-					<input type="text" class="form-control" placeholder="MFSDA task name" aria-describedby="basic-addon3" ng-model="mfsda.name">
-			    </div>
-			  </div>
-			  <div class="col-md-6">
-			    <div class="input-group">
-			    	<span class="input-group-addon" id="basic-addon1">Execution server</span>
-			    	<select class="form-control"  ng-model="clusterpost.selectedServer" ng-options="server.name for server in clusterpost.servers"></select>
-			    </div>
-			  </div>
-			</div>
-			<br>
-			<div class="row">
-				<div class="col-md-12">
-					<div class="input-group">
-						<span class="input-group-btn">
-							<button class="btn btn-default" type="button" ng-click="mfsda.editJobParameters=!mfsda.editJobParameters"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span></button>
-						</span>				
-						<input type="text" class="form-control" placeholder="Additional job parameters" aria-describedby="basic-addon3" ng-model="mfsda.jobParameters" ng-readonly="mfsda.editJobParameters">
-		  			</div>
-		  		</div>
-	  		</div>
-	  		<br>
-	  		<div class="row">
-	  			<div class="col-md-12">
-		  			<span class="input-group-btn">
-						<button type="button" class="btn btn-success" ng-click="mfsda.submitJob()">
-							<span class="glyphicon glyphicon-ok"></span>
-						</button>
-						<button type="button" class="btn btn-info" ng-click="mfsda.download()">
-							<span class="glyphicon glyphicon-download"></span>
-						</button>		  			
-		  			</span>
-		  		</div>
-	  		</div>
+	</uib-tab>
+	<uib-tab heading="Active tasks" index="1">
+		<div class="panel panel-default">				
+			<clusterpost-jobs executable="'MFSDA.sh'" job-callback="mfsda.jobCallback"></clusterpost-jobs>
 		</div>
-	</div>
-</div>
+	</uib-tab>
+	<uib-tab heading="Display results" index="2">		
+		<dcbia-vtk vtk-url="mfsda.vtkUrl" style="display: block"></dcbia-vtk>
+	</uib-tab>
+</uit-tabset>
+
