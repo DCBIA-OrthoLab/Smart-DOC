@@ -356,7 +356,7 @@ angular.module('dcbia-jobs')
 			$scope.projects.analysis.selectedProjectDataKeys = analysis.selectedVariables;
 
 			var indexgroup = $scope.projects.analysis.selectedProjectDataKeys.indexOf('group');
-			if(indexgroup !== 0){
+			if(indexgroup !== -1){
 				$scope.projects.analysis.hasGroup = true;
 				$scope.projects.analysis.selectedProjectDataKeys.splice(indexgroup, 1);//Remove group
 				$scope.projects.analysis.selectedProjectDataKeys.splice(0,0,'group');//Add group first
