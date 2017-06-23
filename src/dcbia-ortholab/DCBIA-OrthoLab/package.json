@@ -27,6 +27,7 @@
     "angular-route": "1.5.8",
     "angular-smart-table": "^2.1.8",
     "angular-ui-bootstrap": "^2.2.0",
+    "angularjs-slider": "^6.2.2",
     "bootstrap": "^3.3.7",
     "checklist-model": "^0.10.0",
     "clusterpost-list": "^2.0.0",
@@ -36,7 +37,8 @@
     "ng-file-model": "0.0.5",
     "three": "^0.81.2",
     "ui-bootstrap": "^0.1.5",
-    "underscore": "^1.8.3"
+    "underscore": "^1.8.3",
+    "vtk.js": "^3.0.0"
   },
   "devDependencies": {
     "grunt": "1.0.1",

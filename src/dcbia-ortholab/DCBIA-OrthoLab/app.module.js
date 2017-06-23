@@ -14,7 +14,9 @@ angular.module('dcbiaOrtholab', [
   'home',
   'dcbia-surveys',
   'dcbia-plots',
-  'clusterpost-list'
+  'clusterpost-list',
+  'dcbia-vtk-module',
+  'rzModule'
 ]).
 config(['$routeProvider', function($routeProvider) {
   $routeProvider
