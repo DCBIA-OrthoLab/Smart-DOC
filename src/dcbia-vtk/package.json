@@ -1,0 +1,43 @@
+{
+  "name": "dcbia-vtk",
+  "version": "1.0.0",
+  "description": "VTK package for dcbia",
+  "main": "index.js",
+  "scripts": {
+    "build": "webpack",
+    "build:release": "webpack -p",
+    "start": "webpack-dev-server --content-base ./dist",
+    "commit": "git cz",
+    "semantic-release": "semantic-release pre && npm publish && semantic-release post"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DCBIA-OrthoLab/shiny-tooth.git"
+  },
+  "keywords": [
+    "VTK",
+    "dental",
+    "DCBIA"
+  ],
+  "author": "juanprietob@gmail.com",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/DCBIA-OrthoLab/shiny-tooth/issues"
+  },
+  "homepage": "https://github.com/DCBIA-OrthoLab/shiny-tooth#readme",
+  "dependencies": {
+    "vtk.js": "^3.0.0"
+  },
+  "devDependencies": {
+    "grunt": "^1.0.1",
+    "grunt-angular-templates": "^1.1.0",
+    "grunt-contrib-clean": "^1.1.0",
+    "grunt-contrib-concat": "^1.0.1",
+    "grunt-contrib-cssmin": "^2.2.0",
+    "grunt-contrib-uglify": "^3.0.1",
+    "grunt-ng-annotate": "^3.0.0",
+    "grunt-webpack": "^3.0.0",
+    "kw-web-suite": "^3.1.1",
+    "webpack": "^3.0.0"
+  }
+}
