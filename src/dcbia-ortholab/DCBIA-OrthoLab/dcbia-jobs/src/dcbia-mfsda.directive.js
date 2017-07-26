@@ -495,11 +495,64 @@ angular.module('dcbia-jobs')
   			})
   		}
 
-  		$scope.mfsda.download = function(){
-  			
-  			var mfsda = $scope.mfsda.getData();
+  		$scope.mfsda.download = function(job){
 
-  			console.log(mfsda);
+  			if(job){
+  				
+  				var jobname = job._id;
+  				if(job.name){
+  					jobname = job.name;
+  				}
+
+				var zip = new JSZip();
+				var allpromise = [];
+				_.each(job.inputs, function(input){
+					allpromise.push(clusterpostService.getAttachment(job._id, input.name, 'arraybuffer')
+					.then(function(ab){
+						return {
+							name: input.name,
+							arraybuffer: ab.data
+						}
+					}));					
+				});
+
+				if(job._attachments['efit.json']){
+					allpromise.push(clusterpostService.getAttachment(job._id, 'efit.json', 'arraybuffer')
+					.then(function(ab){
+						return {
+							name: 'efit.json',
+							arraybuffer: ab.data
+						}
+					}));
+				}
+
+				
+				if(job._attachments['pvalues.json']){
+					allpromise.push(clusterpostService.getAttachment(job._id, 'pvalues.json', 'arraybuffer')
+					.then(function(ab){
+						return {
+							name: 'pvalues.json',
+							arraybuffer: ab.data
+						}
+					}));
+				}
+									
+
+				return Promise.all(allpromise)
+				.then(function(filecontent){
+					_.each(filecontent, function(fc){
+						zip.file(jobname + "/" + fc.name, fc.arraybuffer);
+					});
+
+					return zip.generateAsync({type:"blob"})
+					.then(function(bb) {						
+						
+						saveAs(bb, jobname + ".zip");
+						
+					});
+
+				});
+  			}
   		}
 
   		$scope.mfsda.getData = function(){
