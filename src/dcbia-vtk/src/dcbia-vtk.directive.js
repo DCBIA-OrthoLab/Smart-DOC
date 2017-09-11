@@ -100,7 +100,12 @@ angular.module('dcbia-vtk-module')
       const mapper = vtkMapper.newInstance();
       mapper.setInputData(polydata);
       const lut = mapper.getLookupTable();
-      lut.setHueRange(0.666, 0);
+      if($scope.hueRange && $scope.hueRange.max !== undefined && $scope.hueRange.min !== undefined){
+        lut.setHueRange($scope.hueRange.min, $scope.hueRange.max);
+      }else{
+        lut.setHueRange(0, 0.5);
+      }
+      
       const actor = vtkActor.newInstance();
       actor.setMapper(mapper);
 
