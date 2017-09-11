@@ -1,6 +1,6 @@
 {
   "name": "dcbia-vtk",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "VTK package for dcbia",
   "main": "index.js",
   "scripts": {
