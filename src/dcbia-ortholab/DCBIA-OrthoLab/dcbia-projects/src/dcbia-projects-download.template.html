@@ -1,0 +1,43 @@
+<div class="panel panel-default" style="overflow:scroll">
+	<div class="panel-body">
+		<img ng-if="patient.isDownloading" src='dcbia-projects/src/loading.gif'/>
+		<table st-table="patient.displayedCollection" st-safe-src="patient.morphologicaldata" class="table table-striped">
+			<thead>
+				<h3 align="center">
+					attachments
+				</h3>
+				<tr>
+					<th>
+						Download all the attachment files
+						<button id='loader' type="button" class="btn btn-info btn-lg" ng-click="vtk.downloadAll()">
+	                 		<span class="glyphicon glyphicon-download-alt"></span>
+	                 	
+	                	</button>
+	                	
+	                	<!-- <script >
+	                		function myFunction() {
+    							document.getElementById('loader').innerHTML = "<img src='/tenor.gif' alt='load'/><br/>Loading, please wait ...";
+							}
+	                	</script> -->
+						<!-- <button type="button" class="btn btn-info" ng-click="vtk.downloadall(patient.displayedCollection)">
+	                 		<span class="glyphicon glyphicon-download-alt"></span>
+	                	</button> -->
+					</th>
+				</tr>
+			
+			</thead>
+			<tbody ng-repeat="row in patient.displayedCollection">
+				<tr ng-repeat="(key,data) in row._attachments">
+					<td>
+					{{key}}
+					</td>
+					<td>
+	                	<button type="button" class="btn btn-info" ng-click="vtk.download(key, row)">
+	                 		<span class="glyphicon glyphicon-download-alt"></span>
+	                	</button>
+	            	</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</div>

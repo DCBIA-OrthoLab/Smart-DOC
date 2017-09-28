@@ -192,6 +192,12 @@ angular.module('data-collections')
         method: 'DELETE',
         url: '/dcbia/project/' + id
       });
+    },
+    getMorphologicalDataByCollectionIdPatientId: function(collectionId, patientId){
+      return $http({
+        method: 'GET',
+        url: '/dcbia/morphological/data/' + collectionId + '/patient/' + patientId
+      });
     }
   }
 });
