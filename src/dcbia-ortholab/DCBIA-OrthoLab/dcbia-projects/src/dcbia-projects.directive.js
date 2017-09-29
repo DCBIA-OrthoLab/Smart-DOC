@@ -1,7 +1,7 @@
 angular.module('dcbia-projects')
 .directive('projects', function($q, $routeParams, dcbia, clusterauth) {
 
-	function link($scope, $attrs, $filter){
+	function link($scope, $element, $filter){
 
 		clusterauth.getUser()
 		.then(function(res){
@@ -216,8 +216,8 @@ angular.module('dcbia-projects')
 
 		}
 
-		$scope.projects.showSubset = function(index){
-			$scope.projects.analysis = _.clone($scope.projects.selectedProject.analyses[index]);
+		$scope.projects.showSubset = function(analysis){
+			$scope.projects.analysis = _.clone(analysis);
 		}
 
 		$scope.projects.removeSubset = function(index){
@@ -394,7 +394,7 @@ angular.module('dcbia-projects')
 				if(col2 && col2._attachments && col2._id){
 					var att = {};
 					att[col2._id] = col2._attachments;
-
+					//Use key attachments when collections are merged instead of _attachments
 					col2.attachments = att;
 					delete col2._attachments;
 				}
@@ -422,6 +422,32 @@ angular.module('dcbia-projects')
 				}
 			})
 			return collection1;
+		}
+
+		$scope.projects.getFilteredAttachments = function(attachments){			
+			if($scope.projects.attachmentsRegex && $scope.projects.attachmentsRegex != ""){
+				var re = new RegExp("^" + $scope.projects.attachmentsRegex.split("*").join(".*") + "$");
+				var filteredkeys = _.filter(_.keys(attachments), function(key){				
+						return re.test(key);
+				});
+				return _.pick(attachments, filteredkeys);
+			}else{
+				return attachments;
+			}
+
+		}
+
+		$scope.projects.selectVisibleAttachments = function(select){
+			_.each($scope.projects.displayedSubset, function(pdata){
+				_.each(pdata.attachments, function(col, keycoll){
+					_.each($scope.projects.getFilteredAttachments(col), function(att, keyatt){
+						//first for initialization purposes in case is not init
+						$scope.morphologicalDataCollection.isSelectedAttachments(keycoll, keyatt);
+						//Then we set the value
+						$scope.projects.analysis.isSelectedAttachments[keycoll][keyatt] = select;					
+					});
+				});
+			});
 		}
 
 		$scope.morphologicalDataCollection.downloadAttachment = function(keycoll, filename, att){
@@ -482,7 +508,24 @@ angular.module('dcbia-projects')
   				}
             });
             return display;
+  		}  		
+
+  		$scope.morphologicalDataCollection.isSelectedAttachments = function(keycoll, keyatt){
+  			if($scope.projects.analysis){
+  				if(!$scope.projects.analysis.isSelectedAttachments){
+  					$scope.projects.analysis.isSelectedAttachments = {};
+  				}
+  				if(!$scope.projects.analysis.isSelectedAttachments[keycoll]){
+  					$scope.projects.analysis.isSelectedAttachments[keycoll] = {};
+  				}
+  				if($scope.projects.analysis.isSelectedAttachments[keycoll][keyatt] === undefined){
+  					$scope.projects.analysis.isSelectedAttachments[keycoll][keyatt] = true;
+  				}
+  				return $scope.projects.analysis.isSelectedAttachments[keycoll][keyatt];
+  			} 
+  			return false;  			
   		}
+  		
 
 		$scope.clinicalDataCollection.addRemoveScope = function(collection, scope, checkbox, projectName){
 			if(collection.scope === undefined){
@@ -588,6 +631,7 @@ angular.module('dcbia-projects')
 		$scope.csv.download = function(filename, csv){
 
 			var pom = document.createElement('a');
+			$element.appendChild(pom);
 			var bb = new Blob([csv], {type: 'text/plain'});
 
 			pom.setAttribute('href', window.URL.createObjectURL(bb));
@@ -680,8 +724,8 @@ angular.module('dcbia-projects')
 								removeScope = false;
 							}
 						}
-					})
-				})
+					});
+				});
 				if(removeScope){
 					data.scope.splice(data.scope.indexOf(scope), 1);
 				}

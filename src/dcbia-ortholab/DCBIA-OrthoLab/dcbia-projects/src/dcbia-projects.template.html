@@ -145,11 +145,12 @@
   			<table st-table="projects.displayedProject" st-safe-src="projects.selectedProjectData" class="table table-striped">
 				<thead>
 					<tr>
-						<th ng-repeat="key in projects.selectedProjectDataKeys" st-sort="{{key}}">{{key}}</th>
+						<th ng-repeat="key in projects.selectedProjectDataKeys">{{key}}</th>
 					</tr>
 					<tr>
 						<th ng-repeat="key in projects.selectedProjectDataKeys">
-							<input st-search="{{key}}" placeholder="search for {{key}}" class="input-sm form-control" type="search"/>
+							<input st-search="{{key}}" placeholder="search for {{key}}" class="input-sm form-control" type="search" ng-if="key!='attachments'"/>
+							<input placeholder="search for attachments" class="input-sm form-control" type="search" ng-if="key=='attachments'" ng-model="projects.attachmentsRegex"/>
 						</th>
 					</tr>
 				</thead>
@@ -274,7 +275,7 @@
 	                            {{analysis.name}}
 	                        </td>
 	                        <td>
-	                            <button type="button" class="btn btn-info" ng-click="projects.showSubset(index)">
+	                            <button type="button" class="btn btn-info" ng-click="projects.showSubset(analysis)">
 	                    			<span class="glyphicon glyphicon-eye-open"></span>
 	                 			</button>
 	                        </td>
@@ -310,23 +311,37 @@
 						</tr>
 						<tr>
 							<th ng-repeat="key in projects.analysis.selectedVariables">
-								<input st-search="{{key}}" placeholder="search for {{key}}" class="input-sm form-control" type="search"/>
+								<input st-search="{{key}}" placeholder="search for {{key}}" class="input-sm form-control" type="search" ng-if="key!='attachments'"/>
+								<div class="input-group" ng-if="key=='attachments'">
+									<span class="input-group-btn">
+							  			<button type="button" class="btn btn-sm btn-info" ng-click="projects.selectVisibleAttachments(true)">
+				                			<span class="glyphicon glyphicon-ok"></span>
+				             			</button>
+				             			<button type="button" class="btn btn-sm btn-danger" ng-click="projects.selectVisibleAttachments(false)">
+				                			<span class="glyphicon glyphicon-remove"></span>
+				             			</button>
+						  			</span>
+									<input placeholder="search for attachments" class="input-sm form-control" ng-model="projects.attachmentsRegex" type="search" />
+						  		</div>								
 							</th>
 						</tr>
 					</thead>
 					<tbody>
 						<tr ng-repeat="row in projects.displayedSubset" ng-if="projects.analysis.selectedPatients.indexOf(row.patientId)>-1">
 							<td ng-repeat="key in projects.analysis.selectedVariables">								
+								<!-- Deprecated this chunk can be removed in the future-->
 								<div ng-if="key == '_attachments'">
-									<button type="button" class="btn btn-default" ng-repeat="(key, att) in row[key]" ng-click="morphologicalDataCollection.downloadAttachment(row._id, key, att)">
+									<button type="button" class="btn btn-default" ng-repeat="(key, att) in row[key]" >
 										<span class="glyphicon glyphicon-eye"></span>{{att}}
 									</button>
 									
 								</div>
+								<!-- Deprecated -->
+
 								<div ng-if="key == 'attachments'">
-									<div ng-repeat="(keycoll, collattachments) in row[key]">									
-										<button type="button" class="btn btn-default" ng-repeat="(key, att) in collattachments" ng-click="morphologicalDataCollection.downloadAttachment(keycoll, key, att)">
-											<span class="glyphicon glyphicon-eye"></span>{{key}}
+									<div ng-repeat="(keycoll, collattachments) in row[key]">	
+										<button type="button" class="btn btn-default" ng-repeat="(key, att) in projects.getFilteredAttachments(collattachments)" ng-click="projects.analysis.isSelectedAttachments[keycoll][key] = !projects.analysis.isSelectedAttachments[keycoll][key]">
+											<span class="glyphicon glyphicon-eye"></span><s ng-if="!morphologicalDataCollection.isSelectedAttachments(keycoll, key)">{{key}}</s><b ng-if="morphologicalDataCollection.isSelectedAttachments(keycoll, key)">{{key}}</b>
 										</button>
 									</div>
 								</div>
