@@ -68,9 +68,13 @@
 	</div>
 	<div class="panel panel-default" ng-if="projects.showSection == 1">
 		<div class="panel-heading">
+			<button class="btn btn-default" ng-click="panel.projectCollectionsCollapse=!panel.projectCollectionsCollapse">
+				<span ng-if="panel.projectCollectionsCollapse" class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
+				<span ng-if="!panel.projectCollectionsCollapse" class="glyphicon glyphicon-collapse-up" aria-hidden="true"></span>
+			</button>
 	    	Project collections
 	  	</div>
-		<div class="panel-body">
+		<div ng-class="panel.projectCollectionsCollapse? 'panel-body collapse': 'panel-body'">
 		  	<div class="col-md-6">
 		  		<div class="panel panel-default" style="overflow:scroll">
 					<div class="panel-heading">
@@ -136,12 +140,16 @@
 			  	</div>
 		  	</div>
 		</div>
-	</div>
+	</div>	
 	<div class="panel panel-default" style="overflow:scroll" ng-if="projects.showSection == 1">
 		<div class="panel-heading">
-	    	Merged data collections
+			<button class="btn btn-default" ng-click="panel.mergedCollectionsCollapse=!panel.mergedCollectionsCollapse">
+				<span ng-if="panel.mergedCollectionsCollapse" class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
+				<span ng-if="!panel.mergedCollectionsCollapse" class="glyphicon glyphicon-collapse-up" aria-hidden="true"></span>
+			</button>
+			Merged collections
 	  	</div>
-  		<div class="panel-body">
+  		<div ng-class="panel.mergedCollectionsCollapse? 'panel-body collapse': 'panel-body'" id="mergedCollections">
   			<table st-table="projects.displayedProject" st-safe-src="projects.selectedProjectData" class="table table-striped">
 				<thead>
 					<tr>
@@ -184,11 +192,52 @@
 			</table>
 		</div>
 	</div>
-	<div class="panel panel-default" ng-if="projects.showSection == 1">
+	<div class="panel panel-default" ng-if="projects.showSection == 1">		
+	    <div class="panel panel-default" style="overflow:scroll" ng-if="projects.showSection == 1">
+			<div class="panel-heading">
+				<button class="btn btn-default" ng-click="panel.savedSubsetsCollapse=!panel.savedSubsetsCollapse">
+					<span ng-if="panel.savedSubsetsCollapse" class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
+					<span ng-if="!panel.savedSubsetsCollapse" class="glyphicon glyphicon-collapse-up" aria-hidden="true"></span>
+				</button>
+		    	Saved subsets
+		  	</div>
+		  	<div ng-class="panel.savedSubsetsCollapse? 'panel-body collapse': 'panel-body'">
+		  		<table st-table="projects.displayedAnalyses" st-safe-src="projects.selectedProject.analyses" class="table table-striped">
+	                <thead>
+	                    <tr>
+	                        <th colspan="2">
+	                            <input st-search="" placeholder="search by name" class="input-sm form-control" type="search"/>
+	                        </th>
+	                    </tr>
+	                </thead>
+	                <tbody>
+	                    <tr ng-repeat="(index, analysis) in projects.displayedAnalyses">
+	                        <td>
+	                            {{analysis.name}}
+	                        </td>
+	                        <td>
+	                            <button type="button" class="btn btn-info" ng-click="projects.showSubset(analysis)">
+	                    			<span class="glyphicon glyphicon-eye-open"></span>
+	                 			</button>
+	                        </td>
+	                        <td>
+	                            <button type="button" class="btn btn-warning" ng-click="projects.removeSubset(index)">
+	                    			<span class="glyphicon glyphicon-remove"></span>
+	                 			</button>
+	                        </td>
+	                    </tr>
+	                </tbody>
+	            </table>
+		  	</div>
+		</div>
 		<div class="panel-heading">
-	    	Data analysis
+			<button class="btn btn-default" ng-click="panel.selectedVariablesCollapse=!panel.selectedVariablesCollapse">
+				<span ng-if="panel.selectedVariablesCollapse" class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
+				<span ng-if="!panel.selectedVariablesCollapse" class="glyphicon glyphicon-collapse-up" aria-hidden="true"></span>
+			</button>
+	    	Selected variables
 	  	</div>
-  		<div class="panel-body" class="col-md-12">
+  		<div ng-class="panel.selectedVariablesCollapse? 'panel-body collapse': 'panel-body'" class="col-md-12">
 	        <div class="col-md-6">
 	            <div class="btn-group">
 	                 <button type="button" class="btn btn-default" ng-click="projects.analysis.selectedVariables=projects.selectedProjectDataKeys">
@@ -256,111 +305,81 @@
 	            </table>  
 	        </div>
 	    </div>
-	    <div class="panel panel-default" style="overflow:scroll" ng-if="projects.showSection == 1">
-			<div class="panel-heading">
-		    	Saved subsets
-		  	</div>
-		  	<div class="panel-body">
-		  		<table st-table="projects.displayedAnalyses" st-safe-src="projects.selectedProject.analyses" class="table table-striped">
-	                <thead>
-	                    <tr>
-	                        <th colspan="2">
-	                            <input st-search="" placeholder="search by name" class="input-sm form-control" type="search"/>
-	                        </th>
-	                    </tr>
-	                </thead>
-	                <tbody>
-	                    <tr ng-repeat="(index, analysis) in projects.displayedAnalyses">
-	                        <td>
-	                            {{analysis.name}}
-	                        </td>
-	                        <td>
-	                            <button type="button" class="btn btn-info" ng-click="projects.showSubset(analysis)">
-	                    			<span class="glyphicon glyphicon-eye-open"></span>
-	                 			</button>
-	                        </td>
-	                        <td>
-	                            <button type="button" class="btn btn-warning" ng-click="projects.removeSubset(index)">
-	                    			<span class="glyphicon glyphicon-remove"></span>
-	                 			</button>
-	                        </td>
-	                    </tr>
-	                </tbody>
-	            </table>
-		  	</div>
-		</div>
-    	<div class="panel panel-default" style="overflow:scroll" ng-if="projects.showSection == 1">
-			<div class="panel-heading">
-		    	Subset
-		  	</div>		  	
-	  		<div class="panel-body">
-	  			<div class="input-group">
-		  			<span class="input-group-addon">Name</span>
-		  			<input type="text" class="form-control" placeholder="Subset name" aria-describedby="basic-addon3" ng-model="projects.analysis.name">
-		  		</div>
-	  			<div class="btn-group">
-					 <button type="button" class="btn btn-default" ng-click="projects.saveSubset()">
-					 	<span class="glyphicon glyphicon-save"></span>
-					 	Save subset
-					 </button>				 
-				</div>			    
-	  			<table st-table="projects.displayedSubset" st-safe-src="projects.selectedProjectData" class="table table-striped">
-					<thead>
-						<tr>
-							<th ng-repeat="key in projects.analysis.selectedVariables" st-sort="{{key}}">{{key}}</th>
-						</tr>
-						<tr>
-							<th ng-repeat="key in projects.analysis.selectedVariables">
-								<input st-search="{{key}}" placeholder="search for {{key}}" class="input-sm form-control" type="search" ng-if="key!='attachments'"/>
-								<div class="input-group" ng-if="key=='attachments'">
-									<span class="input-group-btn">
-							  			<button type="button" class="btn btn-sm btn-info" ng-click="projects.selectVisibleAttachments(true)">
-				                			<span class="glyphicon glyphicon-ok"></span>
-				             			</button>
-				             			<button type="button" class="btn btn-sm btn-danger" ng-click="projects.selectVisibleAttachments(false)">
-				                			<span class="glyphicon glyphicon-remove"></span>
-				             			</button>
-						  			</span>
-									<input placeholder="search for attachments" class="input-sm form-control" ng-model="projects.attachmentsRegex" type="search" />
-						  		</div>								
-							</th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr ng-repeat="row in projects.displayedSubset" ng-if="projects.analysis.selectedPatients.indexOf(row.patientId)>-1">
-							<td ng-repeat="key in projects.analysis.selectedVariables">								
-								<!-- Deprecated this chunk can be removed in the future-->
-								<div ng-if="key == '_attachments'">
-									<button type="button" class="btn btn-default" ng-repeat="(key, att) in row[key]" >
-										<span class="glyphicon glyphicon-eye"></span>{{att}}
-									</button>
-									
-								</div>
-								<!-- Deprecated -->
-
-								<div ng-if="key == 'attachments'">
-									<div ng-repeat="(keycoll, collattachments) in row[key]">	
-										<button type="button" class="btn btn-default" ng-repeat="(key, att) in projects.getFilteredAttachments(collattachments)" ng-click="projects.analysis.isSelectedAttachments[keycoll][key] = !projects.analysis.isSelectedAttachments[keycoll][key]">
-											<span class="glyphicon glyphicon-eye"></span><s ng-if="!morphologicalDataCollection.isSelectedAttachments(keycoll, key)">{{key}}</s><b ng-if="morphologicalDataCollection.isSelectedAttachments(keycoll, key)">{{key}}</b>
-										</button>
-									</div>
-								</div>
-								<div ng-if="!_.isArray(row[key]) && key != '_attachments' && key != 'attachments'">
-									{{row[key]}}
-								</div>
-								<div ng-if="_.isArray(row[key]) && key != '_attachments' && key != 'attachments'">
-									<ul>
-										<li ng-repeat="item in row[key]" ng-if="key == 'owners'">{{item.user}}</li>
-									</ul>
-								</div>
-							</td>							
-						</tr>
-					</tbody>
-				</table>
-			</div>
-	    </div>
-
   	</div>
+  	<div class="panel panel-default" style="overflow:scroll" ng-if="projects.showSection == 1">
+		<div class="panel-heading">	    	
+	    	<button class="btn btn-default" ng-click="panel.selectedSubsetCollapse=!panel.selectedSubsetCollapse">
+				<span ng-if="panel.selectedSubsetCollapse" class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
+				<span ng-if="!panel.selectedSubsetCollapse" class="glyphicon glyphicon-collapse-up" aria-hidden="true"></span>
+			</button>
+			Subset
+	  	</div>		  	
+  		<div ng-class="panel.selectedSubsetCollapse? 'panel-body collapse': 'panel-body'">
+  			<div class="input-group">
+	  			<span class="input-group-addon">Name</span>
+	  			<input type="text" class="form-control" placeholder="Subset name" aria-describedby="basic-addon3" ng-model="projects.analysis.name">
+	  		</div>
+  			<div class="btn-group">
+				 <button type="button" class="btn btn-default" ng-click="projects.saveSubset()">
+				 	<span class="glyphicon glyphicon-save"></span>
+				 	Save subset
+				 </button>				 
+			</div>			    
+  			<table st-table="projects.displayedSubset" st-safe-src="projects.selectedProjectData" class="table table-striped">
+				<thead>
+					<tr>
+						<th ng-repeat="key in projects.analysis.selectedVariables" st-sort="{{key}}">{{key}}</th>
+					</tr>
+					<tr>
+						<th ng-repeat="key in projects.analysis.selectedVariables">
+							<input st-search="{{key}}" placeholder="search for {{key}}" class="input-sm form-control" type="search" ng-if="key!='attachments'"/>
+							<div class="input-group" ng-if="key=='attachments'">
+								<span class="input-group-btn">
+						  			<button type="button" class="btn btn-sm btn-info" ng-click="projects.selectVisibleAttachments(true)">
+			                			<span class="glyphicon glyphicon-ok"></span>
+			             			</button>
+			             			<button type="button" class="btn btn-sm btn-danger" ng-click="projects.selectVisibleAttachments(false)">
+			                			<span class="glyphicon glyphicon-remove"></span>
+			             			</button>
+					  			</span>
+								<input placeholder="search for attachments" class="input-sm form-control" ng-model="projects.attachmentsRegex" type="search" />
+					  		</div>								
+						</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-repeat="row in projects.displayedSubset" ng-if="projects.analysis.selectedPatients.indexOf(row.patientId)>-1">
+						<td ng-repeat="key in projects.analysis.selectedVariables">								
+							<!-- Deprecated this chunk can be removed in the future-->
+							<div ng-if="key == '_attachments'">
+								<button type="button" class="btn btn-default" ng-repeat="(key, att) in row[key]" >
+									<span class="glyphicon glyphicon-eye"></span>{{att}}
+								</button>
+								
+							</div>
+							<!-- Deprecated -->
+
+							<div ng-if="key == 'attachments'">
+								<div ng-repeat="(keycoll, collattachments) in row[key]">	
+									<button type="button" class="btn btn-default" ng-repeat="(key, att) in projects.getFilteredAttachments(collattachments)" ng-click="projects.analysis.isSelectedAttachments[keycoll][key] = !projects.analysis.isSelectedAttachments[keycoll][key]">
+										<span class="glyphicon glyphicon-eye"></span><s ng-if="!morphologicalDataCollection.isSelectedAttachments(keycoll, key)">{{key}}</s><b ng-if="morphologicalDataCollection.isSelectedAttachments(keycoll, key)">{{key}}</b>
+									</button>
+								</div>
+							</div>
+							<div ng-if="!_.isArray(row[key]) && key != '_attachments' && key != 'attachments'">
+								{{row[key]}}
+							</div>
+							<div ng-if="_.isArray(row[key]) && key != '_attachments' && key != 'attachments'">
+								<ul>
+									<li ng-repeat="item in row[key]" ng-if="key == 'owners'">{{item.user}}</li>
+								</ul>
+							</div>
+						</td>							
+					</tr>
+				</tbody>
+			</table>
+		</div>
+    </div>
 	<div class="panel panel-info" ng-if="projects.showSection == 2">
 		<div class="panel panel-default">
 		  <div class="panel-body">
@@ -477,41 +496,7 @@
 				</div>
 		  </div>
 		</div>
-	</div>
-	<div class="panel panel-default" style="overflow:scroll" ng-if="projects.showSection == 0">
-		<div class="panel-heading">
-	    	Manage project scopes
-	  	</div>
-  		<div class="panel-body">
-  			<div class="panel panel-info">
-	  			<table st-table="projects.displayedProjects" st-safe-src="projects.projects" class="table table-striped">
-					<thead>
-						<tr>
-							<th>
-								<input st-search="name" placeholder="search for project name" class="input-sm form-control" type="search"/>
-							</th>
-							<th colspan="{{userScopes.scopes.length}}">
-								<input st-search="scope" placeholder="search for scope" class="input-sm form-control" type="search"/>
-							</th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr ng-repeat="project in projects.displayedProjects">
-							<td>{{project.name}}</td>
-							<td ng-repeat="us in userScopes.scopes">
-								<div class="input-group">
-							      <span class="input-group-addon">
-							        <input type="checkbox" aria-label="..." ng-model='checkbox' ng-true-value="true" ng-false-value="false" ng-click="projects.addRemoveScope(project, us, checkbox)" ng-checked="projects.hasScope(project, us)">
-							      </span>
-							      <label class="form-control" >{{ us }}</label>
-							    </div>
-							</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-  		</div>
-  	</div>
+	</div>	
 </div>
 <div class="row" ng-if="projects.section == 1">
 	<div class="panel panel-success">
@@ -629,4 +614,38 @@
 			</div>
 	  </div>
 	</div>
+	<div class="panel panel-default" style="overflow:scroll" ng-if="projects.showSection == 2">
+		<div class="panel-heading">
+	    	Manage project scopes
+	  	</div>
+  		<div class="panel-body">
+  			<div class="panel panel-info">
+	  			<table st-table="projects.displayedProjects" st-safe-src="projects.projects" class="table table-striped">
+					<thead>
+						<tr>
+							<th>
+								<input st-search="name" placeholder="search for project name" class="input-sm form-control" type="search"/>
+							</th>
+							<th colspan="{{userScopes.scopes.length}}">
+								<input st-search="scope" placeholder="search for scope" class="input-sm form-control" type="search"/>
+							</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr ng-repeat="project in projects.displayedProjects">
+							<td>{{project.name}}</td>
+							<td ng-repeat="us in userScopes.scopes">
+								<div class="input-group">
+							      <span class="input-group-addon">
+							        <input type="checkbox" aria-label="..." ng-model='checkbox' ng-true-value="true" ng-false-value="false" ng-click="projects.addRemoveScope(project, us, checkbox)" ng-checked="projects.hasScope(project, us)">
+							      </span>
+							      <label class="form-control" >{{ us }}</label>
+							    </div>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+  		</div>
+  	</div>
 </div>

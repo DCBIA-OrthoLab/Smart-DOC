@@ -42,6 +42,13 @@ angular.module('dcbia-projects')
 			items: 0
 		};
 
+		$scope.panel = {
+			mergedCollectionsCollapse: true,
+			projectCollectionsCollapse: true,
+			selectedVariablesCollapse: true,
+			savedSubsetsCollapse: false
+		}
+
 		$scope.morphologicalDataCollection = {
 			collections: [],
 			selectedCollections: []
