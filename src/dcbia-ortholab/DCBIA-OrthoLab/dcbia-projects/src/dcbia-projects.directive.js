@@ -774,7 +774,7 @@ angular.module('dcbia-projects')
 .filter('filterKeys', function($filter){
 	return function(input, predicate){
         return $filter('filter')(input, function(value, index, array){
-        	return value.indexOf(predicate["$"]) >= 0 || predicate["$"] == '' || predicate["$"] == undefined;
+        	return predicate["$"] == undefined || (predicate["$"] && value.toUpperCase().indexOf(predicate["$"].toUpperCase()) >= 0);
         });
     }
 });
