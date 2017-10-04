@@ -1,6 +1,6 @@
 {
   "name": "dcbia-projects",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "A webpage that allows user to manage projects.",
   "main": "dcbia-projects.min.js",
   "scripts": {
