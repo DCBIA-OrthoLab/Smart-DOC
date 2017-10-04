@@ -227,9 +227,16 @@ angular.module('dcbia-projects')
 			$scope.projects.analysis = _.clone(analysis);
 		}
 
-		$scope.projects.removeSubset = function(index){
-			$scope.projects.selectedProject.analyses.splice(index, 1);
-			dcbia.updateProject($scope.projects.selectedProject);
+		$scope.projects.removeSubset = function(analysis){
+			var index = _.findIndex($scope.projects.selectedProject.analyses, function(an){
+				return an.name == analysis.name;
+			});
+			if(index !== -1){
+				$scope.projects.selectedProject.analyses.splice(index, 1);
+				dcbia.updateProject($scope.projects.selectedProject);
+			}else{
+				console.error("Index not found!");
+			}		
 		}		
 
 		$scope.projects.getProjectKeys = function(project){
@@ -761,4 +768,13 @@ angular.module('dcbia-projects')
 	    templateUrl: './src/dcbia-projects.template.html'
 	}	
 
+});
+
+angular.module('dcbia-projects')
+.filter('filterKeys', function($filter){
+	return function(input, predicate){
+        return $filter('filter')(input, function(value, index, array){
+        	return value.indexOf(predicate["$"]) >= 0 || predicate["$"] == '' || predicate["$"] == undefined;
+        });
+    }
 });
