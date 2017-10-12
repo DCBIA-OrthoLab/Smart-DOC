@@ -193,70 +193,82 @@
 		</div>
 	</uib-tab>
 	<uib-tab heading="Display results" index="2">
-
-
-
-		<div class="input-group">
-			<select ng-model="mfsda.selectOutput.option" class="form-control" ng-options="option as option.name for option in mfsda.selectOutput.options" ng-change="mfsda.selectOutput.update()">
-			</select>
-		</div>
-
-		<div class="input-group">
-			<label class="btn btn-default" for="mfsda-file-selector">
-			 	<span class="glyphicon glyphicon-folder-open"></span>
-			    <input id="mfsda-file-selector" file-model='mfsda.fileTemplate' type="file"  style="display:none;">
-			</label>
-		</div>
-		
 		<div class="panel panel-default">
-		  <div class="panel-heading">
-		    <h3 class="panel-title">Hue</h3>
-		  </div>
-		  <div class="panel-body">
-		    <rzslider class="custom-slider"
-			rz-slider-model="mfsda.hueSlider.min"
-			rz-slider-high="mfsda.hueSlider.max"
-			rz-slider-options="mfsda.hueSlider.options"></rzslider>		
-		  </div>
-		</div>
-		
-		<div ng-if="mfsda.selectOutput.option.name == 'betas'" class="col-md-12">
-			<div class="panel panel-default col-md-6">
-				<div class="panel-heading">
-					<h3 class="panel-title">Covariate</h3>
-				</div>
-				<div class="panel-body">
-					<rzslider class="custom-slider"
-					rz-slider-model="mfsda.covariateSlider.value"			
-					rz-slider-options="mfsda.covariateSlider.options"></rzslider>
-				</div>
-			</div>
-			<div class="panel panel-default col-md-6">
-				<div class="panel-heading">
-					<h3 class="panel-title">Component</h3>
-				</div>
-				<div class="panel-body">
-					<rzslider class="custom-slider"
-					rz-slider-model="mfsda.componentSlider.value"			
-					rz-slider-options="mfsda.componentSlider.options"></rzslider>
-				</div>
-			</div>
-		</div>
-
-		<div ng-if="mfsda.selectOutput.option.name == 'pValues'">
-			<div class="panel-heading">
-				<h3 class="panel-title">pValue</h3>
-			</div>
 			<div class="panel-body">
-				<rzslider class="custom-slider"
-					rz-slider-model="mfsda.pvalueSlider.value"			
-					rz-slider-options="mfsda.pvalueSlider.options"></rzslider>		
-			</div>
+				<div class="col-md-12">
+					<div class="btn-group">
+						<label class="btn btn-default" for="mfsda-file-selector">
+						 	<span class="glyphicon glyphicon-folder-open"></span>
+						    <input id="mfsda-file-selector" file-model='mfsda.fileTemplate' type="file"  style="display:none;">
+						</label>
+						<div class="btn-group" role="group">
+							<select ng-model="mfsda.selectOutput.option" class="form-control" ng-options="option as option.name for option in mfsda.selectOutput.options" ng-change="mfsda.selectOutput.update()">
+							</select>
+						</div>
+					</div>					
+				</div>
+				
+				<div class="col-md-12">
+					<div class="panel panel-default">
+					  <div class="panel-heading">
+					    <h3 class="panel-title">Hue</h3>
+					  </div>
+					  <div class="panel-body">
+					    <rzslider class="custom-slider"
+						rz-slider-model="mfsda.hueSlider.min"
+						rz-slider-high="mfsda.hueSlider.max"
+						rz-slider-options="mfsda.hueSlider.options"></rzslider>		
+					  </div>
+					</div>
+				</div>
+				
+				<div ng-if="mfsda.selectOutput.option.name == 'betas'">
+					<div class="col-md-6">
+						<div class="panel panel-default">
+							<div class="panel-heading">
+								<h3 class="panel-title">Covariate</h3>
+							</div>
+							<div class="panel-body">
+								<rzslider class="custom-slider"
+								rz-slider-model="mfsda.covariateSlider.value"			
+								rz-slider-options="mfsda.covariateSlider.options"></rzslider>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-6">
+						<div class="panel panel-default">
+							<div class="panel-heading">
+								<h3 class="panel-title">Component</h3>
+							</div>
+							<div class="panel-body">
+								<rzslider class="custom-slider"
+								rz-slider-model="mfsda.componentSlider.value"			
+								rz-slider-options="mfsda.componentSlider.options"></rzslider>
+							</div>
+						</div>
+					</div>
+				</div>
 
+				<div ng-if="mfsda.selectOutput.option.name == 'pValues'" class="col-md-12">
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							<h3 class="panel-title">pValue</h3>
+						</div>
+						<div class="panel-body">
+							<rzslider class="custom-slider"
+								rz-slider-model="mfsda.pvalueSlider.value"			
+								rz-slider-options="mfsda.pvalueSlider.options"></rzslider>		
+						</div>
+					</div>
+				</div>
+				
+				<br>
+
+				<div class="col-md-12">
+					<dcbia-vtk vtk-poly-data="mfsda.vtkPolyData" hue-range="mfsda.hueSlider"></dcbia-vtk>
+				</div>
+			</div>
 		</div>
-		<br>
-		<dcbia-vtk vtk-poly-data="mfsda.vtkPolyData" hue-range="mfsda.hueSlider"></dcbia-vtk>
-		
 	</uib-tab>
 </uit-tabset>
 
