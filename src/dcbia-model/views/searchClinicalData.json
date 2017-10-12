@@ -7,6 +7,12 @@
         },
         "patientId": {
             "map": "function(doc) {\n\tif(doc.type === \"clinicalData\"){\n\t\temit(doc.patientId, doc._id);\t\n\t}\n}"
+        },
+        "patientIdDate": {
+            "map": "function(doc) {\n\tif(doc.type === \"clinicalData\" && doc.date){\n\t\temit([doc.patientId, doc.date], doc._id);\t\n\t}\n}"
+        },
+        "date": {
+            "map": "function(doc) {\n\tif(doc.type === \"clinicalData\" && doc.date){\n\t\temit(doc.date, doc._id);\t\n\t}\n}"
         }
     }
 }

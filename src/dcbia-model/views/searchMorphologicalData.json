@@ -7,6 +7,12 @@
         },
         "collectionName": {
             "map": "function(doc) {\n\tif(doc.type === \"morphologicalDataCollection\"){\n\t\temit(doc.name, doc.items);\t\n\t}\n}\n"
+        },
+        "patientIdDate": {
+            "map": "function(doc) {\n\tif(doc.type === \"morphologicalData\" && doc.date){\n\t\temit([doc.patientId, doc.date], doc._id);\t\n\t}\n}"
+        },
+        "date": {
+            "map": "function(doc) {\n\tif(doc.type === \"morphologicalData\" && doc.date){\n\t\temit(doc.date, doc._id);\t\n\t}\n}"
         }
     }
 }

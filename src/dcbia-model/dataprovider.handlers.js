@@ -13,30 +13,40 @@ module.exports = function (server, conf) {
 	couchUpdateViews.migrateUp(server.methods.dcbia.getCouchDBServer(), path.join(__dirname, 'views'), true);
 
 	const validateOwnership = function(doc, credentials){
-		return new Promise(function(resolve, reject){
-			if(credentials.scope.indexOf('admin') !== -1 || doc.owner === credentials.email || !doc.scope){
-				resolve(doc);
-			}else if(doc.scope){
-				var authorize = false;
-				for(var i = 0; i < doc.scope.length && !authorize; i++){
-					if(credentials.scope.indexOf(doc.scope[i]) !== -1){
-						authorize = true;
-					}
+		if(credentials.scope.indexOf('admin') !== -1 || doc.owner === credentials.email || !doc.scope){
+			return true;
+		}else if(doc.scope){
+			var authorize = false;
+			for(var i = 0; i < doc.scope.length && !authorize; i++){
+				if(credentials.scope.indexOf(doc.scope[i]) !== -1){
+					authorize = true;
 				}
-				if(authorize){
-					resolve(doc);
-				}else{
-					reject(Boom.unauthorized("You are not allowed to access this job document!"));
-				}
-			}else{
-				reject(Boom.unauthorized("You are not allowed to access this job document!"));
 			}
-		});
+			return authorize;			
+		}else{
+			return false;
+		}
 	}
 
 	server.method({
 	    name: 'dcbia.validateOwnership',
 	    method: validateOwnership,
+	    options: {}
+	});
+
+	const validateOwnershipPromise = function(doc, credentials){
+		return new Promise(function(resolve, reject){
+			if(dcbia.methods.validateOwnership(doc, credentials)){
+				resolve(doc);
+			}else{
+				reject(Boom.unauthorized("You are not allowed to access this job document!"));
+			}			
+		});
+	}
+
+	server.method({
+	    name: 'dcbia.validateOwnershipPromise',
+	    method: validateOwnershipPromise,
 	    options: {}
 	});
 
@@ -68,7 +78,7 @@ module.exports = function (server, conf) {
 		
 		server.methods.dcbia.getDocument(req.params.id)
 		.then(function(doc){
-			return server.methods.dcbia.validateOwnership(doc, req.auth.credentials);
+			return server.methods.dcbia.validateOwnershipPromise(doc, req.auth.credentials);
 		})
 		.then(rep)
 		.catch(function(e){
@@ -114,7 +124,7 @@ module.exports = function (server, conf) {
 
 		server.methods.dcbia.getDocument(docid)
 		.then(function(doc){
-			return server.methods.dcbia.validateOwnership(doc, req.auth.credentials);
+			return server.methods.dcbia.validateOwnershipPromise(doc, req.auth.credentials);
 		})
 		.then(function(doc){
 			if(doc._attachments && doc._attachments[name]){
@@ -246,6 +256,52 @@ module.exports = function (server, conf) {
 		});
 	}
 
+	handler.getClinicalData = function(req, rep){
+		var credentials = req.auth.credentials;
+		var email = credentials.email;
+
+		var patientId = req.query.patientId;
+		var date = req.query.date;
+
+		var view;
+
+		if(patientId && date){			
+			var params = {
+				key: JSON.stringify([patientId, date]),
+				include_docs: true
+			};
+			view = '_design/searchClinicalData/_view/patientIdDate?' + qs.stringify(params);
+		}else if(patientId){			
+			var params = {
+				key: patientId,
+				include_docs: true
+			};
+			view = '_design/searchClinicalData/_view/patientId?' + qs.stringify(params);
+		}else if(date){
+			var params = {
+				key: date,
+				include_docs: true
+			};
+			view = '_design/searchClinicalData/_view/date?' + qs.stringify(params);
+		}else{
+			var params = {				
+				include_docs: true
+			};
+			view = '_design/searchClinicalData/_view/patientId?' + qs.stringify(params);
+		}
+
+		server.methods.dcbia.getView(view)
+		.then(function(rows){			
+			var docs = _.pluck(rows, 'value');
+			var compactdocs = _.compact(docs);
+			return _.filter(compactdocs, dcbia.methods.validateOwnership);
+		})
+		.then(rep)
+		.catch(function(e){
+			rep(Boom.wrap(e));
+		});
+	}
+
 	handler.getMorphologicalCollections = function(req, rep){
 
 		var credentials = req.auth.credentials;
@@ -338,6 +394,52 @@ module.exports = function (server, conf) {
 			rep(Boom.wrap(err));
 		});
 
+	}
+
+	handler.getMorphologicalData = function(req, rep){
+		var credentials = req.auth.credentials;
+		var email = credentials.email;
+
+		var patientId = req.query.patientId;
+		var date = req.query.date;
+
+		var view;
+
+		if(patientId && date){			
+			var params = {
+				key: JSON.stringify([patientId, date]),
+				include_docs: true
+			};
+			view = '_design/searchMorphologicalData/_view/patientIdDate?' + qs.stringify(params);
+		}else if(patientId){			
+			var params = {
+				key: patientId,
+				include_docs: true
+			};
+			view = '_design/searchMorphologicalData/_view/patientId?' + qs.stringify(params);
+		}else if(date){
+			var params = {
+				key: date,
+				include_docs: true
+			};
+			view = '_design/searchMorphologicalData/_view/date?' + qs.stringify(params);
+		}else{
+			var params = {				
+				include_docs: true
+			};
+			view = '_design/searchMorphologicalData/_view/patientId?' + qs.stringify(params);
+		}
+
+		server.methods.dcbia.getView(view)
+		.then(function(rows){			
+			var docs = _.pluck(rows, 'value');
+			var compactdocs = _.compact(docs);
+			return _.filter(compactdocs, dcbia.methods.validateOwnership);
+		})
+		.then(rep)
+		.catch(function(e){
+			rep(Boom.wrap(e));
+		});
 	}
 
 	handler.getProjects = function(req, rep){
