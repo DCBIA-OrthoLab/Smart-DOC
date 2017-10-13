@@ -13,6 +13,7 @@ module.exports = function (server, conf) {
 	couchUpdateViews.migrateUp(server.methods.dcbia.getCouchDBServer(), path.join(__dirname, 'views'), true);
 
 	const validateOwnership = function(doc, credentials){
+		
 		if(credentials.scope.indexOf('admin') !== -1 || doc.owner === credentials.email || !doc.scope){
 			return true;
 		}else if(doc.scope){
@@ -36,7 +37,7 @@ module.exports = function (server, conf) {
 
 	const validateOwnershipPromise = function(doc, credentials){
 		return new Promise(function(resolve, reject){
-			if(dcbia.methods.validateOwnership(doc, credentials)){
+			if(server.methods.dcbia.validateOwnership(doc, credentials)){
 				resolve(doc);
 			}else{
 				reject(Boom.unauthorized("You are not allowed to access this job document!"));
@@ -56,6 +57,11 @@ module.exports = function (server, conf) {
 	handler.createDocument = function(req, rep){
 		
 		var doc = req.payload;
+		var credentials = req.auth.credentials;
+
+		if(!doc.owner){
+			doc.owner = credentials.email;
+		}
 
 		server.methods.dcbia.uploadDocuments(doc)
 		.then(function(res){
@@ -266,8 +272,9 @@ module.exports = function (server, conf) {
 		var view;
 
 		if(patientId && date){			
+			var d = new Date(date);
 			var params = {
-				key: JSON.stringify([patientId, date]),
+				key: JSON.stringify([patientId, d.getFullYear(), d.getMonth() + 1, d.getDate()]),
 				include_docs: true
 			};
 			view = '_design/searchClinicalData/_view/patientIdDate?' + qs.stringify(params);
@@ -278,8 +285,9 @@ module.exports = function (server, conf) {
 			};
 			view = '_design/searchClinicalData/_view/patientId?' + qs.stringify(params);
 		}else if(date){
+			var d = new Date(date);
 			var params = {
-				key: date,
+				key: JSON.stringify([d.getFullYear(), d.getMonth() + 1, d.getDate()]),
 				include_docs: true
 			};
 			view = '_design/searchClinicalData/_view/date?' + qs.stringify(params);
@@ -292,9 +300,11 @@ module.exports = function (server, conf) {
 
 		server.methods.dcbia.getView(view)
 		.then(function(rows){			
-			var docs = _.pluck(rows, 'value');
+			var docs = _.pluck(rows, 'doc');
 			var compactdocs = _.compact(docs);
-			return _.filter(compactdocs, dcbia.methods.validateOwnership);
+			return _.filter(compactdocs, function(doc){
+				return server.methods.dcbia.validateOwnership(doc, credentials);
+			});
 		})
 		.then(rep)
 		.catch(function(e){
@@ -405,9 +415,10 @@ module.exports = function (server, conf) {
 
 		var view;
 
-		if(patientId && date){			
+		if(patientId && date){
+			var d = new Date(date);			
 			var params = {
-				key: JSON.stringify([patientId, date]),
+				key: JSON.stringify([patientId, d.getFullYear(), d.getMonth() + 1, d.getDate()]),
 				include_docs: true
 			};
 			view = '_design/searchMorphologicalData/_view/patientIdDate?' + qs.stringify(params);
@@ -418,8 +429,9 @@ module.exports = function (server, conf) {
 			};
 			view = '_design/searchMorphologicalData/_view/patientId?' + qs.stringify(params);
 		}else if(date){
+			var d = new Date(date);
 			var params = {
-				key: date,
+				key: JSON.stringify([d.getFullYear(), d.getMonth() + 1, d.getDate()]),
 				include_docs: true
 			};
 			view = '_design/searchMorphologicalData/_view/date?' + qs.stringify(params);
@@ -431,10 +443,13 @@ module.exports = function (server, conf) {
 		}
 
 		server.methods.dcbia.getView(view)
-		.then(function(rows){			
-			var docs = _.pluck(rows, 'value');
+		.then(function(rows){		
+			
+			var docs = _.pluck(rows, 'doc');
 			var compactdocs = _.compact(docs);
-			return _.filter(compactdocs, dcbia.methods.validateOwnership);
+			return _.filter(compactdocs, function(doc){
+				return server.methods.dcbia.validateOwnership(doc, credentials);
+			});
 		})
 		.then(rep)
 		.catch(function(e){

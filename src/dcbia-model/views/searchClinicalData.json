@@ -6,13 +6,13 @@
             "map": "function(doc) {\n\tif(doc.type === \"clinicalDataCollection\"){\n\t\temit(doc.name, doc.items);\t\n\t}\n}"
         },
         "patientId": {
-            "map": "function(doc) {\n\tif(doc.type === \"clinicalData\"){\n\t\temit(doc.patientId, doc._id);\t\n\t}\n}"
+            "map": "function(doc) {\n\tif(doc.type === \"clinicalData\"){\n\t\temit(doc.patientId, {\n\t\t\t\"_id\": doc._id,\n\t\t\t\"patientId\": doc.patientId, \n\t\t\t\"date\": doc.date\n\t\t});\t\n\t}\n}"
         },
         "patientIdDate": {
-            "map": "function(doc) {\n\tif(doc.type === \"clinicalData\" && doc.date){\n\t\temit([doc.patientId, doc.date], doc._id);\t\n\t}\n}"
+            "map": "function(doc) {\n\tif(doc.type === \"clinicalData\" && doc.date){\n\t\tvar d = new Date(doc.date);\n\t\temit([doc.patientId, d.getFullYear(),d.getMonth() + 1,d.getDate()], {\n\t\t\t\"_id\": doc._id,\n\t\t\t\"patientId\": doc.patientId, \n\t\t\t\"date\": doc.date\n\t\t});\t\n\t}\n}"
         },
         "date": {
-            "map": "function(doc) {\n\tif(doc.type === \"clinicalData\" && doc.date){\n\t\temit(doc.date, doc._id);\t\n\t}\n}"
+            "map": "function(doc) {\n\tif(doc.type === \"clinicalData\" && doc.date){\n\t\tvar d = new Date(doc.date);\n\t\temit([d.getFullYear(), d.getMonth() + 1, d.getDate()], {\n\t\t\t\"_id\": doc._id,\n\t\t\t\"patientId\": doc.patientId, \n\t\t\t\"date\": doc.date\n\t\t});\t\n\t}\n}"
         }
     }
 }
