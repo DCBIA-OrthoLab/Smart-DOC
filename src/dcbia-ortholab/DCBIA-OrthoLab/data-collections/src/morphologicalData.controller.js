@@ -72,6 +72,14 @@ angular.module('data-collections')
 			.catch(console.error);
 		}
 
+		$scope.morphologicalDataCollection.update = function(collection){
+			return dcbia.updateMorphologicalDataCollection(collection)
+			.then(function(res){
+				return $scope.morphologicalDataCollection.refreshSelectedCollection();
+			})
+			.catch(console.error);
+		}
+
 		$scope.morphologicalDataCollection.selectCollection = function(collection){
 			if($scope.morphologicalDataCollection.selectedCollection){
 				$scope.morphologicalDataCollection.collectionsProperties[$scope.morphologicalDataCollection.selectedCollection._id].class = "";
@@ -81,7 +89,7 @@ angular.module('data-collections')
 		}
 
 		$scope.morphologicalDataCollection.refreshSelectedCollection = function(){
-			$scope.morphologicalDataCollection.select($scope.morphologicalDataCollection.selectedCollection)
+			return $scope.morphologicalDataCollection.select($scope.morphologicalDataCollection.selectedCollection)
 			.then(function(res){
 				return dcbia.getMorphologicalDataCollection($scope.morphologicalDataCollection.selectedCollection._id)
 				.then(function(res){
@@ -170,41 +178,113 @@ angular.module('data-collections')
 			
 		}
 
-		$scope.morphologicalDataCollection.addMorphologicalData = function(){
-			if ($scope.morphologicalData.data.date == undefined) {
-				var dt = new Date();
-			}
-			else{
-				var dt = $scope.morphologicalData.data.date
-			}
-			var year = dt.getFullYear();
-			var month = ((dt.getMonth()+1)>=10)? (dt.getMonth()+1) : '0' + (dt.getMonth()+1);
-			var day = ((dt.getDate())>=10)? (dt.getDate()) : '0' + (dt.getDate());
-			$scope.morphologicalData.data.date = year + "-" + month + "-" + day;
-			var morphologicalData = {
-				patientId: $scope.morphologicalData.data.patientId,
-				date: $scope.morphologicalData.data.date,
-				scope: [],
-				owners: [],
-				type: "morphologicalData"
-			}
-			morphologicalData.owners.push({
-				user: $scope.user.email
-			});
-			dcbia.createMorphologicalData(morphologicalData)
-			.then(function(res){
-				$scope.morphologicalDataCollection.selectedCollection.items.push({
-					_id: res.data.id
+		$scope.morphologicalDataCollection.addMorphologicalData = function(morphologicalData, update){
+
+			var prom;
+
+			if(!morphologicalData){
+				if ($scope.morphologicalData.data.date == undefined) {
+					var dt = new Date();
+				}
+				else{
+					var dt = $scope.morphologicalData.data.date
+				}
+				var year = dt.getFullYear();
+				var month = ((dt.getMonth()+1)>=10)? (dt.getMonth()+1) : '0' + (dt.getMonth()+1);
+				var day = ((dt.getDate())>=10)? (dt.getDate()) : '0' + (dt.getDate());
+				$scope.morphologicalData.data.date = year + "-" + month + "-" + day;
+				var morphologicalData = {
+					patientId: $scope.morphologicalData.data.patientId,
+					date: $scope.morphologicalData.data.date,
+					scope: [],
+					owners: [],
+					type: "morphologicalData"
+				}
+				morphologicalData.owners.push({
+					user: $scope.user.email
 				});
-				return Promise.all([dcbia.addAttachement(res.data.id, $scope.morphologicalData.data.file.name, $scope.morphologicalData.data.file), dcbia.updateMorphologicalDataCollection($scope.morphologicalDataCollection.selectedCollection)]);
-			})
+
+				prom = dcbia.createMorphologicalData(morphologicalData)
+				.then(function(res){
+					return dcbia.addAttachement(res.data.id, $scope.morphologicalData.data.file.name, $scope.morphologicalData.data.file);
+				})
+				.then(function(res){
+					$scope.morphologicalData.clear();
+				});
+			}else{
+				prom = Promise.resolve({
+					data: {
+						id: morphologicalData._id
+					}
+				})
+			}
+			
+			return prom
 			.then(function(res){
-				$scope.morphologicalData.clear();
+
+				var index = _.indexOf($scope.morphologicalDataCollection.selectedCollection.items, function(it){
+					return res.data.id == it._id;
+				});
+
+				if(index == -1){
+					$scope.morphologicalDataCollection.selectedCollection.items.push({
+						_id: res.data.id
+					});
+					if(update){
+						return dcbia.updateMorphologicalDataCollection($scope.morphologicalDataCollection.selectedCollection)
+						.then(function(){
+							return $scope.morphologicalDataCollection.refreshSelectedCollection();
+						});
+					}
+				}
+
+				
+				return Promise.resolve();
 			})
 			.catch(function(err){
 				alert(JSON.stringify(err));
 			})
 			
+		}
+
+		$scope.morphologicalDataCollection.addAllMorphologicalData = function(){
+			return Promise.all(_.map($scope.morphologicalDataCollection.displayedCollectionDataSelect, function(morphologicalData){
+				return $scope.morphologicalDataCollection.addMorphologicalData(morphologicalData, false);
+			}))
+			.then(function(res){
+				return dcbia.updateMorphologicalDataCollection($scope.morphologicalDataCollection.selectedCollection);
+			})
+			.then(function(res){
+				return $scope.morphologicalDataCollection.refreshSelectedCollection();
+			})
+			.catch(function(err){
+				console.error(err);
+			})
+		}
+
+		$scope.morphologicalDataCollection.getAllMorphologicalDataSelect = function(){
+			return dcbia.getAllMorphologicalData()
+			.then(function(res){
+
+				$scope.morphologicalDataCollection.collectionDataSelectInCollection = {};
+
+				_.each($scope.morphologicalDataCollection.selectedCollectionData, function(morphologicalData){
+					$scope.morphologicalDataCollection.collectionDataSelectInCollection[morphologicalData._id] = true;
+				});
+
+			    $scope.morphologicalDataCollection.collectionDataSelect = _.map(res.data, function(d){
+			    	if(d._attachments){
+			    		_.extend(d, {
+			    			attachments: _.keys(d._attachments)
+			    		});
+			    	}
+			    	return d;
+			    	
+			    });
+				$scope.morphologicalDataCollection.collectionDataSelectKeys = $scope.morphologicalDataCollection.getDataCollectionKeys($scope.morphologicalDataCollection.collectionDataSelect);
+
+			})
+			.catch(console.error);
 		}
 
 
@@ -220,12 +300,61 @@ angular.module('data-collections')
 		})
 		.catch(console.error);
 
+		$scope.morphologicalData.remove = function(item, accept, update){
+			if(accept? accept : confirm("Do you want to remove the current item?")){
+				var index = _.indexOf($scope.morphologicalDataCollection.selectedCollection.items, function(it){
+					return it._it === item._id;
+				});
+				$scope.morphologicalDataCollection.selectedCollection.items.splice(index, 1);
+				if(update){
+					return $scope.morphologicalDataCollection.update($scope.morphologicalDataCollection.selectedCollection)
+					.then(function(){
+						return $scope.morphologicalDataCollection.refreshSelectedCollection();
+					});
+				}
+			}
+			return Promise.resolve(true);
+		}
 
-		$scope.morphologicalData.delete = function(item){
-			if(confirm("Do you want to delete the current item?")){
+		$scope.morphologicalData.delete = function(item, accept, update){
+			if(accept? accept : confirm("Do you want to delete the current item?")){
 				return dcbia.deleteMorphologicalData(item._id)
 				.then(function(){
-					$scope.morphologicalDataCollection.refreshSelectedCollection();
+					return $scope.morphologicalData.remove(item, true, update);
+				});
+			}
+		}
+
+		$scope.morphologicalData.removeAll = function(){
+			if(confirm("Do you want to remove all the displayed items from the collection?")){
+				return Promise.all(_.map($scope.morphologicalDataCollection.displayedCollection, function(item){
+					return $scope.morphologicalData.remove(item, true, false);
+				}))
+				.then(function(res){
+					return $scope.morphologicalDataCollection.update($scope.morphologicalDataCollection.selectedCollection);
+				})
+				.then(function(res){
+					return $scope.morphologicalDataCollection.refreshSelectedCollection();
+				})
+				.then(function(res){
+					console.log(res);
+				});
+			}
+		}
+
+		$scope.morphologicalData.deleteAll = function(){
+			if(confirm("Do you want to delete all the displayed items?")){
+				return Promise.all(_.map($scope.morphologicalDataCollection.displayedCollection, function(item){
+					return $scope.morphologicalData.delete(item, true, false);
+				}))
+				.then(function(res){
+					return $scope.morphologicalDataCollection.update($scope.morphologicalDataCollection.selectedCollection);
+				})
+				.then(function(res){
+					return $scope.morphologicalDataCollection.refreshSelectedCollection();
+				})
+				.then(function(res){
+					console.log(res);
 				});
 			}
 		}
@@ -317,6 +446,8 @@ angular.module('data-collections')
 			pom.click();
 			
 		}
+
+		
 
 	}
 
