@@ -6,7 +6,6 @@ var path = require('path');
 var _ = require('underscore');
 var Joi = require('joi');
 var qs = require('querystring');
-var prompt = require('prompt');
 var os = require('os');
 var hapijwtcouch = require('hapi-jwt-couch-lib');
 var csvtojson = require('csvtojson');
@@ -148,7 +147,7 @@ dcbia.uploadFiles = function(docid, filenames, names){
 dcbia.getClinicalData = function(patientId, date){
     return new Promise(function(resolve, reject){
         var options = {
-            url : dcbia.getServer() + "/clinical/data",
+            url : dcbia.getServer() + "/dcbia/clinical/data",
             method: "GET",
             qs: {
                 patientId: patientId, 
@@ -170,7 +169,7 @@ dcbia.getClinicalData = function(patientId, date){
 dcbia.getMorphologicalData = function(patientId, date){
     return new Promise(function(resolve, reject){
         var options = {
-            url : dcbia.getServer() + "/morphological/data",
+            url : dcbia.getServer() + "/dcbia/morphological/data",
             method: "GET",
             qs: {
                 patientId: patientId, 
@@ -198,11 +197,12 @@ dcbia.createMorphologicalData = function(doc){
             agentOptions: dcbia.agentOptions,
             auth: dcbia.auth
         }
+
         request(options, function(err, res, body){
             if(err){
                 reject(err);
             }else{
-                resolve(JSON.parse(body));
+                resolve(body);
             }
         })
     });    
@@ -221,7 +221,7 @@ dcbia.createClinicalData = function(doc){
             if(err){
                 reject(err);
             }else{
-                resolve(JSON.parse(body));
+                resolve(body);
             }
         })
     });    
@@ -244,17 +244,50 @@ dcbia.readCSV = function(filename){
     });
 }
 
-dcbia.importMorphologicalData = function(filename){        
+dcbia.importMorphologicalData = function(filename, root){        
 
     return dcbia.readCSV(filename)
     .then(function(res){
         return Promise.map(res, function(obj){
             return dcbia.getMorphologicalData(obj.patientId, obj.date)
             .then(function(res){
-                console.log(res);
+
+                if(res.length == 0 || (res.statusCode && res.statusCode !== 200)){
+                    var morphodata = {
+                        type: "morphologicalData",
+                        patientId: obj.patientId,
+                        date: obj.date, 
+                        timestamp: new Date()
+                    }
+                    return dcbia.createMorphologicalData(morphodata);
+                }else if(res.length > 0){
+                    return {
+                        id: res[0]._id
+                    };
+                }else{
+                    return Promise.reject(res);
+                }
+            })
+            .then(function(res){
+                
+                var fullpath = root? path.join(root, obj.filename) : obj.filename;
+                var importname = obj.rename? obj.rename: path.basename(fullpath);
+                
+                return dcbia.uploadFile(res.id, fullpath, importname);
             });
+        }, {
+            concurrency: 1
         })
+        .catch(function(err){
+            console.error(err);
+        });
     })
+    .then(function(res){
+        console.log(res);
+    })
+    .catch(function(err){
+        console.error(err);
+    });
     
 }
 
