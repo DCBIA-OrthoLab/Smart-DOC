@@ -103,7 +103,8 @@ module.exports = function (server, conf) {
 				_id: Joi.string().alphanum()
 			})), Joi.object().optional()),
 			scope: Joi.array().items(Joi.string()).optional(),
-			analyses: Joi.array().items(Joi.object()).optional()
+			analyses: Joi.array().items(Joi.object()).optional(),
+			owner: Joi.string().email().optional()
 		});
 
 	var projectpost = Joi.object({
@@ -111,10 +112,10 @@ module.exports = function (server, conf) {
         	type: Joi.string().valid('project').required(),
         	description: Joi.string().required(),
         	patients: Joi.string().alphanum().required(),
-        	// scope: Joi.array().items(Joi.string()),
         	collections: Joi.array().items(Joi.object().keys({
         		_id: Joi.string().alphanum().required()
-        	}))
+        	})),
+        	owner: Joi.string().email().optional()
         });
 
 
