@@ -87,7 +87,7 @@ angular.module('dcbia-projects')
 			.catch(console.error);
 		};
 
-		$scope.projects.create = function(newProject){
+		$scope.projects.create = function(){
 			_.each($scope.clinicalDataCollection.selectedCollections, function(collection){
 				_.each($scope.clinicalDataCollection.collections, function(items){
 					if(collection === items.name){
@@ -105,7 +105,7 @@ angular.module('dcbia-projects')
 			// if($scope.projects.newProject.scope === ""){
 			// 	delete $scope.projects.newProject.scope;
 			// }
-			dcbia.createProject(newProject)
+			dcbia.createProject($scope.projects.newProject)
 			.then(function(res){
 				return $scope.projects.getProjects();
 			})
@@ -169,7 +169,7 @@ angular.module('dcbia-projects')
 				.then(function(res){					
 					$scope.projects.selectedProjectData = $scope.projects.mergeCollections(res[0], res[1]);
 					$scope.projects.selectedProjectDataKeys = $scope.projects.getProjectDataKeys($scope.projects.selectedProjectData);
-					$scope.projects.selectedProjectPatients = _.map($scope.projects.selectedProjectData, function(item){ return item.patientId; });
+					$scope.projects.selectedProjectPatients = _.uniq(_.map($scope.projects.selectedProjectData, function(item){ return item.patientId; }));
 				});
 
 			}else{
@@ -284,7 +284,7 @@ angular.module('dcbia-projects')
 			if(projectDataKeys.scope){
 				delete projectDataKeys.scope;
 			}						
-			return _.keys(projectDataKeys);
+			return _.uniq(_.keys(projectDataKeys));
 		}
 
 		$scope.projects.select = function(project){

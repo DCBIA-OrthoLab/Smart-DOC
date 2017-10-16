@@ -235,7 +235,7 @@
 				<span ng-if="panel.selectedVariablesCollapse" class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
 				<span ng-if="!panel.selectedVariablesCollapse" class="glyphicon glyphicon-collapse-up" aria-hidden="true"></span>
 			</button>
-	    	Selected variables
+	    	Select variables
 	  	</div>
   		<div ng-class="panel.selectedVariablesCollapse? 'panel-body collapse': 'panel-body'" class="col-md-12">
 	        <div class="col-md-6">
@@ -260,7 +260,7 @@
 	                    </tr>
 	                </thead>
 	                <tbody>
-	                    <tr ng-repeat="row in multiSeries.displayedKeys track by $index">
+	                    <tr ng-repeat="row in multiSeries.displayedKeys">
 	                        <td>
 	                            <div class="input-group">
 	                            	<input type="checkbox" aria-label="..." checklist-model="projects.analysis.selectedVariables" checklist-value="row">
@@ -293,7 +293,7 @@
 	                    </tr>
 	                </thead>
 	                <tbody>
-	                    <tr ng-repeat="row in multiSeries.displayedSubjects track by $index">
+	                    <tr ng-repeat="row in multiSeries.displayedSubjects">
 	                        <td>
 	                            <div class="input-group">
 	                            <input type="checkbox" aria-label="..." checklist-model="projects.analysis.selectedPatients" checklist-value="row">
@@ -603,7 +603,7 @@
 			</div>
 		</div>
   		<div class="btn-group">
-			 <button type="button" class="btn btn-default" ng-click="projects.create(projects.newProject);projects.clearForm(true);projects.section = 0">
+			 <button type="button" class="btn btn-default" ng-click="projects.create();projects.clearForm(true);projects.section = 0">
 			 	<span class="glyphicon glyphicon-ok"></span>
 			 	Create
 			 </button>
