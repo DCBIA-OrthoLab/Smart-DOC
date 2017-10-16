@@ -97,7 +97,7 @@ module.exports = function (server, conf) {
 			_rev: Joi.string().required(),
 			type: Joi.string().valid('project').required(),
 			name: Joi.string().required(),
-			patients: Joi.string().alphanum().required(),
+			patients: Joi.string().alphanum().optional(),
 			description: Joi.string().required(),
 			collections: Joi.allow(Joi.array().items(Joi.object().keys({
 				_id: Joi.string().alphanum()
@@ -111,7 +111,7 @@ module.exports = function (server, conf) {
 			name: Joi.string().required(),
         	type: Joi.string().valid('project').required(),
         	description: Joi.string().required(),
-        	patients: Joi.string().alphanum().required(),
+        	patients: Joi.string().alphanum().optional(),
         	collections: Joi.array().items(Joi.object().keys({
         		_id: Joi.string().alphanum().required()
         	})),
