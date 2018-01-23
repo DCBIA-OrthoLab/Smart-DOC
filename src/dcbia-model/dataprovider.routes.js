@@ -529,7 +529,7 @@ module.exports = function (server, conf) {
 			response: {
 				schema: Joi.array().items(morphologicaldata)
 			},
-			description: 'Get the job document posted to the database'
+			description: 'Get the morphological data for a collection given the collectionId'
 	    }
 	});
 
@@ -799,6 +799,30 @@ module.exports = function (server, conf) {
 			},
 			description: 'This route will be used to delete job documents from the database'
 		}
+	});
+
+	server.route({
+		method: 'GET',
+		path: "/dcbia/morphological/data/{collectionId}/patient/{patientId}",
+		config: {
+			auth: {
+                strategy: 'token',
+                scope: ['dentist']
+            },
+			handler: handlers.getMorphologicalDataByCollectionIdPatientId,
+			validate: {
+			  	query: false,
+			    params: {
+			    	collectionId: Joi.string(),
+			    	patientId: Joi.string()
+			    }, 
+			    payload: false
+			},
+			response: {
+				schema: Joi.array(morphologicaldata)
+			},
+			description: 'Get the attachment files from the database'
+	    }
 	});
 
 
