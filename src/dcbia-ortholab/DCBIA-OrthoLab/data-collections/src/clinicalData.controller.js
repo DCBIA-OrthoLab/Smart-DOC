@@ -78,6 +78,17 @@ angular.module('data-collections')
 				delete collectionDataKeys._rev;
 			}
 
+			if(!collectionDataKeys.scope.isArray)
+			{
+				delete collectionDataKeys.scope;
+			}
+
+			if(collectionDataKeys.attachments)
+			{
+				delete collectionDataKeys.attachments;
+			}
+
+
 			return _.keys(collectionDataKeys);
 		}
 
@@ -400,6 +411,8 @@ angular.module('data-collections')
 						var day = ((dt.getDate())>=10)? (dt.getDate()) : '0' + (dt.getDate());
 						rowclone.date = year + "-" + month + "-" + day;
 					}
+					//TODO check for scope field
+					
 					return $scope.clinical.createClinicalData(rowclone);
 					
 				}))
