@@ -284,41 +284,57 @@ module.exports = function (server, conf) {
 		});
 	}
 
+	const getMorphologicalCollectionData = function(collectionId){
+		return new Promise(function(resolve, reject){
+
+			var params = {
+				include_docs: true,
+				key: JSON.stringify(collectionId)
+			}
+			var view = '_design/getMorphologicalDataCollection/_view/items?' + qs.stringify(params);
+			
+			return server.methods.dcbia.getView(view)
+			.then(function(rows){
+				var docs = _.pluck(rows, 'doc');
+				var compactdocs = _.compact(docs);
+				if(docs.length !== compactdocs.length){
+					return server.methods.dcbia.getDocument(req.params.id)
+					.then(function(col){
+						col.items = _.compact(_.map(rows, function(row){
+							if(row.doc !== null){
+								return row.value;
+							}else{
+								return null;
+							}
+						}));
+						return server.methods.dcbia.uploadDocuments(col)
+						.then(function(){
+							return compactdocs;
+						});
+					});
+				}else{
+					return compactdocs;
+				}
+			})
+			.then(resolve)
+			.catch(function(e){
+				reject(Boom.badData(e))
+			});
+		});
+	}
+
 	/*
 	*/
 	handler.getMorphologicalCollectionData = function(req, rep){
 		var credentials = req.auth.credentials;
 		var email = credentials.email;
 		
-		var view = '_design/getMorphologicalDataCollection/_view/items?include_docs=true&key="' + req.params.id + '"';
-
-		server.methods.dcbia.getView(view)
-		.then(function(rows){
-			var docs = _.pluck(rows, 'doc');
-			var compactdocs = _.compact(docs);
-			if(docs.length !== compactdocs.length){
-				return server.methods.dcbia.getDocument(req.params.id)
-				.then(function(col){
-					col.items = _.compact(_.map(rows, function(row){
-						if(row.doc !== null){
-							return row.value;
-						}else{
-							return null;
-						}
-					}));
-					return server.methods.dcbia.uploadDocuments(col)
-					.then(function(){
-						return compactdocs;
-					});
-				});
-			}else{
-				return compactdocs;
-			}
-		})
+		getMorphologicalCollectionData(req.params.id)
 		.then(rep)
 		.catch(function(e){
 			rep(Boom.wrap(e));
 		});
+		
 	}
 
 	/*
@@ -354,6 +370,27 @@ module.exports = function (server, conf) {
 		.catch(function(e){
 			rep(Boom.wrap(e));
 		});
+	
+	}
+
+	handler.getMorphologicalDataByCollectionIdPatientId = function(req, rep){
+			
+
+		getMorphologicalCollectionData(req.params.collectionId)
+		.then(function(rows){
+			//TODO filter by patient Id
+
+			return _.filter(rows,function(morphologicalData){
+				return morphologicalData.patientId==req.params.patientId;
+
+			});
+		})
+		.then(rep)
+		.catch(function(e){
+			rep(Boom.wrap(e));
+		});
+		
+	
 	
 	}
 	
