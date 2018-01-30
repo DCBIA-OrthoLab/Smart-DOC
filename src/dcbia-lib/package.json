@@ -1,0 +1,28 @@
+{
+  "name": "dcbia-lib",
+  "version": "1.0.0",
+  "description": "Utility to import data to the system",
+  "main": "index.js",
+  "scripts": {
+    "test": "lab -v test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/DCBIA-OrthoLab/shiny-tooth.git"
+  },
+  "keywords": [
+    "Import",
+    "data",
+    "to"
+  ],
+  "author": "juanprietob@gmail.com",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/DCBIA-OrthoLab/shiny-tooth/issues"
+  },
+  "homepage": "https://github.com/DCBIA-OrthoLab/shiny-tooth#readme",
+  "dependencies": {
+    "csvtojson": "^1.1.9",
+    "hapi-jwt-couch-lib": "^1.0.1"
+  }
+}

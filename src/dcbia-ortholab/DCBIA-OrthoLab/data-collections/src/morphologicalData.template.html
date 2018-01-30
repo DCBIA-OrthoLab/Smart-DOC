@@ -48,7 +48,7 @@
 				        	<b>Number of items: </b> {{defaultMorphologicalDataCollection.items.length}}
 				        </p>
 			        	<div class="btn-group">
-						 <button type="button" class="btn btn-default" ng-click="morphologicalDataCollection.showSection = 0;morphologicalDataCollection.select(defaultMorphologicalDataCollection)">
+						 <button type="button" class="btn btn-default" ng-click="morphologicalDataCollection.section = 0;morphologicalDataCollection.select(defaultMorphologicalDataCollection)">
 						 	<span class="glyphicon glyphicon-refresh"></span>
 						 </button>
 
@@ -74,7 +74,7 @@
 						 <button type="button" class="btn btn-default" ng-click="morphologicalDataCollection.section = 0;morphologicalDataCollection.select(collection)">
 						 	<span class="glyphicon glyphicon-eye-open"></span>
 						 </button>
-						 <button type="button" class="btn btn-default" ng-click="morphologicalDataCollection.section = 1;morphologicalDataCollection.select(collection)">
+						 <button type="button" class="btn btn-default" ng-click="morphologicalDataCollection.section = 1;morphologicalDataCollection.select(collection);morphologicalDataCollection.getAllMorphologicalDataSelect()">
 						 	<span class="glyphicon glyphicon-plus-sign"></span>
 						 </button>
 
@@ -93,8 +93,10 @@
 			</div>
 		</div>
 	</div>
+	
 	<div class="panel panel-default" ng-if="morphologicalDataCollection.section != -1">
   		<div class="panel-body">
+  	
 			<div class="row" ng-if="morphologicalDataCollection.section == 0">
 				<div class="panel panel-default">
 		  			<div class="panel-body">
@@ -106,6 +108,14 @@
 								<tr>
 									<th ng-repeat="key in morphologicalDataCollection.selectedCollectionDataKeys" ng-if="key != 'scope'">
 										<input st-search="{{key}}" placeholder="search for {{key}}" class="input-sm form-control" type="search"/>
+									</th>
+									<th>
+										<button type="button" class="btn btn-warning" ng-click="morphologicalData.removeAll()">
+										 	<span class="glyphicon glyphicon-remove"></span>
+										 </button>
+										<button type="button" class="btn btn-danger" ng-click="morphologicalData.deleteAll()">
+										 	<span class="glyphicon glyphicon-trash"></span>
+										 </button>
 									</th>
 								</tr>
 							</thead>
@@ -129,8 +139,11 @@
 										</div>
 									</td>
 									<td>
-										<button type="button" class="btn btn-danger" ng-click="morphologicalData.delete(row)">
+										<button type="button" class="btn btn-warning" ng-click="morphologicalData.remove(row, false, true)">
 										 	<span class="glyphicon glyphicon-remove"></span>
+										 </button>
+										<button type="button" class="btn btn-danger" ng-click="morphologicalData.delete(row, false, true)">
+										 	<span class="glyphicon glyphicon-trash"></span>
 										 </button>
 									</td>
 								</tr>
@@ -179,6 +192,49 @@
 						</div>
 		  			</div>
 		  		</div>
+		  		<div class="panel panel-default">
+		  			<div class="panel-body">
+		  				<table st-table="morphologicalDataCollection.displayedCollectionDataSelect" st-safe-src="morphologicalDataCollection.collectionDataSelect" class="table table-striped">
+							<thead>
+								<tr>
+									<th ng-repeat="key in morphologicalDataCollection.collectionDataSelectKeys" st-sort="{{key}}" ng-if="key != 'scope'">{{key}}</th>
+								</tr>
+								<tr>
+									<th ng-repeat="key in morphologicalDataCollection.collectionDataSelectKeys" ng-if="key != 'scope'">
+										<input st-search="{{key}}" placeholder="search for {{key}}" class="input-sm form-control" type="search"/>
+									</th>
+									<th>
+										<button type="button" class="btn btn-info" ng-click="morphologicalDataCollection.addAllMorphologicalData()">
+										 	<span class="glyphicon glyphicon-plus"></span>
+										 </button>
+									</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr ng-repeat="row in morphologicalDataCollection.displayedCollectionDataSelect">
+									<td ng-repeat="key in morphologicalDataCollection.collectionDataSelectKeys" ng-if="key != 'scope'">
+										<div ng-if="_.isArray(row[key]) && key == 'attachments'">
+											{{att}}
+										</div>
+										<div ng-if="!_.isArray(row[key])">
+											{{row[key]}}
+										</div>
+										<div ng-if="_.isArray(row[key]) && key != 'attachments'">
+											<ul>
+												<li ng-repeat="item in row[key]" ng-if="key == 'owners'">{{item.user}}</li>
+											</ul>
+										</div>
+									</td>
+									<td>
+										<button type="button" class="btn btn-info" ng-click="morphologicalDataCollection.addMorphologicalData(row, true)">
+										 	<span class="glyphicon glyphicon-plus"></span>
+										 </button>											
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>

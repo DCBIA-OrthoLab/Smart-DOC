@@ -41,7 +41,7 @@
 			                        {{analysis.name}}
 			                    </td>
 			                    <td>
-			                        <button type="button" class="btn btn-info" ng-click="projects.showSubset(index)">
+			                        <button type="button" class="btn btn-info" ng-click="projects.showSubset(analysis)">
 			                			<span class="glyphicon glyphicon-eye-open"></span>
 			             			</button>
 			                    </td>                        
@@ -62,13 +62,19 @@
 					<table st-table="projects.analysis.selectedProjectDataDisplayed" st-safe-src="projects.analysis.selectedProjectData" class="table table-striped">
 						<thead>
 							<tr>
-								<th colspan="2" st-sort="{{key}}" ng-if="projects.analysis.hasGroup">group</th>
+								<th colspan="1">Covariate type</th>
+								<td colspan="2" ng-repeat="type in mfsda.covariateType track by $index">
+									<input placeholder="Covariate type" class="input-sm form-control" type="number" ng-model="type"/>
+								</td>
+							</tr>
+							<tr>								
 								<th colspan="1" st-sort="{{key}}">Template</th>
 								<th colspan="2" ng-repeat="key in projects.analysis.selectedProjectDataKeys" st-sort="{{key}}">{{key}}</th>
 							</tr>
-							<tr>
-								<th colspan="2" ng-if="projects.analysis.hasGroup">
-									<div class="input-group">							
+							<tr>								
+								<th colspan="1"></th>
+								<th colspan="2" ng-repeat="key in projects.analysis.selectedProjectDataKeys">
+									<div class="input-group" ng-if="key=='group'">							
 										<span class="input-group-btn">
 											<button type="button" class="btn btn-sm btn-info" ng-click="projects.setGroupProjectDataDisplayed()" >
 					                			<span class="glyphicon glyphicon-ok"></span>
@@ -76,9 +82,6 @@
 										</span>
 										<input placeholder="Set group" class="input-sm form-control" type="number" ng-model="projects.analysis.group"/>
 									</div>
-								</th>
-								<th colspan="1"></th>
-								<th colspan="2" ng-repeat="key in projects.analysis.selectedProjectDataKeys">
 									<input st-search="{{key}}" placeholder="search by {{key}}" class="input-sm form-control" type="search" ng-if="key!='attachments'" />
 									<div class="input-group" ng-if="key=='attachments'">
 										<span class="input-group-btn">
@@ -94,19 +97,25 @@
 								</th>
 							</tr>
 						</thead>
-						<tbody>
+						<tbody>							
 							<tr ng-repeat="row in projects.analysis.selectedProjectDataDisplayed">
-								<td colspan="2" ng-if="projects.analysis.hasGroup"><input placeholder="group" class="input-sm form-control" ng-model="row.group" type="number"/></td>
-								<td colspan="1"><input type="checkbox" aria-label="..." ng-model="row.isTemplate"></td>
+								<td colspan="1">
+									<input type="checkbox" aria-label="..." ng-model="row.isTemplate">
+								</td>
 								<td colspan="2" ng-repeat="key in projects.analysis.selectedProjectDataKeys">
+									<div ng-if="key == 'group'">
+										<input placeholder="group" class="input-sm form-control" ng-model="row.group" type="number"/>
+									</div>
+									<!-- Deprecated -->
 									<div ng-if="key == '_attachments'">
 										<button type="button" class="btn btn-default" ng-repeat="(key, att) in row[key]" ng-click="morphologicalDataCollection.downloadAttachment(row._id, key, att)">
 											<span class="glyphicon glyphicon-eye"></span>{{att}}
 										</button>
 									</div>
+									<!-- Deprecated -->
 									<div ng-if="key == 'attachments'">
 										<div ng-repeat="(keycoll, collattachments) in row[key]">
-											<div class="input-group" ng-repeat="(keyatt, att) in projects.getFilteredAttachments(collattachments)">
+											<div class="input-group" ng-repeat="(keyatt, att) in projects.getFilteredAttachments(collattachments, keycoll)">
 												<span class="input-group-addon">
 													<input type="checkbox" aria-label="..." ng-model="att.selected">
 												</span>
@@ -114,10 +123,10 @@
 										    </div>
 										</div>
 									</div>
-									<div ng-if="!_.isArray(row[key]) && key != '_attachments' && key != 'attachments'">
+									<div ng-if="!_.isArray(row[key]) && key != '_attachments' && key != 'attachments' && key != 'group'">
 										{{row[key]}}
 									</div>
-									<div ng-if="_.isArray(row[key]) && key != '_attachments' && key != 'attachments'">
+									<div ng-if="_.isArray(row[key]) && key != '_attachments' && key != 'attachments' && key != 'group'">
 										<ul>
 											<li ng-repeat="item in row[key]" ng-if="key == 'owners'">{{item.user}}</li>
 										</ul>
@@ -135,7 +144,7 @@
 					  <div class="col-md-6">
 					    <div class="input-group">
 							<span class="input-group-addon" id="basic-addon1">Task name</span>
-							<input type="text" class="form-control" placeholder="MFSDA task name" aria-describedby="basic-addon3" ng-model="mfsda.name">
+							<input type="text" class="form-control" placeholder="MFSDA task name" aria-describedby="basic-addon3" ng-model="mfsda.name" ng-change="mfsda.taskSubmitted = false">
 					    </div>
 					  </div>
 					  <div class="col-md-6">
@@ -159,6 +168,11 @@
 			  		<br>
 			  		<div class="row">
 			  			<div class="col-md-12">
+			  				<div class="alert alert-info" role="alert" ng-if="mfsda.taskSubmitted">
+			  					The task {{mfsda.name}} has been succesfully submitted.
+			  				</div>
+			  			</div>
+			  			<div class="col-md-12">
 				  			<span class="input-group-btn">
 								<button type="button" class="btn btn-success" ng-click="mfsda.submitJob()">
 									<span class="glyphicon glyphicon-ok"></span>
@@ -179,70 +193,82 @@
 		</div>
 	</uib-tab>
 	<uib-tab heading="Display results" index="2">
-
-
-
-		<div class="input-group">
-			<select ng-model="mfsda.selectOutput.option" class="form-control" ng-options="option as option.name for option in mfsda.selectOutput.options" ng-change="mfsda.selectOutput.update()">
-			</select>
-		</div>
-
-		<div class="input-group">
-			<label class="btn btn-default" for="mfsda-file-selector">
-			 	<span class="glyphicon glyphicon-folder-open"></span>
-			    <input id="mfsda-file-selector" file-model='mfsda.fileTemplate' type="file"  style="display:none;">
-			</label>
-		</div>
-		
 		<div class="panel panel-default">
-		  <div class="panel-heading">
-		    <h3 class="panel-title">Hue</h3>
-		  </div>
-		  <div class="panel-body">
-		    <rzslider class="custom-slider"
-			rz-slider-model="mfsda.hueSlider.min"
-			rz-slider-high="mfsda.hueSlider.max"
-			rz-slider-options="mfsda.hueSlider.options"></rzslider>		
-		  </div>
-		</div>
-		
-		<div ng-if="mfsda.selectOutput.option.name == 'betas'" class="col-md-12">
-			<div class="panel panel-default col-md-6">
-				<div class="panel-heading">
-					<h3 class="panel-title">Covariate</h3>
-				</div>
-				<div class="panel-body">
-					<rzslider class="custom-slider"
-					rz-slider-model="mfsda.covariateSlider.value"			
-					rz-slider-options="mfsda.covariateSlider.options"></rzslider>
-				</div>
-			</div>
-			<div class="panel panel-default col-md-6">
-				<div class="panel-heading">
-					<h3 class="panel-title">Component</h3>
-				</div>
-				<div class="panel-body">
-					<rzslider class="custom-slider"
-					rz-slider-model="mfsda.componentSlider.value"			
-					rz-slider-options="mfsda.componentSlider.options"></rzslider>
-				</div>
-			</div>
-		</div>
-
-		<div ng-if="mfsda.selectOutput.option.name == 'pValues'">
-			<div class="panel-heading">
-				<h3 class="panel-title">pValue</h3>
-			</div>
 			<div class="panel-body">
-				<rzslider class="custom-slider"
-					rz-slider-model="mfsda.pvalueSlider.value"			
-					rz-slider-options="mfsda.pvalueSlider.options"></rzslider>		
-			</div>
+				<div class="col-md-12">
+					<div class="btn-group">
+						<label class="btn btn-default" for="mfsda-file-selector">
+						 	<span class="glyphicon glyphicon-folder-open"></span>
+						    <input id="mfsda-file-selector" file-model='mfsda.fileTemplate' type="file"  style="display:none;">
+						</label>
+						<div class="btn-group" role="group">
+							<select ng-model="mfsda.selectOutput.option" class="form-control" ng-options="option as option.name for option in mfsda.selectOutput.options" ng-change="mfsda.selectOutput.update()">
+							</select>
+						</div>
+					</div>					
+				</div>
+				
+				<div class="col-md-12">
+					<div class="panel panel-default">
+					  <div class="panel-heading">
+					    <h3 class="panel-title">Hue</h3>
+					  </div>
+					  <div class="panel-body">
+					    <rzslider class="custom-slider"
+						rz-slider-model="mfsda.hueSlider.min"
+						rz-slider-high="mfsda.hueSlider.max"
+						rz-slider-options="mfsda.hueSlider.options"></rzslider>		
+					  </div>
+					</div>
+				</div>
+				
+				<div ng-if="mfsda.selectOutput.option.name == 'betas'">
+					<div class="col-md-6">
+						<div class="panel panel-default">
+							<div class="panel-heading">
+								<h3 class="panel-title">Covariate</h3>
+							</div>
+							<div class="panel-body">
+								<rzslider class="custom-slider"
+								rz-slider-model="mfsda.covariateSlider.value"			
+								rz-slider-options="mfsda.covariateSlider.options"></rzslider>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-6">
+						<div class="panel panel-default">
+							<div class="panel-heading">
+								<h3 class="panel-title">Component</h3>
+							</div>
+							<div class="panel-body">
+								<rzslider class="custom-slider"
+								rz-slider-model="mfsda.componentSlider.value"			
+								rz-slider-options="mfsda.componentSlider.options"></rzslider>
+							</div>
+						</div>
+					</div>
+				</div>
 
+				<div ng-if="mfsda.selectOutput.option.name == 'pValues'" class="col-md-12">
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							<h3 class="panel-title">pValue</h3>
+						</div>
+						<div class="panel-body">
+							<rzslider class="custom-slider"
+								rz-slider-model="mfsda.pvalueSlider.value"			
+								rz-slider-options="mfsda.pvalueSlider.options"></rzslider>		
+						</div>
+					</div>
+				</div>
+				
+				<br>
+
+				<div class="col-md-12">
+					<dcbia-vtk vtk-poly-data="mfsda.vtkPolyData" hue-range="mfsda.hueSlider"></dcbia-vtk>
+				</div>
+			</div>
 		</div>
-		<br>
-		<dcbia-vtk vtk-poly-data="mfsda.vtkPolyData" hue-range="mfsda.hueSlider"></dcbia-vtk>
-		
 	</uib-tab>
 </uit-tabset>
 
