@@ -51,6 +51,9 @@ config(['$routeProvider', function($routeProvider) {
   .when('/tasks', {
     templateUrl: 'home/tasks.html'
   })
+  .when('/project-download/:projectId/:patientId', {
+    templateUrl: 'home/dcbia-projects-download.template.html'
+  })
   .when('/notFound', {
     templateUrl: 'home/notFound.html'
   })

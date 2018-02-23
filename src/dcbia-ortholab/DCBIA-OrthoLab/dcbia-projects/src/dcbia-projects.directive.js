@@ -1,8 +1,7 @@
 angular.module('dcbia-projects')
 .directive('projects', function($q, $routeParams, dcbia, clusterauth) {
 
-	function link($scope, $element, $filter){
-
+	function link($scope,$element, $filter){
 		clusterauth.getUser()
 		.then(function(res){
 			$scope.user = res;
@@ -464,9 +463,20 @@ angular.module('dcbia-projects')
 			});
 		}
 
-		$scope.morphologicalDataCollection.downloadAttachment = function(keycoll, filename, att){
-			console.log(keycoll, filename, att);
-		}
+    $scope.morphologicalDataCollection.downloadAttachment = function(filename, morphologicaldata){
+			var id=_.keys(morphologicaldata);
+			return dcbia.getAttachement(morphologicaldata, filename, 'blob')
+			.then(function(res){
+				var pom = document.createElement('a');
+				$element[0].appendChild(pom);
+				var bb = res.data;
+
+				pom.setAttribute('href', window.URL.createObjectURL(bb));
+				pom.setAttribute('download', filename);
+
+				pom.dataset.downloadurl = ['text/plain', pom.download, pom.href].join(':');
+				pom.click();
+		})
 
 		$scope.morphologicalDataCollection.addRemoveScope = function(collection, scope, checkbox, projectName){
 			if(collection.scope === undefined){
@@ -607,16 +617,75 @@ angular.module('dcbia-projects')
 
 			prom
 			.then(function(){
-				var keys = $scope.projects.getProjectKeys([$scope.projects.selectedProject]);
-				var csv = 'name:,' + $scope.projects.selectedProject.name + '\n'
-				csv += 'description:,' + $scope.projects.selectedProject.description + '\n'
-				csv += 'patients:,' + $scope.projects.selectedProject.patients + '\n'
-				// if(keys.indexOf("scope") !== -1){
-				// 	csv += 'scope:,' + $scope.projects.selectedProject.scope + '\n'
-				// }
-				csv += '\n';
-				var collectionKeys = ['Name','Number of items','Type']
-				csv += collectionKeys.toString();
+				var keys = _.clone($scope.projects.selectedProjectDataKeys);
+
+				//var csv=keys.toString();
+				var csv=$scope.projects.selectedProjectDataKeys;
+				csv+='\n';
+
+				_.each($scope.projects.selectedProjectData,function (row,i){
+					_.each(keys, function(key,j){
+						var value;
+						if(key=='attachments')
+						{
+							_.each(row[key], function(item,k){
+								var projectid=$scope.projects.selectedProject._id;
+								console.log('valeur de projectid:'+ projectid);
+								var patientid=row.patientId;
+								console.log('valeur de patientid:'+ patientid);
+								var valuetmp='http://localhost:8180/DCBIA-OrthoLab/public/#/project-download/'+projectid +'/'+patientid;
+								value='=HYPERLINK("'+valuetmp+'")';
+								if(row.patientId=='Template')
+								{
+									value='';
+								}
+							
+							});
+							
+
+						}						
+						else{
+							if(Array.isArray(row[key])){					
+								_.each(row[key], function(item,k){
+									if(k === 0){
+										value = key[k];
+									}else{
+										value += key[k];
+									}
+								});
+							}else{
+								if(JSON.stringify(row[key]) === undefined || JSON.stringify(row[key]) === undefined){
+									value = "";
+								}
+								else{
+									value = JSON.stringify(row[key])? JSON.stringify(row[key]): '';
+								}
+							}
+						}
+
+						csv+=value;
+						if(j < keys.length -1){
+							csv += ","
+						}
+					});
+					if( i < $scope.projects.selectedProjectDataKeys.length - 1){
+						csv += "\n";
+					}
+				});
+
+
+
+
+
+				// var csv = 'name:,' + $scope.projects.selectedProject.name + '\n'
+				// csv += 'description:,' + $scope.projects.selectedProject.description + '\n'
+				// csv += 'patients:,' + $scope.projects.selectedProject.patients + '\n'
+				// // if(keys.indexOf("scope") !== -1){
+				// // 	csv += 'scope:,' + $scope.projects.selectedProject.scope + '\n'
+				// // }
+				// csv += '\n';
+				// var collectionKeys = ['Name','Number of items','Type']
+				// csv += collectionKeys.toString();
 				csv += '\n';
 				_.each($scope.projects.selectedProject.collections, function(collection, i){
 					_.each($scope.clinicalDataCollection.collections, function(clinicalCollection){

@@ -12,7 +12,7 @@ module.exports = function(grunt) {
             appJS: [
             './src/dcbia-projects.module.js',
             './src/dcbia-projects.directive.js',
-            './dist/dcbia-projects.templates.js',
+            './src/dcbia-projects-download.directive.js',
             './dist/dcbia-projects.templates.js'
             ]
         },

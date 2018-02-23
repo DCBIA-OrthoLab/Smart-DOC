@@ -166,15 +166,15 @@
 					<tr ng-repeat="row in projects.displayedProject">
 						<td ng-repeat="key in projects.selectedProjectDataKeys">
 							<div ng-if="key == '_attachments'">
-								<button type="button" class="btn btn-default" ng-repeat="(key, att) in row[key]" ng-click="morphologicalDataCollection.downloadAttachment(row._id, key, att)">
+								<button type="button" class="btn btn-default" ng-repeat="(key, att) in row[key]" ng-click="morphologicalDataCollection.downloadAttachment(key, att)">
 									<span class="glyphicon glyphicon-eye"></span>{{att}}
 								</button>
 								
 							</div>
 							<div ng-if="key == 'attachments'">
 								<div ng-repeat="(keycoll, collattachments) in row[key]">									
-									<button type="button" class="btn btn-default" ng-repeat="(key, att) in collattachments" ng-click="morphologicalDataCollection.downloadAttachment(keycoll, key, att)">
-										<span class="glyphicon glyphicon-eye"></span>{{key}}
+									<button type="button" class="btn btn-default" ng-repeat="(keys, att) in collattachments" ng-click="morphologicalDataCollection.downloadAttachment(keys, keycoll)">
+										<span class="glyphicon glyphicon-eye"></span>{{keys}}
 									</button>
 								</div>
 							</div>
