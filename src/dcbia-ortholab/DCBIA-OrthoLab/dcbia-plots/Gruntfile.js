@@ -15,8 +15,10 @@ module.exports = function(grunt) {
             './src/boxPlot.directive.js',
             './src/circlePlot.directive.js',
             './src/d3Plots.directive.js',
+            './src/preprocessingPlot.directive.js',
             './src/dcbia-plots.module.js',
             './dist/dcbia-plots.templates.js'
+            
             ]
         },
         concat: {
