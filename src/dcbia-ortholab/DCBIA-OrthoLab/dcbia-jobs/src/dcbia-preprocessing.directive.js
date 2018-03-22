@@ -515,6 +515,11 @@ angular.module('dcbia-jobs')
   				path: "./output/pearsoncorr.csv"
   			},
   			{
+  				name: "pvaluesFirst.json",
+  				type: "file",
+  				path: "./output/pvaluesFirst.json"
+  			},
+  			{
   				name: "pearsonFirst.csv",
   				type: "file",
   				path: "./output/pearsonFirst.csv"
@@ -539,7 +544,6 @@ angular.module('dcbia-jobs')
   			job.jobparameters = [];
 
   			var jobParameters = minimist(stringArgv($scope.preprocessing.jobParameters));
-  			console.log("jobparameters" + jobParameters)
   			_.each(jobParameters, function(val, key){
   				if(_.isArray(val)){
   					_.each(val, function(v){
@@ -588,6 +592,16 @@ angular.module('dcbia-jobs')
 					.then(function(ab){
 						return {
 							name: 'pearsoncorr.json',
+							arraybuffer: ab.data
+						}
+					}));
+				}
+
+				if(job._attachments['pvaluesFirst.json']){
+					allpromise.push(clusterpostService.getAttachment(job._id, 'pvaluesFirst.json', 'arraybuffer')
+					.then(function(ab){
+						return {
+							name: 'pvaluesFirst.json',
 							arraybuffer: ab.data
 						}
 					}));
@@ -822,75 +836,75 @@ angular.module('dcbia-jobs')
 			}
 		};
 
+		$scope.heat_map = { 
+			pearsoncorr : {},
+			pvalues : {},
+			attributes : {
+            	colors : ["#ff0000", "#ffff00","#008000", "#0000ff"],
+            	scale : [0, 0.01, 0.05, 0.05001,1]
+			}
+		};
+
   		$scope.preprocessing.jobCallback = function(job){
   			$scope.preprocessing.showPlots = true;
+  			$scope.activeTab = 2;
+
+			$scope.preprocessing.getDataDisplay(job)
+  			.then(function(pc){
+  					_.extend($scope.heat_map.pvalues, pc[0]);
+  					_.extend($scope.heat_map.pearsoncorr, pc[1]);
+  					
+  					$scope.heat_map.pvalues.attributes = $scope.heat_map.attributes;
+					$scope.heat_map.pearsoncorr.attributes = $scope.heat_map.attributes;
+
+  					$scope.$apply();
+  			})
   		}
 
-  		// $scope.preprocessing.getEfitBetas = function(){
-  		// 	var efitBetas = [];
-
-  		// 	if($scope.preprocessing.efit && $scope.preprocessing.efit.efitBetas){
-  		// 		var arraydata = $scope.preprocessing.efit.efitBetas._ArrayData_;
-  		// 		var size = $scope.preprocessing.efit.efitBetas._ArraySize_;	  				
-						
-				// var start = $scope.preprocessing.componentSlider.value * size[1] * size[0] + $scope.preprocessing.covariateSlider.value;
-				// var end = start + size[1] * size[0];				
-				
-				// var max = 0;
-				
-				// for(var i = start; i < end && i < arraydata.length; i+=size[0]){					
-				// 	efitBetas.push(arraydata[i]);
-				// }	
-  		// 	}
-
-  		// 	return efitBetas;
-  			
-  		// }
-
-  		// $scope.preprocessing.getPvalues = function(){
-  		// 	var pvalues = [];
-  		// 	if($scope.preprocessing.Lpvals_fdr){
-  		// 		for(var i = 0; i < $scope.preprocessing.Lpvals_fdr.length; i++){
-  		// 			pvalues.push($scope.preprocessing.Lpvals_fdr[i][$scope.preprocessing.pvalueSlider.value]);
-  		// 		}
-  		// 	}
-  		// 	return pvalues;
-  		// }
-
-  // 		$scope.preprocessing.selectOutput = {
-		// 	options: [
-		// 		{
-		// 			name: 'betas'
-		// 		},
-		// 		{
-		// 			name: 'pValues'
-		// 		}
-		// 	]	
-		// }
-
-  		// $scope.$watch('preprocessing.covariateSlider.value', function(covariate){
-  		// 	if(covariate !== undefined && $scope.preprocessing.vtkPolyData){
-  		// 		var colors = $scope.preprocessing.getEfitBetas();
-  		// 		$scope.preprocessing.vtkPolyData.addPointDataArray(new Float32Array(colors), "pointScalars", "Float32Array");
-  		// 	}
-  		// })
-
-  		// $scope.$watch('preprocessing.componentSlider.value', function(component){
-  		// 	if(component !== undefined && $scope.preprocessing.vtkPolyData){
-  		// 		var colors = $scope.preprocessing.getEfitBetas();
-  		// 		$scope.preprocessing.vtkPolyData.addPointDataArray(new Float32Array(colors), "pointScalars", "Float32Array");
-  		// 	}
-  		// })
-
-  		// $scope.$watch('preprocessing.pvalueSlider.value', function(pValue){
-  		// 	if(pValue !== undefined && $scope.preprocessing.vtkPolyData){
-  		// 		var colors = $scope.preprocessing.getPvalues();
-  		// 		$scope.preprocessing.vtkPolyData.addPointDataArray(new Float32Array(colors), "pointScalars", "Float32Array");
-  		// 	}
-  		// })
-
-
-
+  		$scope.preprocessing.getDataDisplay = function(job, namefile){
+  			return Promise.all([
+  				clusterpostService.getAttachment(job._id, 'pvaluesFirst.json', 'json'),
+  				clusterpostService.getAttachment(job._id, 'pearsoncorr.json', 'json')
+  				])
+  			.then(function(res){
+  				namesx = res[0].data.covariates;
+  					var a = Array(res[1].data.pearsoncorr.length);
+	                var b = Array.apply(null, a);
+	                var namesy_pearsoncorr = b.map(function(_, n){ return "PC " + (n + 1); });
+	                pvalue=[];
+	                for (i=0; i<res[1].data.pearsoncorr.length; i++){
+	                  pvalue[i] = [];
+	                  for(j=0; j<res[1].data.covariates.length; j++){
+	                    pvalue[i][j]= res[1].data.pearsoncorr[i][j][1];
+	                  }
+	                }
+                  heat_map_pearsoncorr = pvalue;
+              	  var namesy = res[0].data.covariates;
+                  value = [];
+                  temp = [];
+                  for (i=0; i<res[0].data.pearsoncorr.length; i++){
+                    temp[i] = [];
+                    for(j=0; j<res[0].data.covariates.length; j++){
+                      temp[i][j]= res[0].data.pearsoncorr[i][j];
+                    }
+                  }
+                  heat_map = temp;
+              	var pearsoncorr = {
+                	namesx: namesx,
+                	namesy: namesy_pearsoncorr,
+                	heat_map: heat_map_pearsoncorr
+                	};
+                var inputvalue = {
+                	namesx: namesx,
+                	namesy: namesy,
+                	heat_map: heat_map
+                };
+	  			return {
+	  				0: inputvalue,
+	  				1: pearsoncorr
+	  			};
+  			});
+  	    } 
   		$scope.$watch('preprocessing.fileTemplate', function(fileTemplate){
   			if(fileTemplate){
   				var reader = new FileReader();
@@ -984,7 +998,6 @@ angular.module('dcbia-jobs')
 				return $scope.clinical.data;
 			});
 		}
-
 		$scope.morphological.getSelectedProjectData = function(){
 			var mapId = _.map($scope.projects.selectedProject.collections,function(col){ return col._id });
 			return Promise.all(_.map(mapId,dcbia.getMorphologicalData))
