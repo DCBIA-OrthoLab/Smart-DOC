@@ -4,14 +4,14 @@
 			<clusterpost-jobs></clusterpost-jobs>
 		</div>
 	</uib-tab>
-	<uib-tab heading="MFSDA" index="1">
-		<div class="panel panel-default">				
-			<dcbia-mfsda job-parameters="'-l nodes=1:ppn=1,mem=2000mb,walltime=24:00:00 -q flux -l qos=flux -A luciacev_flux'"></dcbia-mfsda>
-		</div>
-	</uib-tab>
-	<uib-tab heading="Pearson and PCA" index="2">
+	<uib-tab heading="Pearson and PCA" index="1">
 		<div class="panel panel-default">				
 			<dcbia-preprocessing job-parameters="'-l nodes=1:ppn=1,mem=2000mb,walltime=24:00:00 -q flux -l qos=flux -A luciacev_flux'"></dcbia-preprocessing>
+		</div>
+	</uib-tab>
+	<uib-tab heading="MFSDA" index="2">
+		<div class="panel panel-default">				
+			<dcbia-mfsda job-parameters="'-l nodes=1:ppn=1,mem=2000mb,walltime=24:00:00 -q flux -l qos=flux -A luciacev_flux'"></dcbia-mfsda>
 		</div>
 	</uib-tab>
 </uit-tabset>

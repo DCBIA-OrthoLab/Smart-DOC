@@ -177,9 +177,6 @@
 								<button type="button" class="btn btn-success" ng-click="preprocessing.submitJob()">
 									<span class="glyphicon glyphicon-ok"></span>
 								</button>
-								<button type="button" class="btn btn-info" ng-click="preprocessing.download()">
-									<span class="glyphicon glyphicon-download"></span>
-								</button>		  			
 				  			</span>
 				  		</div>
 			  		</div>
@@ -188,8 +185,38 @@
 		</div>
 	</uib-tab>
 	<uib-tab heading="Active tasks" index="1">
-		<div class="panel panel-default">				
-			<clusterpost-jobs executable="'preprocessing.sh'" job-callback="preprocessing.jobCallback" download-callback="preprocessing.download"></clusterpost-jobs>
+		<div class="panel panel-default">	
+			<div class="panel-body"> 			
+				<clusterpost-jobs executable="'preprocessing.sh'" job-callback="preprocessing.jobCallback" download-callback="preprocessing.download"></clusterpost-jobs>
+			</div>
+		</div>
+	</uib-tab>
+	<uib-tab heading="Results" index="2">
+		<div class="panel panel-default">
+			<div class="row">
+				<div class="column">
+					<h3>Modify Colors Bar</h3>
+					<div ng-repeat="color in heat_map.attributes.colors track by $index">
+						<input type="color" class="form-control" placeholder="Color" aria-describedby="basic-addon3" ng-model="heat_map.attributes.colors[$index]">
+					</div>
+					<button ng-click="heat_map.attributes.colors.push('#ffffff')">+ Add Color</button>
+					<button ng-click = "heat_map.attributes.colors.pop()">- Remove one element</button>
+				</div>
+				<div class="column">
+					<h3>Modify Scale</h3>
+					<div ng-repeat="scale in heat_map.attributes.scale track by $index">
+						<input type="Number" class="form-control" placeholder="Level" aria-describedby="basic-addon3" ng-model="heat_map.attributes.scale[$index]">
+					</div>
+					<button ng-click="heat_map.attributes.scale.push('1.0')">+ Add value to the scale</button>
+					<button ng-click = "heat_map.attributes.scale.pop()">- Remove one element</button>
+				</div>
+			</div>	
+			<div class="panel-body" id="div1">
+				<preprocessing-plot-chart data="heat_map.pvalues"></preprocessing-plot-chart>
+			</div>
+			<div class="panel-body" id="div2">
+				<preprocessing-plot-chart data="heat_map.pearsoncorr"></preprocessing-plot-chart>
+			</div>
 		</div>
 	</uib-tab>
 </uit-tabset>
