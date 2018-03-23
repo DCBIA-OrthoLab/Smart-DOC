@@ -1,14 +1,79 @@
+import vtkFullScreenRenderWindow from 'vtk.js/Sources/Rendering/Misc/FullScreenRenderWindow';
+import vtk                       from 'vtk.js/Sources/vtk';
+import vtkActor                  from 'vtk.js/Sources/Rendering/Core/Actor';
+import vtkMapper                 from 'vtk.js/Sources/Rendering/Core/Mapper';
+import vtkOBJReader              from 'vtk.js/Sources/IO/Misc/OBJReader';
+import vtkPolyDataReader from 'vtk.js/Sources/IO/Legacy/PolyDataReader';
+
+global.vtk = vtk;
+
 angular.module("dcbia-vtk-module")
 .service("dcbiaVTKService", function(){
 
     var nextId = 0;
 
     return {
+    	initializeRenderWindow: function(rootContainer, container){
+
+    	  // ----------------------------------------------------------------------------
+	      // Standard rendering code setup
+	      // ----------------------------------------------------------------------------
+	      const fullScreenRenderer = vtkFullScreenRenderWindow.newInstance({ background: [255, 255, 255], rootContainer: rootContainer, container: container });
+	      const renderer = fullScreenRenderer.getRenderer();
+	      const renderWindow = fullScreenRenderer.getRenderWindow();
+	      
+	      // -----------------------------------------------------------
+	      // Make some variables global so that you can inspect and
+	      // modify objects in your browser's developer console:
+	      // -----------------------------------------------------------
+
+	      return {
+	      	renderer: renderer,
+	      	renderWindow: renderWindow
+	      }
+	      
+    	},
     	getUniqueId: function(){
     		nextId++;
     		return Promise.resolve(nextId);
 	    }, 
-	    parseVTK: function(data){
+	    parsePolyData: function(data){
+	    	const reader = vtkPolyDataReader.newInstance();
+	    	reader.parse(data);
+	    	reader.update();
+	    	return reader.getOutputData();
+	    },
+	    addPointDataArray: function(polydata, array, name, dataType){
+	    	name = name? name: 'pointScalars';
+	    	dataType = dataType? dataType: 'Float32Array';
+
+	    	if(polydata && polydata.getPointData()){
+	    		var pointdata = polydata.getPointData();
+				
+				pointdata.setScalars(vtk({
+					vtkClass: 'vtkDataArray',
+					name: name,
+					dataType: dataType,
+					values: array
+				}));
+				
+	    	}
+	    },
+	    newActor: function(polydata){
+	    	// const mapper = vtkMapper.newInstance({ interpolateScalarsBeforeMapping: true });
+	      const mapper = vtkMapper.newInstance();
+	      mapper.setInputData(polydata);
+
+	      const actor = vtkActor.newInstance();
+	      actor.setMapper(mapper);
+
+	      return {
+	      	mapper: mapper,
+	      	actor: actor
+	      }
+
+	    },
+	    parseVTK1: function(data){
 	    	  // connectivity of the triangles
 		      var indices = [];
 

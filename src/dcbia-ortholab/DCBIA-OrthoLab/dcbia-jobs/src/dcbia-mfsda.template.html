@@ -179,7 +179,7 @@
 								</button>
 								<button type="button" class="btn btn-info" ng-click="mfsda.download()">
 									<span class="glyphicon glyphicon-download"></span>
-								</button>		  			
+								</button>
 				  			</span>
 				  		</div>
 			  		</div>
@@ -189,7 +189,7 @@
 	</uib-tab>
 	<uib-tab heading="Active tasks" index="1">
 		<div class="panel panel-default">				
-			<clusterpost-jobs executable="'MFSDA.sh'" job-callback="mfsda.jobCallback" download-callback="mfsda.download"></clusterpost-jobs>
+			<clusterpost-jobs executable="['MFSDA.sh','MFSDAv2.0.0.sh']" job-callback="mfsda.jobCallback" download-callback="mfsda.download"></clusterpost-jobs>
 		</div>
 	</uib-tab>
 	<uib-tab heading="Display results" index="2">
@@ -205,6 +205,9 @@
 							<select ng-model="mfsda.selectOutput.option" class="form-control" ng-options="option as option.name for option in mfsda.selectOutput.options" ng-change="mfsda.selectOutput.update()">
 							</select>
 						</div>
+						<button type="button" class="btn btn-info" ng-click="vtk.download()">
+							<span class="glyphicon glyphicon-save"></span>
+						</button>
 					</div>					
 				</div>
 				
@@ -265,7 +268,7 @@
 				<br>
 
 				<div class="col-md-12">
-					<dcbia-vtk vtk-poly-data="mfsda.vtkPolyData" hue-range="mfsda.hueSlider"></dcbia-vtk>
+					<dcbia-vtk ></dcbia-vtk>
 				</div>
 			</div>
 		</div>
