@@ -463,20 +463,21 @@ angular.module('dcbia-projects')
 			});
 		}
 
-    $scope.morphologicalDataCollection.downloadAttachment = function(filename, morphologicaldata){
-			var id=_.keys(morphologicaldata);
-			return dcbia.getAttachement(morphologicaldata, filename, 'blob')
-			.then(function(res){
-				var pom = document.createElement('a');
-				$element[0].appendChild(pom);
-				var bb = res.data;
+	    $scope.morphologicalDataCollection.downloadAttachment = function(filename, morphologicaldata){
+				var id=_.keys(morphologicaldata);
+				return dcbia.getAttachement(morphologicaldata, filename, 'blob')
+				.then(function(res){
+					var pom = document.createElement('a');
+					$element[0].appendChild(pom);
+					var bb = res.data;
 
-				pom.setAttribute('href', window.URL.createObjectURL(bb));
-				pom.setAttribute('download', filename);
+					pom.setAttribute('href', window.URL.createObjectURL(bb));
+					pom.setAttribute('download', filename);
 
-				pom.dataset.downloadurl = ['text/plain', pom.download, pom.href].join(':');
-				pom.click();
-		})
+					pom.dataset.downloadurl = ['text/plain', pom.download, pom.href].join(':');
+					pom.click();
+				})
+		}
 
 		$scope.morphologicalDataCollection.addRemoveScope = function(collection, scope, checkbox, projectName){
 			if(collection.scope === undefined){
