@@ -12,7 +12,9 @@ module.exports = function(grunt) {
             appJS: [
             './src/dcbia-jobs.module.js',            
             './src/dcbia-mfsda.directive.js',
-            './dist/dcbia-jobs.templates.js'            
+            './src/dcbia-preprocessing.directive.js',
+            './src/d3_plot/main.js',
+            './dist/dcbia-jobs.templates.js'
             ]
         },
         concat: {
