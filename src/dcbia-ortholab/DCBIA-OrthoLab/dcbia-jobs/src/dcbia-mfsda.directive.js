@@ -407,6 +407,7 @@ angular.module('dcbia-jobs')
 			editJobParameters: true,
 			jobParameters: $scope.jobParameters
 		};
+		$scope.vtk = {};
 
 		$scope.mfsda.submitJob = function(){
 
@@ -790,7 +791,7 @@ angular.module('dcbia-jobs')
 
   		$scope.mfsda.jobCallback = function(job){
   			
-  			$scope.mfsda.vtkUrl = job;
+  			$scope.mfsda.job = job;
   			$scope.activeTab = 2;
 
   			var template = _.find(job.parameters, function(param){
@@ -809,8 +810,19 @@ angular.module('dcbia-jobs')
   				clusterpostService.getAttachment(job._id, template, "text")
 			])  			
   			.then(function(res){
+
+  				if($scope.vtk.actor){
+  					$scope.$broadcast('removeActor', $scope.vtk.actor);
+  				}
+
   				var data = _.compact(_.pluck(res, "data"));
-  				$scope.mfsda.vtkPolyData = dcbiaVTKService.parseVTK(data[2]);
+  				$scope.vtk.vtkascii = data[2];
+  				$scope.vtk.vtkPolyData = dcbiaVTKService.parsePolyData(data[2]);
+  				if(!$scope.vtk.vtkPolyData){
+  					return Promise.reject('Poly data is not loaded');
+  				}
+  				_.extend($scope.vtk, dcbiaVTKService.newActor($scope.vtk.vtkPolyData));
+  				$scope.$broadcast('addActor', $scope.vtk.actor, true);
 
   				if(data.length > 0){  					
   					if(job.version){
@@ -847,7 +859,10 @@ angular.module('dcbia-jobs')
   					
 
 					var colors = $scope.mfsda.getEfitBetas();
-					$scope.mfsda.vtkPolyData.addPointDataArray(new Float32Array(colors), "pointScalars", "Float32Array");
+					dcbiaVTKService.addPointDataArray($scope.vtk.vtkPolyData, colors);
+					$scope.vtk.updateActor();
+
+					$scope.$broadcast('resetCamera');
 					
   				}
   				$scope.$apply();
@@ -909,6 +924,85 @@ angular.module('dcbia-jobs')
 			]	
 		}
 
+		$scope.vtk.updateActor = function(hue){
+  			
+  			hue = hue? hue: $scope.mfsda.hueSlider;
+
+  			if($scope.vtk.mapper){
+	      		var lut = $scope.vtk.mapper.getLookupTable();
+		        lut.setHueRange(hue.min, hue.max);
+		        $scope.vtk.mapper.update();
+		        $scope.$broadcast('renderWindow');
+	      	}
+  		}
+
+  		$scope.vtk.download = function(){
+
+  			if($scope.mfsda.job){
+  				var job = {};
+	  			job.executable = "generateShapes.sh";
+	  			job.version = "1.0.0";
+	  			job.parameters = [
+	  				{
+	  					flag: "--shape",
+	  					name: "shape.vtk"
+	  				},
+	  				{
+	  					flag: "--pvalues",
+	  					name: "pvalues.json",
+	  				},
+	  				{
+	  					flag: "--efit",
+	  					name: "efit.json"
+	  				},
+	  				{
+	  					flag: "--output",
+	  					name: "output.vtk"
+	  				}
+	  			];
+
+	  			job.type = "job";
+	  			job.inputs = [{
+	  				name: "pvalues.json",
+	  				local: {
+	  					uri: $scope.mfsda.job._id + "/pvalues.json"
+	  				}
+	  			},
+	  			{
+	  				name: "efit.json",
+	  				local: {
+	  					uri: $scope.mfsda.job._id + "/efit.json"
+	  				}
+	  			},
+	  			{
+	  				name: "shape.vtk"
+	  			}];
+
+	  			job.executionserver = "localhost";
+	  			job.outputs = [{
+	  				name: "output",
+	  				type: "tar.gz",  				
+	  			},
+	  			{
+	  				name: "stdout.out",
+	  				type: "file"
+	  			},
+	  			{
+	  				name: "stderr.err",
+	  				type: "file"
+	  			}];
+	  			job.userEmail = $scope.user.email;
+	  			job.jobparameters = [];
+
+	  			return clusterpostService.createAndSubmitJob(job, ["shape.vtk"], [$scope.vtk.vtkascii])
+	  			.then(function(res){
+	  				console.log(res);
+	  				$scope.mfsda.taskSubmitted = true;  				
+	  			})
+  			}
+  			
+  		}
+
   		$scope.mfsda.selectOutput.update = function(){
   			var colors = [];
   			if($scope.mfsda.selectOutput.option){
@@ -917,28 +1011,32 @@ angular.module('dcbia-jobs')
 	  			}else if($scope.mfsda.selectOutput.option.name === "pValues"){
 	  				colors = $scope.mfsda.getPvalues();
 	  			}
-	  			$scope.mfsda.vtkPolyData.addPointDataArray(new Float32Array(colors), "pointScalars", "Float32Array");
+	  			dcbiaVTKService.addPointDataArray($scope.vtk.vtkPolyData, colors);
+	  			$scope.vtk.updateActor();
   			}
   		}
 
   		$scope.$watch('mfsda.covariateSlider.value', function(covariate){
-  			if(covariate !== undefined && $scope.mfsda.vtkPolyData){
+  			if(covariate !== undefined && $scope.vtk.vtkPolyData){
   				var colors = $scope.mfsda.getEfitBetas();
-  				$scope.mfsda.vtkPolyData.addPointDataArray(new Float32Array(colors), "pointScalars", "Float32Array");
+  				dcbiaVTKService.addPointDataArray($scope.vtk.vtkPolyData, colors);
+  				$scope.vtk.updateActor();
   			}
   		})
 
   		$scope.$watch('mfsda.componentSlider.value', function(component){
-  			if(component !== undefined && $scope.mfsda.vtkPolyData){
+  			if(component !== undefined && $scope.vtk.vtkPolyData){
   				var colors = $scope.mfsda.getEfitBetas();
-  				$scope.mfsda.vtkPolyData.addPointDataArray(new Float32Array(colors), "pointScalars", "Float32Array");
+  				dcbiaVTKService.addPointDataArray($scope.vtk.vtkPolyData, colors);
+  				$scope.vtk.updateActor();
   			}
   		})
 
   		$scope.$watch('mfsda.pvalueSlider.value', function(pValue){
-  			if(pValue !== undefined && $scope.mfsda.vtkPolyData){
+  			if(pValue !== undefined && $scope.vtk.vtkPolyData){
   				var colors = $scope.mfsda.getPvalues();
-  				$scope.mfsda.vtkPolyData.addPointDataArray(new Float32Array(colors), "pointScalars", "Float32Array");
+  				dcbiaVTKService.addPointDataArray($scope.vtk.vtkPolyData, colors);
+  				$scope.vtk.updateActor();
   			}
   		})
 
@@ -950,7 +1048,11 @@ angular.module('dcbia-jobs')
 	                
 		        reader.onload = function(e) {
 		          var vtk = e.target.result;
-		          $scope.mfsda.vtkPolyData = dcbiaVTKService.parseVTK(vtk);
+		          $scope.$broadcast('removeActor', $scope.vtk.actor);
+		          $scope.vtk.vtkascii = vtk;
+		          $scope.vtk.vtkPolyData = dcbiaVTKService.parsePolyData(vtk);
+		          _.extend($scope.vtk, dcbiaVTKService.newActor($scope.vtk.vtkPolyData));
+		          $scope.$broadcast('addActor', $scope.vtk.actor, true);
 		          $scope.mfsda.selectOutput.update();
 		        }
 
@@ -959,65 +1061,71 @@ angular.module('dcbia-jobs')
 		        }
 		        reader.readAsText(fileTemplate);
   			}
-  		})
+  		});
 
-		$scope.csv.export = function(project){
-			var prom;
-			if(!$scope.projects.selectedProject || project._id !== $scope.projects.selectedProject._id){
-				prom = $scope.projects.select(project);
-			}else{
-				prom = Promise.resolve(true);
-			}
+  		$scope.$watch('mfsda.hueSlider', function(hue){
+	      if(hue){
+	      	$scope.vtk.updateActor(hue);
+	      }
+	    }, true)
 
-			prom
-			.then(function(){
-				var keys = $scope.projects.getProjectKeys([$scope.projects.selectedProject]);
-				var csv = 'name:,' + $scope.projects.selectedProject.name + '\n'
-				csv += 'description:,' + $scope.projects.selectedProject.description + '\n'
-				csv += 'patients:,' + $scope.projects.selectedProject.patients + '\n'
-				// if(keys.indexOf("scope") !== -1){
-				// 	csv += 'scope:,' + $scope.projects.selectedProject.scope + '\n'
-				// }
-				csv += '\n';
-				var collectionKeys = ['Name','Number of items','Type']
-				csv += collectionKeys.toString();
-				csv += '\n';
-				_.each($scope.projects.selectedProject.collections, function(collection, i){
-					_.each($scope.clinicalDataCollection.collections, function(clinicalCollection){
-						if(collection._id === clinicalCollection._id){
-							csv += clinicalCollection.name + ',' + clinicalCollection.items.length + ',' + clinicalCollection.type + '\n';
-						}
-					})
-					_.each($scope.morphologicalDataCollection.collections, function(morphologicalDataCollection){
-						if(collection._id === morphologicalDataCollection._id){
-							csv += morphologicalDataCollection.name + ',' + morphologicalDataCollection.items.length + ',' + morphologicalDataCollection.type + '\n';
-						}
-					})
-				})
+		// $scope.csv.export = function(project){
+		// 	var prom;
+		// 	if(!$scope.projects.selectedProject || project._id !== $scope.projects.selectedProject._id){
+		// 		prom = $scope.projects.select(project);
+		// 	}else{
+		// 		prom = Promise.resolve(true);
+		// 	}
 
-				var filename = $scope.projects.selectedProject.name;
-				if($scope.projects.selectedProject.name.indexOf('csv') === -1){
-					filename += '.csv';
-				}
+		// 	prom
+		// 	.then(function(){
+		// 		var keys = $scope.projects.getProjectKeys([$scope.projects.selectedProject]);
+		// 		var csv = 'name:,' + $scope.projects.selectedProject.name + '\n'
+		// 		csv += 'description:,' + $scope.projects.selectedProject.description + '\n'
+		// 		csv += 'patients:,' + $scope.projects.selectedProject.patients + '\n'
+		// 		// if(keys.indexOf("scope") !== -1){
+		// 		// 	csv += 'scope:,' + $scope.projects.selectedProject.scope + '\n'
+		// 		// }
+		// 		csv += '\n';
+		// 		var collectionKeys = ['Name','Number of items','Type']
+		// 		csv += collectionKeys.toString();
+		// 		csv += '\n';
+		// 		_.each($scope.projects.selectedProject.collections, function(collection, i){
+		// 			_.each($scope.clinicalDataCollection.collections, function(clinicalCollection){
+		// 				if(collection._id === clinicalCollection._id){
+		// 					csv += clinicalCollection.name + ',' + clinicalCollection.items.length + ',' + clinicalCollection.type + '\n';
+		// 				}
+		// 			})
+		// 			_.each($scope.morphologicalDataCollection.collections, function(morphologicalDataCollection){
+		// 				if(collection._id === morphologicalDataCollection._id){
+		// 					csv += morphologicalDataCollection.name + ',' + morphologicalDataCollection.items.length + ',' + morphologicalDataCollection.type + '\n';
+		// 				}
+		// 			})
+		// 		})
 
-				return $scope.csv.download(filename, csv);
-			})
-			.catch(console.error);
+		// 		var filename = $scope.projects.selectedProject.name;
+		// 		if($scope.projects.selectedProject.name.indexOf('csv') === -1){
+		// 			filename += '.csv';
+		// 		}
+
+		// 		return $scope.csv.download(filename, csv);
+		// 	})
+		// 	.catch(console.error);
 			
-		}
+		// }
 
-		$scope.csv.download = function(filename, csv){
+		// $scope.csv.download = function(filename, csv){
 
-			var pom = document.createElement('a');
-			var bb = new Blob([csv], {type: 'text/plain'});
+		// 	var pom = document.createElement('a');
+		// 	var bb = new Blob([csv], {type: 'text/plain'});
 
-			pom.setAttribute('href', window.URL.createObjectURL(bb));
-			pom.setAttribute('download', filename);
+		// 	pom.setAttribute('href', window.URL.createObjectURL(bb));
+		// 	pom.setAttribute('download', filename);
 
-			pom.dataset.downloadurl = ['text/plain', pom.download, pom.href].join(':');
-			pom.click();
+		// 	pom.dataset.downloadurl = ['text/plain', pom.download, pom.href].join(':');
+		// 	pom.click();
 			
-		}
+		// }
 
 		$scope.clinical = {
 			data: []
