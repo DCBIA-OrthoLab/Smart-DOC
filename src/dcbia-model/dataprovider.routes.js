@@ -7,6 +7,7 @@ module.exports = function (server, conf) {
 	var clinicaldatapost = Joi.object({
         	type: Joi.string().valid('clinicalData').required(),
         	patientId: Joi.any().required(),
+        	date: Joi.date().required(),
         	scope: Joi.array().items(Joi.string()).optional()
         }).unknown();
 
@@ -15,6 +16,7 @@ module.exports = function (server, conf) {
 			_rev: Joi.string().required(),
         	type: Joi.string().valid('clinicalData').required(),
         	patientId: Joi.any().required(),
+        	date: Joi.date().optional(),
         	scope: Joi.array().items(Joi.string()).optional(),
         	owner: Joi.string().email().optional()
         }).unknown();
@@ -45,6 +47,7 @@ module.exports = function (server, conf) {
 	var morphologicaldatapost = Joi.object({
         	type: Joi.string().valid('morphologicalData').required(),
         	patientId: Joi.any().required(),
+        	date: Joi.date().required(),
         	scope: Joi.array().items(Joi.string()).optional()
         }).unknown();
 
@@ -53,6 +56,7 @@ module.exports = function (server, conf) {
 			_rev: Joi.string().required(),
         	type: Joi.string().valid('morphologicalData').required(),
         	patientId: Joi.any().required(),
+        	date: Joi.date().optional(),
         	scope: Joi.array().items(Joi.string()).optional(),
         	owner: Joi.string().email().optional()
         }).unknown();
@@ -93,24 +97,25 @@ module.exports = function (server, conf) {
 			_rev: Joi.string().required(),
 			type: Joi.string().valid('project').required(),
 			name: Joi.string().required(),
-			patients: Joi.string().alphanum().required(),
+			patients: Joi.string().alphanum().optional(),
 			description: Joi.string().required(),
 			collections: Joi.allow(Joi.array().items(Joi.object().keys({
 				_id: Joi.string().alphanum()
 			})), Joi.object().optional()),
 			scope: Joi.array().items(Joi.string()).optional(),
-			analyses: Joi.array().items(Joi.object()).optional()
+			analyses: Joi.array().items(Joi.object()).optional(),
+			owner: Joi.string().email().optional()
 		});
 
 	var projectpost = Joi.object({
 			name: Joi.string().required(),
         	type: Joi.string().valid('project').required(),
         	description: Joi.string().required(),
-        	patients: Joi.string().alphanum().required(),
-        	// scope: Joi.array().items(Joi.string()),
+        	patients: Joi.string().alphanum().optional(),
         	collections: Joi.array().items(Joi.object().keys({
         		_id: Joi.string().alphanum().required()
-        	}))
+        	})),
+        	owner: Joi.string().email().optional()
         });
 
 
@@ -131,7 +136,7 @@ module.exports = function (server, conf) {
 			response: {
 				schema: Joi.array().items(clinicalcollection)
 			},
-			description: 'This route will be used to post job documents to the couch database.'
+			description: 'Get all the clinical data collections in the database.'
 		}
 	});
 
@@ -152,7 +157,7 @@ module.exports = function (server, conf) {
 			payload:{
 				output: 'data'
 			},
-			description: 'This route will be used to post job documents to the couch database.'
+			description: 'Create a new clinical data collection.'
 		}
 	});
 
@@ -175,7 +180,7 @@ module.exports = function (server, conf) {
 			response: {
 				schema: clinicalcollection
 			},
-			description: 'Get the a document from the database'
+			description: 'Get a clinical data collection document from the database'
 	    }
 	});
 
@@ -198,7 +203,7 @@ module.exports = function (server, conf) {
 			payload:{
 				output: 'data'
 			},
-			description: 'This route will be used to delete job documents from the database'
+			description: 'Delete a clinical collection from the database'
 		}
 	});
 
@@ -219,7 +224,7 @@ module.exports = function (server, conf) {
 			payload:{
 				output: 'data'
 			},
-			description: 'This route will be used to update a job document in the couch database.'
+			description: 'Update a clinical data collection.'
 		}
 	});
 
@@ -264,7 +269,7 @@ module.exports = function (server, conf) {
 			response: {
 				schema: Joi.array().items(clinicaldata)
 			},
-			description: 'Get the job document posted to the database'
+			description: 'Get the data from a clinical data collection'
 	    }
 	});
 
@@ -287,8 +292,32 @@ module.exports = function (server, conf) {
 			response: {
 				schema: Joi.array().items(dataowned)
 			},
-			description: 'Get the job document posted to the database'
+			description: 'Get clinical data by the owner who created the collection'
 	    }
+	});
+
+	server.route({
+		path: '/dcbia/clinical/data',
+		method: 'GET',
+		config: {
+			auth: {
+                strategy: 'token',
+                scope: ['dentist']
+            },
+			handler: handlers.getClinicalData,
+			validate: {
+				query: {
+			    	patientId: Joi.string().optional(),
+			    	date: Joi.date().optional()
+			    },
+		        payload: false,
+		        params: false
+			},
+			response: {
+				schema: Joi.array().items(clinicaldata)
+			},
+			description: 'Get clinical data from the database using optional query parameters patientId and/or date'
+		}
 	});
 
 	server.route({
@@ -308,7 +337,7 @@ module.exports = function (server, conf) {
 			payload:{
 				output: 'data'
 			},
-			description: 'This route will be used to post job documents to the couch database.'
+			description: 'Create a new clinical data item'
 		}
 	});
 
@@ -331,7 +360,7 @@ module.exports = function (server, conf) {
 			response: {
 				schema: clinicaldata
 			},
-			description: 'Get the job document posted to the database'
+			description: 'Get a clinical data item from the database'
 	    }
 	});
 
@@ -592,6 +621,30 @@ module.exports = function (server, conf) {
 			    params: {
 			    	id: Joi.string().alphanum().required()
 			    }, 
+			    payload: false
+			},
+			response: {
+				schema: Joi.array(morphologicaldata)
+			},
+			description: 'Get the morphological data by patientId'
+	    }
+	});
+
+	server.route({
+		method: 'GET',
+		path: "/dcbia/morphological/data",
+		config: {
+			auth: {
+                strategy: 'token',
+                scope: ['dentist']
+            },
+			handler: handlers.getMorphologicalData,
+			validate: {
+			  	query: {
+			    	patientId: Joi.string().optional(),
+			    	date: Joi.date().optional()
+			    },
+			    params: false, 
 			    payload: false
 			},
 			response: {

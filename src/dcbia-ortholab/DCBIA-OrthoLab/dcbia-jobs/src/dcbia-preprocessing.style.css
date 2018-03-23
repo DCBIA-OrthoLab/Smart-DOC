@@ -1,0 +1,87 @@
+.custom-slider.rzslider .rz-bar {
+  background: #ffe4d1;
+  height: 2px;
+}
+.custom-slider.rzslider .rz-selection {
+  background: rgb(26, 152, 236);
+}
+
+.custom-slider.rzslider .rz-pointer {
+  width: 8px;
+  height: 16px;
+  top: auto; /* to remove the default positioning */
+  bottom: 0;
+  background-color: #333;
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+}
+
+.custom-slider.rzslider .rz-pointer:after {
+  display: none;
+}
+
+.custom-slider.rzslider .rz-bubble {
+  bottom: 14px;
+}
+
+.custom-slider.rzslider .rz-limit {
+  font-weight: bold;
+  color: rgb(26, 152, 236);
+}
+
+.custom-slider.rzslider .rz-tick {
+  width: 1px;
+  height: 10px;
+  margin-left: 4px;
+  border-radius: 0;
+  background: #ffe4d1;
+  top: -1px;
+}
+
+.custom-slider.rzslider .rz-tick.rz-selected {
+  background: rgb(26, 152, 236);
+}
+
+rect.bordered {
+  stroke: #E6E6E6;
+  stroke-width:2px;   
+}
+
+text.mono {
+  font-size: 9pt;
+  font-family: Consolas, courier;
+  fill: #aaa;
+}
+
+text.axis-covariates {
+  fill: #000;
+  overflow-y: auto;
+}
+
+text.axis-num_components {
+  fill: #000;
+}
+div.tooltip { 
+    text-align: center;     
+    width: 60px;          
+    height: 28px;         
+    padding: 2px;       
+    font: 12px sans-serif;    
+    background: lightsteelblue; 
+    border: 0px;    
+    border-radius: 8px;     
+    pointer-events: none;
+    position: relative;     
+}
+.column {
+    float: left;
+    width: 50%;
+    padding: 15px;
+}
+.ui-tabs{
+  height: 10px;
+  width: 10px;
+  border:1px dotted #ccc;
+  background-color: #ccc;
+  overflow: scroll;
+}

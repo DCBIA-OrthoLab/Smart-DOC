@@ -1,18 +1,20 @@
 var path = require('path');
 var webpack = require('webpack');
 var vtkRules = require('vtk.js/Utilities/config/dependency.js').webpack.v2.rules;
-var entry = path.join(__dirname, './src/dcbia-vtk.directive.js');
+
 const sourcePath = path.join(__dirname, './src');
 const outputPath = path.join(__dirname, './dist');
 module.exports = {
-  entry,
+  entry: {
+    'dcbia-vtk.service': path.join(__dirname, './src/dcbia-vtk.service.js')
+  },
   output: {
     path: outputPath,
-    filename: 'dcbia-vtk.directive.js',
+    filename: '[name].js',
   },
   module: {
     rules: [
-        { test: entry, loader: "expose-loader?dcbia-vtk.directive" },
+        // { test: entry, loader: "expose-loader?dcbia-vtk.directive" },
         { test: /\.html$/, loader: 'html-loader' },
     ].concat(vtkRules),
   },

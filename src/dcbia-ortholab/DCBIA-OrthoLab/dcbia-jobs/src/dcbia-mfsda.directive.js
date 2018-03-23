@@ -140,17 +140,21 @@ angular.module('dcbia-jobs')
 		};		
 
 
-		$scope.projects.getFilteredAttachments = function(attachments){			
+		$scope.projects.getFilteredAttachments = function(attachments, colid){
+			var filteredatt = attachments;
 			if($scope.projects.analysis.attachmentsRegex && $scope.projects.analysis.attachmentsRegex != ""){
 				var re = new RegExp("^" + $scope.projects.analysis.attachmentsRegex.split("*").join(".*") + "$");
 				var filteredkeys = _.filter(_.keys(attachments), function(key){				
 						return re.test(key);
 				});
-				return _.pick(attachments, filteredkeys);
-			}else{
-				return attachments;
+				filteredatt = _.pick(attachments, filteredkeys);
 			}
-
+			if(colid && $scope.projects.analysis.isSelectedAttachments){
+				return _.pick(filteredatt, _.compact(_.map($scope.projects.analysis.isSelectedAttachments[colid], function(selected, name){
+					return selected? name: '';
+				})));
+			}
+			return filteredatt;
 		}
 
 		$scope.projects.setGroupProjectDataDisplayed = function(){
@@ -332,12 +336,10 @@ angular.module('dcbia-jobs')
   				}
             });
             return display;
-  		}
+  		}  		
 
-  		
-
-  		$scope.projects.showSubset = function(index){
-			var analysis = $scope.projects.selectedProject.analyses[index];
+  		$scope.projects.showSubset = function(analysis){
+			//var analysis = $scope.projects.selectedProject.analyses[index];
 			
 			var selectedProjectData = _.filter($scope.projects.selectedProjectData, function(data){
 				return analysis.selectedPatients.indexOf(data.patientId) !== -1;				
@@ -354,6 +356,7 @@ angular.module('dcbia-jobs')
 			$scope.projects.analysis.name = analysis.name;
 			$scope.projects.analysis.selectedProjectData = selectedProjectData;
 			$scope.projects.analysis.selectedProjectDataKeys = analysis.selectedVariables;
+			$scope.projects.analysis.isSelectedAttachments = analysis.isSelectedAttachments;
 
 			var indexgroup = $scope.projects.analysis.selectedProjectDataKeys.indexOf('group');
 			if(indexgroup !== -1){
@@ -363,6 +366,23 @@ angular.module('dcbia-jobs')
 			}else{
 				$scope.projects.analysis.hasGroup = false;
 			}
+			
+			var projectDataKeys = _.clone($scope.projects.analysis.selectedProjectDataKeys);
+			if(projectDataKeys.indexOf('attachments') != -1){
+				projectDataKeys.splice(projectDataKeys.indexOf('attachments'), 1);
+			}
+  			$scope.mfsda.covariateType = _.map(projectDataKeys, function(cn){
+  				
+				var data = _.pluck($scope.projects.analysis.selectedProjectData, cn);
+  				var datatype = _.map(data, function(d){
+  					if(_.isNumber(d)){
+  						return Number.isInteger(d);
+  					}
+  					return 1;
+  				});
+  				return Number(!eval(datatype.join("&&")));
+  				
+  			});
 
 			// $scope.projects.selectedProjectData;
 			// projects.analysis.selectedPatients.indexOf(row.patientId)>-1">
@@ -374,8 +394,8 @@ angular.module('dcbia-jobs')
 
 		$scope.projects.selectVisibleAttachments = function(select){
 			_.each($scope.projects.analysis.selectedProjectDataDisplayed, function(pdata){
-				_.each(pdata.attachments, function(col){
-					_.each($scope.projects.getFilteredAttachments(col), function(att){
+				_.each(pdata.attachments, function(col, keycol){
+					_.each($scope.projects.getFilteredAttachments(col, keycol), function(att){
 						att.selected = select;
 					});
 				});
@@ -387,6 +407,7 @@ angular.module('dcbia-jobs')
 			editJobParameters: true,
 			jobParameters: $scope.jobParameters
 		};
+		$scope.vtk = {};
 
 		$scope.mfsda.submitJob = function(){
 
@@ -404,43 +425,53 @@ angular.module('dcbia-jobs')
 	// mfsda.shapes = filelistobj;
 	// mfsda.template = template;			
 
-			var mfsda = $scope.mfsda.getData();			
+			var mfsda = $scope.mfsda.getData();
+			
+			mfsda.data.push({
+  				name: "covariateType.csv",
+  				data: $scope.mfsda.covariateType.join(',')
+  			});  
+
+			mfsda.inputs.push({
+  				name: "covariateType.csv"
+  			});
 
   			var job = {};  			
 
   			if($scope.mfsda.name){
   				job.name = $scope.mfsda.name;
   			}
-  			job.executable = "MFSDA.sh";
+  			job.executable = "MFSDAv2.0.0.sh";
+  			job.version = "2.0.0";
   			job.parameters = [
   				{
-  					flag: "-shapeData",
+  					flag: "--shapeData",
   					name: "shapeData.txt"
   				},
   				{
-  					flag: "-coordData",
+  					flag: "--coordData",
   					name: mfsda.template.name,
   				},
   				{
-  					flag: "-covariate",
-  					name: "covariate.txt"
+  					flag: "--covariate",
+  					name: "covariate.csv"
+  				},
+  				// {
+  				// 	flag: "-covariateInterest",
+  				// 	name: "covariateInterest.csv"
+  				// },
+  				{
+  					flag: "--covariateType",
+  					name: "covariateType.csv"
   				},
   				{
-  					flag: "-covariateInterest",
-  					name: "covariateInterest.txt"
-  				},
-  				{
-  					flag: "-covariateType",
-  					name: "covariateType.txt"
-  				},
-  				{
-  					flag: "-outputDir",
+  					flag: "--outputDir",
   					name: "./output"
-  				},
-  				{
-  					flag: "-exportJSON",
-  					name: ""
-  				}
+  				}//,
+  				// {
+  				// 	flag: "-exportJSON",
+  				// 	name: ""
+  				// }
   			];
 
   			job.type = "job";
@@ -492,6 +523,7 @@ angular.module('dcbia-jobs')
   			return clusterpostService.createAndSubmitJob(job, _.pluck(mfsda.data, "name"), _.pluck(mfsda.data, "data"))
   			.then(function(res){
   				console.log(res);
+  				$scope.mfsda.taskSubmitted = true;  				
   			})
   		}
 
@@ -561,8 +593,7 @@ angular.module('dcbia-jobs')
   			$scope.mfsda.showWarningTemplate = false;
 
   			var covariateName = _.clone($scope.projects.analysis.selectedProjectDataKeys);
-  			var covariate = _.clone($scope.projects.analysis.selectedProjectData); 			 			
-
+  			var covariate = _.clone($scope.projects.analysis.selectedProjectData);
 
   			var mapnames = {};
 
@@ -578,7 +609,7 @@ angular.module('dcbia-jobs')
 									}
 								};
 								obj.local.uri = colid + "/" + name;
-								if(mapnames[name]){				  					
+								if(mapnames[name]){
 				  					obj.name = mapnames[name] + "_" + name;
 				  					mapnames[name] += 1;
 				  				}else{
@@ -640,16 +671,7 @@ angular.module('dcbia-jobs')
   			var covariateInterest = _.map(covariateName, function(){
   				return "1";
   			}).join(",");
-  			var covariateType = _.map(covariateName, function(cn){
-  				var data = _.pluck(covariate, cn);
-  				var datatype = _.map(data, function(d){
-  					if(_.isNumber(d)){
-  						return Number.isInteger(d);
-  					}
-  					return 1;
-  				});
-  				return Number(!eval(datatype.join("&&")));
-  			}).join(",");
+  			
   			
   			var filelistobj = _.compact(_.flatten(_.map(covariate, function(cov){
   				if(!cov.isTemplate){
@@ -686,19 +708,19 @@ angular.module('dcbia-jobs')
   			});
 
   			mfsda.data.push({
-  				name: "covariate.txt",
+  				name: "covariate.csv",
   				data: covariatecsv
   			});
 
-  			mfsda.data.push({
-  				name: "covariateInterest.txt",
-  				data: covariateInterest
-  			});
+  			// mfsda.data.push({
+  			// 	name: "covariateInterest.txt",
+  			// 	data: covariateInterest
+  			// });
 
-  			mfsda.data.push({
-  				name: "covariateType.txt",
-  				data: covariateType
-  			});
+  			// mfsda.data.push({
+  			// 	name: "covariateType.csv",
+  			// 	data: covariateType
+  			// });  			
   			
   			if(template.length == 1){
   				filelistobj.push(template[0]);
@@ -709,16 +731,16 @@ angular.module('dcbia-jobs')
   			});
 
   			filelistobj.push({
-  				name: "covariate.txt"
+  				name: "covariate.csv"
   			});
 
-  			filelistobj.push({
-  				name: "covariateInterest.txt"
-  			});
+  			// filelistobj.push({
+  			// 	name: "covariateInterest.txt"
+  			// });
 
-  			filelistobj.push({
-  				name: "covariateType.txt"
-  			});
+  			// filelistobj.push({
+  			// 	name: "covariateType.csv"
+  			// });
 
   			mfsda.inputs = filelistobj;
   			mfsda.template = template[0];
@@ -769,13 +791,18 @@ angular.module('dcbia-jobs')
 
   		$scope.mfsda.jobCallback = function(job){
   			
-  			$scope.mfsda.vtkUrl = job;
+  			$scope.mfsda.job = job;
   			$scope.activeTab = 2;
 
   			var template = _.find(job.parameters, function(param){
-  				return param.flag == "-coordData";
+  				return param.flag == "--coordData" || param.flag == "-coordData";
   			});
-  			template = template.name;
+  			if(template){
+  				template = template.name;
+  			}else{
+  				throw "template not found! mfsda.jobCallback";
+  			}
+  			
 
   			return Promise.all([
   				clusterpostService.getAttachment(job._id, "efit.json", "json"),
@@ -783,11 +810,24 @@ angular.module('dcbia-jobs')
   				clusterpostService.getAttachment(job._id, template, "text")
 			])  			
   			.then(function(res){
+
+  				if($scope.vtk.actor){
+  					$scope.$broadcast('removeActor', $scope.vtk.actor);
+  				}
+
   				var data = _.compact(_.pluck(res, "data"));
-  				$scope.mfsda.vtkPolyData = dcbiaVTKService.parseVTK(data[2]);
+  				$scope.vtk.vtkascii = data[2];
+  				$scope.vtk.vtkPolyData = dcbiaVTKService.parsePolyData(data[2]);
+  				if(!$scope.vtk.vtkPolyData){
+  					return Promise.reject('Poly data is not loaded');
+  				}
+  				_.extend($scope.vtk, dcbiaVTKService.newActor($scope.vtk.vtkPolyData));
+  				$scope.$broadcast('addActor', $scope.vtk.actor, true);
 
   				if(data.length > 0){  					
-
+  					if(job.version){
+  						$scope.mfsda.version = job.version.split('.');
+  					}
   					$scope.mfsda.efit = data[0];
   					$scope.mfsda.Lpvals_fdr = data[1].Lpvals_fdr;
   					if($scope.mfsda.Lpvals_fdr.length > 0){
@@ -795,16 +835,34 @@ angular.module('dcbia-jobs')
   						$scope.mfsda.pvalueSlider.options.ceil = $scope.mfsda.Lpvals_fdr[0].length - 1;
   					}
 
-  					var size = $scope.mfsda.efit.efitBetas._ArraySize_;
+  					if($scope.mfsda.version && $scope.mfsda.version[0] >= "2" ){  						
 	  				
-	  				$scope.mfsda.covariateSlider.options.ceil = size[0] - 1;
-	  				$scope.mfsda.covariateSlider.options.maxLimit = size[0] - 1;
+		  				$scope.mfsda.covariateSlider.options.ceil = $scope.mfsda.efit.efitBetas.length - 1;
+		  				$scope.mfsda.covariateSlider.options.maxLimit = $scope.mfsda.efit.efitBetas.length - 1;
 
-	  				$scope.mfsda.componentSlider.options.ceil = size[2] - 1;
-	  				$scope.mfsda.componentSlider.options.maxLimit = size[2] - 1;
+		  				if($scope.mfsda.efit.efitBetas.length > 0 && $scope.mfsda.efit.efitBetas[0].length > 0){
+		  					$scope.mfsda.componentSlider.options.ceil = $scope.mfsda.efit.efitBetas[0][0].length - 1;
+		  					$scope.mfsda.componentSlider.options.maxLimit = $scope.mfsda.efit.efitBetas[0][0].length - 1;
+		  				}else{
+		  					$scope.mfsda.componentSlider.options.ceil = 2;
+		  					$scope.mfsda.componentSlider.options.maxLimit = 2;
+		  				}
+  					}else{
+  						var size = $scope.mfsda.efit.efitBetas._ArraySize_;
+	  				
+		  				$scope.mfsda.covariateSlider.options.ceil = size[0] - 1;
+		  				$scope.mfsda.covariateSlider.options.maxLimit = size[0] - 1;
+
+		  				$scope.mfsda.componentSlider.options.ceil = size[2] - 1;
+		  				$scope.mfsda.componentSlider.options.maxLimit = size[2] - 1;
+  					}
+  					
 
 					var colors = $scope.mfsda.getEfitBetas();
-					$scope.mfsda.vtkPolyData.addPointDataArray(new Float32Array(colors), "pointScalars", "Float32Array");
+					dcbiaVTKService.addPointDataArray($scope.vtk.vtkPolyData, colors);
+					$scope.vtk.updateActor();
+
+					$scope.$broadcast('resetCamera');
 					
   				}
   				$scope.$apply();
@@ -816,18 +874,30 @@ angular.module('dcbia-jobs')
   			var efitBetas = [];
 
   			if($scope.mfsda.efit && $scope.mfsda.efit.efitBetas){
-  				var arraydata = $scope.mfsda.efit.efitBetas._ArrayData_;
-  				var size = $scope.mfsda.efit.efitBetas._ArraySize_;	  				
-						
-				var start = $scope.mfsda.componentSlider.value * size[1] * size[0] + $scope.mfsda.covariateSlider.value;
-				var end = start + size[1] * size[0];				
-				
-				var max = 0;
-				
-				for(var i = start; i < end && i < arraydata.length; i+=size[0]){					
-					efitBetas.push(arraydata[i]);
-				}	
-  			}
+	  			if($scope.mfsda.version && $scope.mfsda.version[0] >= "2" ){
+	  				if($scope.mfsda.covariateSlider.value < $scope.mfsda.efit.efitBetas.length){
+	  					for(var i = 0; i < $scope.mfsda.efit.efitBetas[$scope.mfsda.covariateSlider.value].length; i++){
+	  						if($scope.mfsda.componentSlider.value < $scope.mfsda.efit.efitBetas[$scope.mfsda.covariateSlider.value][i].length){
+	  							efitBetas.push($scope.mfsda.efit.efitBetas[$scope.mfsda.covariateSlider.value][i][$scope.mfsda.componentSlider.value]);
+	  						}else{
+	  							console.error("WARNING! different size in efitBetas resul, index=", $scope.mfsda.covariateSlider.value, i, $scope.mfsda.componentSlider.value);
+	  						}
+						}
+	  				}					
+	  			}else{
+	  				var arraydata = $scope.mfsda.efit.efitBetas._ArrayData_;
+	  				var size = $scope.mfsda.efit.efitBetas._ArraySize_;	  				
+							
+					var start = $scope.mfsda.componentSlider.value * size[1] * size[0] + $scope.mfsda.covariateSlider.value;
+					var end = start + size[1] * size[0];				
+					
+					var max = 0;
+					
+					for(var i = start; i < end && i < arraydata.length; i+=size[0]){					
+						efitBetas.push(arraydata[i]);
+					}	
+	  			}
+	  		}
 
   			return efitBetas;
   			
@@ -854,6 +924,85 @@ angular.module('dcbia-jobs')
 			]	
 		}
 
+		$scope.vtk.updateActor = function(hue){
+  			
+  			hue = hue? hue: $scope.mfsda.hueSlider;
+
+  			if($scope.vtk.mapper){
+	      		var lut = $scope.vtk.mapper.getLookupTable();
+		        lut.setHueRange(hue.min, hue.max);
+		        $scope.vtk.mapper.update();
+		        $scope.$broadcast('renderWindow');
+	      	}
+  		}
+
+  		$scope.vtk.download = function(){
+
+  			if($scope.mfsda.job){
+  				var job = {};
+	  			job.executable = "generateShapes.sh";
+	  			job.version = "1.0.0";
+	  			job.parameters = [
+	  				{
+	  					flag: "--shape",
+	  					name: "shape.vtk"
+	  				},
+	  				{
+	  					flag: "--pvalues",
+	  					name: "pvalues.json",
+	  				},
+	  				{
+	  					flag: "--efit",
+	  					name: "efit.json"
+	  				},
+	  				{
+	  					flag: "--output",
+	  					name: "output.vtk"
+	  				}
+	  			];
+
+	  			job.type = "job";
+	  			job.inputs = [{
+	  				name: "pvalues.json",
+	  				local: {
+	  					uri: $scope.mfsda.job._id + "/pvalues.json"
+	  				}
+	  			},
+	  			{
+	  				name: "efit.json",
+	  				local: {
+	  					uri: $scope.mfsda.job._id + "/efit.json"
+	  				}
+	  			},
+	  			{
+	  				name: "shape.vtk"
+	  			}];
+
+	  			job.executionserver = "localhost";
+	  			job.outputs = [{
+	  				name: "output",
+	  				type: "tar.gz",  				
+	  			},
+	  			{
+	  				name: "stdout.out",
+	  				type: "file"
+	  			},
+	  			{
+	  				name: "stderr.err",
+	  				type: "file"
+	  			}];
+	  			job.userEmail = $scope.user.email;
+	  			job.jobparameters = [];
+
+	  			return clusterpostService.createAndSubmitJob(job, ["shape.vtk"], [$scope.vtk.vtkascii])
+	  			.then(function(res){
+	  				console.log(res);
+	  				$scope.mfsda.taskSubmitted = true;  				
+	  			})
+  			}
+  			
+  		}
+
   		$scope.mfsda.selectOutput.update = function(){
   			var colors = [];
   			if($scope.mfsda.selectOutput.option){
@@ -862,28 +1011,32 @@ angular.module('dcbia-jobs')
 	  			}else if($scope.mfsda.selectOutput.option.name === "pValues"){
 	  				colors = $scope.mfsda.getPvalues();
 	  			}
-	  			$scope.mfsda.vtkPolyData.addPointDataArray(new Float32Array(colors), "pointScalars", "Float32Array");
+	  			dcbiaVTKService.addPointDataArray($scope.vtk.vtkPolyData, colors);
+	  			$scope.vtk.updateActor();
   			}
   		}
 
   		$scope.$watch('mfsda.covariateSlider.value', function(covariate){
-  			if(covariate !== undefined && $scope.mfsda.vtkPolyData){
+  			if(covariate !== undefined && $scope.vtk.vtkPolyData){
   				var colors = $scope.mfsda.getEfitBetas();
-  				$scope.mfsda.vtkPolyData.addPointDataArray(new Float32Array(colors), "pointScalars", "Float32Array");
+  				dcbiaVTKService.addPointDataArray($scope.vtk.vtkPolyData, colors);
+  				$scope.vtk.updateActor();
   			}
   		})
 
   		$scope.$watch('mfsda.componentSlider.value', function(component){
-  			if(component !== undefined && $scope.mfsda.vtkPolyData){
+  			if(component !== undefined && $scope.vtk.vtkPolyData){
   				var colors = $scope.mfsda.getEfitBetas();
-  				$scope.mfsda.vtkPolyData.addPointDataArray(new Float32Array(colors), "pointScalars", "Float32Array");
+  				dcbiaVTKService.addPointDataArray($scope.vtk.vtkPolyData, colors);
+  				$scope.vtk.updateActor();
   			}
   		})
 
   		$scope.$watch('mfsda.pvalueSlider.value', function(pValue){
-  			if(pValue !== undefined && $scope.mfsda.vtkPolyData){
+  			if(pValue !== undefined && $scope.vtk.vtkPolyData){
   				var colors = $scope.mfsda.getPvalues();
-  				$scope.mfsda.vtkPolyData.addPointDataArray(new Float32Array(colors), "pointScalars", "Float32Array");
+  				dcbiaVTKService.addPointDataArray($scope.vtk.vtkPolyData, colors);
+  				$scope.vtk.updateActor();
   			}
   		})
 
@@ -895,7 +1048,11 @@ angular.module('dcbia-jobs')
 	                
 		        reader.onload = function(e) {
 		          var vtk = e.target.result;
-		          $scope.mfsda.vtkPolyData = dcbiaVTKService.parseVTK(vtk);
+		          $scope.$broadcast('removeActor', $scope.vtk.actor);
+		          $scope.vtk.vtkascii = vtk;
+		          $scope.vtk.vtkPolyData = dcbiaVTKService.parsePolyData(vtk);
+		          _.extend($scope.vtk, dcbiaVTKService.newActor($scope.vtk.vtkPolyData));
+		          $scope.$broadcast('addActor', $scope.vtk.actor, true);
 		          $scope.mfsda.selectOutput.update();
 		        }
 
@@ -904,65 +1061,71 @@ angular.module('dcbia-jobs')
 		        }
 		        reader.readAsText(fileTemplate);
   			}
-  		})
+  		});
 
-		$scope.csv.export = function(project){
-			var prom;
-			if(!$scope.projects.selectedProject || project._id !== $scope.projects.selectedProject._id){
-				prom = $scope.projects.select(project);
-			}else{
-				prom = Promise.resolve(true);
-			}
+  		$scope.$watch('mfsda.hueSlider', function(hue){
+	      if(hue){
+	      	$scope.vtk.updateActor(hue);
+	      }
+	    }, true)
 
-			prom
-			.then(function(){
-				var keys = $scope.projects.getProjectKeys([$scope.projects.selectedProject]);
-				var csv = 'name:,' + $scope.projects.selectedProject.name + '\n'
-				csv += 'description:,' + $scope.projects.selectedProject.description + '\n'
-				csv += 'patients:,' + $scope.projects.selectedProject.patients + '\n'
-				// if(keys.indexOf("scope") !== -1){
-				// 	csv += 'scope:,' + $scope.projects.selectedProject.scope + '\n'
-				// }
-				csv += '\n';
-				var collectionKeys = ['Name','Number of items','Type']
-				csv += collectionKeys.toString();
-				csv += '\n';
-				_.each($scope.projects.selectedProject.collections, function(collection, i){
-					_.each($scope.clinicalDataCollection.collections, function(clinicalCollection){
-						if(collection._id === clinicalCollection._id){
-							csv += clinicalCollection.name + ',' + clinicalCollection.items.length + ',' + clinicalCollection.type + '\n';
-						}
-					})
-					_.each($scope.morphologicalDataCollection.collections, function(morphologicalDataCollection){
-						if(collection._id === morphologicalDataCollection._id){
-							csv += morphologicalDataCollection.name + ',' + morphologicalDataCollection.items.length + ',' + morphologicalDataCollection.type + '\n';
-						}
-					})
-				})
+		// $scope.csv.export = function(project){
+		// 	var prom;
+		// 	if(!$scope.projects.selectedProject || project._id !== $scope.projects.selectedProject._id){
+		// 		prom = $scope.projects.select(project);
+		// 	}else{
+		// 		prom = Promise.resolve(true);
+		// 	}
 
-				var filename = $scope.projects.selectedProject.name;
-				if($scope.projects.selectedProject.name.indexOf('csv') === -1){
-					filename += '.csv';
-				}
+		// 	prom
+		// 	.then(function(){
+		// 		var keys = $scope.projects.getProjectKeys([$scope.projects.selectedProject]);
+		// 		var csv = 'name:,' + $scope.projects.selectedProject.name + '\n'
+		// 		csv += 'description:,' + $scope.projects.selectedProject.description + '\n'
+		// 		csv += 'patients:,' + $scope.projects.selectedProject.patients + '\n'
+		// 		// if(keys.indexOf("scope") !== -1){
+		// 		// 	csv += 'scope:,' + $scope.projects.selectedProject.scope + '\n'
+		// 		// }
+		// 		csv += '\n';
+		// 		var collectionKeys = ['Name','Number of items','Type']
+		// 		csv += collectionKeys.toString();
+		// 		csv += '\n';
+		// 		_.each($scope.projects.selectedProject.collections, function(collection, i){
+		// 			_.each($scope.clinicalDataCollection.collections, function(clinicalCollection){
+		// 				if(collection._id === clinicalCollection._id){
+		// 					csv += clinicalCollection.name + ',' + clinicalCollection.items.length + ',' + clinicalCollection.type + '\n';
+		// 				}
+		// 			})
+		// 			_.each($scope.morphologicalDataCollection.collections, function(morphologicalDataCollection){
+		// 				if(collection._id === morphologicalDataCollection._id){
+		// 					csv += morphologicalDataCollection.name + ',' + morphologicalDataCollection.items.length + ',' + morphologicalDataCollection.type + '\n';
+		// 				}
+		// 			})
+		// 		})
 
-				return $scope.csv.download(filename, csv);
-			})
-			.catch(console.error);
+		// 		var filename = $scope.projects.selectedProject.name;
+		// 		if($scope.projects.selectedProject.name.indexOf('csv') === -1){
+		// 			filename += '.csv';
+		// 		}
+
+		// 		return $scope.csv.download(filename, csv);
+		// 	})
+		// 	.catch(console.error);
 			
-		}
+		// }
 
-		$scope.csv.download = function(filename, csv){
+		// $scope.csv.download = function(filename, csv){
 
-			var pom = document.createElement('a');
-			var bb = new Blob([csv], {type: 'text/plain'});
+		// 	var pom = document.createElement('a');
+		// 	var bb = new Blob([csv], {type: 'text/plain'});
 
-			pom.setAttribute('href', window.URL.createObjectURL(bb));
-			pom.setAttribute('download', filename);
+		// 	pom.setAttribute('href', window.URL.createObjectURL(bb));
+		// 	pom.setAttribute('download', filename);
 
-			pom.dataset.downloadurl = ['text/plain', pom.download, pom.href].join(':');
-			pom.click();
+		// 	pom.dataset.downloadurl = ['text/plain', pom.download, pom.href].join(':');
+		// 	pom.click();
 			
-		}
+		// }
 
 		$scope.clinical = {
 			data: []

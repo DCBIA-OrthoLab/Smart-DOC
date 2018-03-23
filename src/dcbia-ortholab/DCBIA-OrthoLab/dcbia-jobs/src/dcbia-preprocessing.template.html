@@ -1,0 +1,222 @@
+<uib-tabset active="activeTab">
+	<uib-tab heading="Select task" index="0">
+		<div ng-if="projects.section == 0">
+			<div class="panel panel-default">
+		  		<div class="panel-body">  			
+					<div class="col-sm-6 col-md-4" ng-repeat="project in projects.projects">
+						<div ng-class="projects.projectsProperties[project._id].class">
+						    <div class="thumbnail">
+						      <div class="caption">
+						        <h3>{{project.name}}</h3>
+						        <p>
+						        	<b>Number of items: </b> {{projects.getProjectItems(project)}}
+						        </p>
+					        	<div class="btn-group">
+								 <button type="button" class="btn btn-default" ng-click="projects.showSection = 1;projects.select(project)">
+								 	<span class="glyphicon glyphicon-eye-open"></span>
+								 </button>
+								</div>
+						      </div>
+						    </div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="panel panel-default" style="overflow:scroll" ng-if="projects.showSection == 1">
+				<div class="panel-heading">
+			    	Saved subsets
+			  	</div>
+			  	<div class="panel-body">
+			  		<table st-table="projects.displayedAnalyses" st-safe-src="projects.selectedProject.analyses" class="table table-striped">
+			            <thead>
+			                <tr>
+			                    <th colspan="2">
+			                        <input st-search="" placeholder="search by name" class="input-sm form-control" type="search"/>
+			                    </th>	                    
+			                </tr>
+			            </thead>
+			            <tbody>
+			                <tr ng-repeat="(index, analysis) in projects.displayedAnalyses">
+			                    <td>
+			                        {{analysis.name}}
+			                    </td>
+			                    <td>
+			                        <button type="button" class="btn btn-info" ng-click="projects.showSubset(index)" >
+			                			<span class="glyphicon glyphicon-eye-open"></span>
+			             			</button>
+			                    </td>                        
+			                </tr>
+			            </tbody>
+			        </table>
+			  	</div>
+			</div>
+			<div class="panel panel-default" style="overflow:scroll" ng-if="projects.showSection == 1">
+				<div class="input-group">
+			  		<span class="input-group-addon">Number of axis to run PCA</span>
+			  		<input type="text" class="form-control" placeholder="Number of components" aria-describedby="basic-addon3" ng-model="preprocessing.num_components">
+		  		</div>
+		  		<div class="input-group">
+		  			<span class="input-group-addon">Choose OA patients or Control patients</span>
+	                <!-- <input type="checkbox" aria-label="OA" checklist-model="OA" checklist-value="row"> -->
+	                	<span class="input-group-addon">OA</span>
+	                	<input type="checkbox" class="form-control" ng-model="preprocessing.type_OA" placeholder="OA" ng-change="preprocessing.getFilteredDataSet()">
+	                	<span class="input-group-addon">Control</span>
+ 						<input type="checkbox" class="form-control" ng-model="preprocessing.type_Control" placeholder="Control" ng-change="preprocessing.getFilteredDataSet()">
+ 						<!-- <span class="input-group-addon">{{$scope.preprocessing.numCovariates}}}</span> -->
+	            </div>
+				<div class="panel-body">
+					<div class="input-group">
+			  			<span class="input-group-addon">Name</span>
+			  			<input type="text" class="form-control" placeholder="Subset name" aria-describedby="basic-addon3" ng-model="projects.analysis.name">
+		  			</div>
+		  			<div ng-if="preprocessing.OA">  				    
+						<table st-table="projects.analysis.selectedProjectDataDisplayed" st-safe-src="projects.analysis.selectedProjectDataOA" class="table table-striped">
+							<thead>
+								<tr>
+									<th colspan="2" ng-repeat="key in projects.analysis.selectedProjectDataKeys" st-sort="{{key}}">{{key}}</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr ng-repeat="row in projects.analysis.selectedProjectDataDisplayed">
+									<td colspan="2" ng-repeat="key in projects.analysis.selectedProjectDataKeys">
+										<div ng-if="!_.isArray(row[key]) && key != '_attachments' && key != 'attachments'">
+											{{row[key]}}
+										</div>
+										<div ng-if="_.isArray(row[key]) && key != '_attachments' && key != 'attachments'">
+											<ul>
+												<li ng-repeat="item in row[key]" ng-if="key == 'owners'">{{item.user}}</li>
+											</ul>
+										</div>
+									</td>						
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<div ng-if="preprocessing.Control">  				    
+						<table st-table="projects.analysis.selectedProjectDataDisplayed" st-safe-src="projects.analysis.selectedProjectDataControl" class="table table-striped">
+							<thead>
+								<tr>
+									<th colspan="2" ng-repeat="key in projects.analysis.selectedProjectDataKeys" st-sort="{{key}}">{{key}}</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr ng-repeat="row in projects.analysis.selectedProjectDataDisplayed">
+									<td colspan="2" ng-repeat="key in projects.analysis.selectedProjectDataKeys">
+										<div ng-if="!_.isArray(row[key]) && key != '_attachments' && key != 'attachments'">
+											{{row[key]}}
+										</div>
+										<div ng-if="_.isArray(row[key]) && key != '_attachments' && key != 'attachments'">
+											<ul>
+												<li ng-repeat="item in row[key]" ng-if="key == 'owners'">{{item.user}}</li>
+											</ul>
+										</div>
+									</td>						
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<div ng-if="preprocessing.Neutral">  				    
+						<table st-table="projects.analysis.selectedProjectDataDisplayed" st-safe-src="projects.analysis.selectedProjectDataNeutral" class="table table-striped">
+							<thead>
+								<tr>
+									<th colspan="2" ng-repeat="key in projects.analysis.selectedProjectDataKeys" st-sort="{{key}}">{{key}}</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr ng-repeat="row in projects.analysis.selectedProjectDataDisplayed">
+									<td colspan="2" ng-repeat="key in projects.analysis.selectedProjectDataKeys">
+										<div ng-if="!_.isArray(row[key]) && key != '_attachments' && key != 'attachments'">
+											{{row[key]}}
+										</div>
+										<div ng-if="_.isArray(row[key]) && key != '_attachments' && key != 'attachments'">
+											<ul>
+												<li ng-repeat="item in row[key]" ng-if="key == 'owners'">{{item.user}}</li>
+											</ul>
+										</div>
+									</td>						
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<div class="alert alert-warning" role="alert" ng-if="preprocessing.showWarningNumComponent">
+						Number of components wrong ! You have to choose between 1 and {{preprocessing.length}} <br>
+				    </div>
+				    <div class="alert alert-warning" role="alert" ng-if="preprocessing.showWarningPatienttype">
+						You have to choose Control patients or OA patients or both<br>
+				    </div>
+					<br>
+					<div class="row">
+					  <div class="col-md-6">
+					    <div class="input-group">
+							<span class="input-group-addon" id="basic-addon1">Task name</span>
+							<input type="text" class="form-control" placeholder="preprocessing task name" aria-describedby="basic-addon3" ng-model="preprocessing.name">
+					    </div>
+					  </div>
+					  <div class="col-md-6">
+					    <div class="input-group">
+					    	<span class="input-group-addon" id="basic-addon1">Execution server</span>
+					    	<select class="form-control"  ng-model="clusterpost.selectedServer" ng-options="server.name for server in clusterpost.servers"></select>
+					    </div>
+					  </div>
+					</div>
+					<br>
+					<div class="row">
+						<div class="col-md-12">
+							<div class="input-group">
+								<span class="input-group-btn">
+									<button class="btn btn-default" type="button" ng-click="preprocessing.editJobParameters=!preprocessing.editJobParameters"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span></button>
+								</span>				
+								<input type="text" class="form-control" placeholder="Additional job parameters" aria-describedby="basic-addon3" ng-model="preprocessing.jobParameters" ng-readonly="preprocessing.editJobParameters">
+				  			</div>
+				  		</div>
+			  		</div>
+			  		<br>
+			  		<div class="row">
+			  			<div class="col-md-12">
+				  			<span class="input-group-btn">
+								<button type="button" class="btn btn-success" ng-click="preprocessing.submitJob()">
+									<span class="glyphicon glyphicon-ok"></span>
+								</button>
+				  			</span>
+				  		</div>
+			  		</div>
+				</div>
+			</div>
+		</div>
+	</uib-tab>
+	<uib-tab heading="Active tasks" index="1">
+		<div class="panel panel-default">	
+			<div class="panel-body"> 			
+				<clusterpost-jobs executable="'preprocessing.sh'" job-callback="preprocessing.jobCallback" download-callback="preprocessing.download"></clusterpost-jobs>
+			</div>
+		</div>
+	</uib-tab>
+	<uib-tab heading="Results" index="2">
+		<div class="panel panel-default">
+			<div class="row">
+				<div class="column">
+					<h3>Modify Colors Bar</h3>
+					<div ng-repeat="color in heat_map.attributes.colors track by $index">
+						<input type="color" class="form-control" placeholder="Color" aria-describedby="basic-addon3" ng-model="heat_map.attributes.colors[$index]">
+					</div>
+					<button ng-click="heat_map.attributes.colors.push('#ffffff')">+ Add Color</button>
+					<button ng-click = "heat_map.attributes.colors.pop()">- Remove one element</button>
+				</div>
+				<div class="column">
+					<h3>Modify Scale</h3>
+					<div ng-repeat="scale in heat_map.attributes.scale track by $index">
+						<input type="Number" class="form-control" placeholder="Level" aria-describedby="basic-addon3" ng-model="heat_map.attributes.scale[$index]">
+					</div>
+					<button ng-click="heat_map.attributes.scale.push('1.0')">+ Add value to the scale</button>
+					<button ng-click = "heat_map.attributes.scale.pop()">- Remove one element</button>
+				</div>
+			</div>	
+			<div class="panel-body" id="div1">
+				<preprocessing-plot-chart data="heat_map.pvalues"></preprocessing-plot-chart>
+			</div>
+			<div class="panel-body" id="div2">
+				<preprocessing-plot-chart data="heat_map.pearsoncorr"></preprocessing-plot-chart>
+			</div>
+		</div>
+	</uib-tab>
+</uit-tabset>

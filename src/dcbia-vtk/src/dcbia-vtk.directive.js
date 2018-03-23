@@ -1,138 +1,36 @@
-import vtkFullScreenRenderWindow from 'vtk.js/Sources/Rendering/Misc/FullScreenRenderWindow';
-import vtk                       from 'vtk.js/Sources/vtk';
-import vtkActor                  from 'vtk.js/Sources/Rendering/Core/Actor';
-import vtkMapper                 from 'vtk.js/Sources/Rendering/Core/Mapper';
-import vtkOBJReader              from 'vtk.js/Sources/IO/Misc/OBJReader';
-
-
-global.vtk = vtk;
-global.vtkOBJReader = vtkOBJReader;
-
-global.readPolyData = function(url){
-  const reader = vtkOBJReader.newInstance({ splitMode: 'usemtl' });
-  reader.setUrl(url);
-  return reader;
-}
-
 angular.module('dcbia-vtk-module')
 .directive('dcbiaVtk', function($routeParams, $timeout, dcbiaVTKService) {
 
   function link($scope, $elem){
 
-    $scope.initializeRenderWindow = function(){      
-        
+    if($scope.vtk === undefined){
       $scope.vtk = {};
+    }
 
-      var rootContainer = $elem[0];        
-      var container = _.find(rootContainer.getElementsByClassName('vtkViewPort'), function(node){
+    $scope.initializeRenderWindow = function(){      
+
+      $scope.vtk.rootContainer = $elem[0];        
+      $scope.vtk.container = _.find($scope.vtk.rootContainer.getElementsByClassName('vtkViewPort'), function(node){
         return node.id == "vtk-vp";
       });
 
-      // ----------------------------------------------------------------------------
-      // Standard rendering code setup
-      // ----------------------------------------------------------------------------
-      const fullScreenRenderer = vtkFullScreenRenderWindow.newInstance({ background: [255, 255, 255], rootContainer: rootContainer, container: container });
-      const renderer = fullScreenRenderer.getRenderer();
-      const renderWindow = fullScreenRenderer.getRenderWindow();
-      
-      // -----------------------------------------------------------
-      // Make some variables global so that you can inspect and
-      // modify objects in your browser's developer console:
-      // -----------------------------------------------------------
-      
-      $scope.vtk.renderer = renderer;
-      $scope.vtk.renderWindow = renderWindow;
-      $scope.vtk.rootContainer = rootContainer;
-      $scope.vtk.container = container;            
+      _.extend($scope.vtk, dcbiaVTKService.initializeRenderWindow($scope.vtk.rootContainer, $scope.vtk.container));
+                  
     }
 
-    $scope.loadPolyData = function(vtkpolydata){
-      // const polydata = vtk({
-      //   vtkClass: 'vtkPolyData',
-      //   points: {
-      //     vtkClass: 'vtkPoints',
-      //     dataType: 'Float32Array',
-      //     numberOfComponents: 3,
-      //     values: [
-      //       0, 0, 0,
-      //       1, 0, 0.25,
-      //       1, 1, 0,
-      //       0, 1, 0.25,
-      //     ],
-      //   },
-      //   polys: {
-      //     vtkClass: 'vtkCellArray',
-      //     dataType: 'Uint16Array',
-      //     values: [
-      //       3, 0, 1, 2,
-      //       3, 0, 2, 3,
-      //     ],
-      //   },
-      //   pointData: {
-      //     vtkClass: 'vtkDataSetAttributes',
-      //     activeScalars: 0,
-      //     arrays: [{
-      //       data: {
-      //         vtkClass: 'vtkDataArray',
-      //         name: 'pointScalars',
-      //         dataType: 'Float32Array',
-      //         values: [0, 1, 0, 1],
-      //       },
-      //     }],
-      //   },
-      //   cellData: {
-      //     vtkClass: 'vtkDataSetAttributes',
-      //     activeScalars: 0,
-      //     arrays: [{
-      //       data: {
-      //         vtkClass: 'vtkDataArray',
-      //         name: 'cellScalars',
-      //         dataType: 'Float32Array',
-      //         values: [0, 1],
-      //       },
-      //     }],
-      //   },
-      // });
-
-      const polydata = vtk(vtkpolydata)
-
-      // const mapper = vtkMapper.newInstance({ interpolateScalarsBeforeMapping: true });
-      const mapper = vtkMapper.newInstance();
-      mapper.setInputData(polydata);
-      const lut = mapper.getLookupTable();
-      if($scope.hueRange && $scope.hueRange.max !== undefined && $scope.hueRange.min !== undefined){
-        lut.setHueRange($scope.hueRange.min, $scope.hueRange.max);
-      }else{
-        lut.setHueRange(0, 0.5);
+    $scope.addActor = function(actor){
+      if($scope.vtk.renderer && $scope.vtk.renderWindow){
+        $scope.vtk.renderer.addActor(actor);
+        $scope.vtk.renderWindow.render();
       }
-      
-      const actor = vtkActor.newInstance();
-      actor.setMapper(mapper);
-
-      $scope.vtk.mapper = mapper;
-      $scope.vtk.lut = lut;
-      $scope.vtk.actor = actor;
-      $scope.vtk.renderer.addActor($scope.vtk.actor);
-      $scope.vtk.renderer.resetCamera();
-      $scope.vtk.renderWindow.render();
-      
     }
 
-
-    $scope.$watch('vtkUrl', function(){
-      if($scope.vtkUrl){
-        //$scope.loadPolyData();        
+    $scope.removeActor = function(actor){
+      if($scope.vtk.renderer && $scope.vtk.renderWindow){
+        $scope.vtk.renderer.removeActor(actor);
+        $scope.vtk.renderWindow.render();
       }
-    });
-
-    $scope.$watch('vtkPolyData', function(){
-      if($scope.vtkPolyData){
-        if($scope.vtk.actor){
-          $scope.vtk.renderer.removeActor($scope.vtk.actor);
-        }
-        $scope.loadPolyData($scope.vtkPolyData);
-      }
-    }, true);
+    }
 
     $scope.initializeRenderWindow();
 
@@ -153,24 +51,45 @@ angular.module('dcbia-vtk-module')
       true //deep watch
     );
 
-    $scope.$watch('hueRange', function(hueRange){
-      if(hueRange && $scope.vtk.lut){
-        $scope.vtk.lut.setHueRange(hueRange.min, hueRange.max);
-        $scope.vtk.mapper.update();
+    $scope.$on('addActor', function(event, actor, resetCamera){
+      //obj = {
+      //   actor: vtkActor,
+      //   mapper: vtkMapper
+      // }
+      $scope.addActor(actor);
+      if(resetCamera && $scope.vtk.renderer){
+        $scope.vtk.renderer.resetCamera();
+      }
+    });
+
+    $scope.$on('removeActor', function(event, actor){
+      //obj = {
+      //   actor: vtkActor,
+      //   mapper: vtkMapper
+      // }
+      $scope.removeActor(actor);
+    });
+
+    $scope.$on('renderWindow', function(){
+      if($scope.vtk.renderWindow){
         $scope.vtk.renderWindow.render();
       }
-    }, true)
+    });
+
+    $scope.$on('resetCamera', function(){
+      if($scope.vtk.renderer){
+        $scope.vtk.renderer.resetCamera();
+      }
+    })
+
+    
     
   }
 
   return {
     restrict : 'E',
       link : link,
-      scope: {
-        vtkUrl: "=",
-        vtkPolyData: "=",
-        hueRange: "="
-      },
+      scope: {},
       templateUrl: './src/dcbia-vtk.template.html'
   }
 

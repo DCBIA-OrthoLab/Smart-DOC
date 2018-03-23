@@ -21,8 +21,8 @@ module.exports = function(grunt) {
         assets:{
             appJS: [
             './src/dcbia-vtk.module.js',
-            './src/dcbia-vtk.service.js',
-            './dist/dcbia-vtk.directive.js',
+            './dist/dcbia-vtk.service.js',
+            './src/dcbia-vtk.directive.js',
             './dist/dcbia-vtk.templates.js'
             ]
         },

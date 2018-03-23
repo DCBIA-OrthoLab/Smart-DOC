@@ -39,9 +39,6 @@ config(['$routeProvider', function($routeProvider) {
   .when('/projects', {
     templateUrl: './home/dcbia-projects.template.html'
   })
-  .when('/jobs', {
-    templateUrl: './home/dcbia-jobs.template.html'
-  })  
   .when('/login/reset', {
     templateUrl: 'home/login.html'
   })

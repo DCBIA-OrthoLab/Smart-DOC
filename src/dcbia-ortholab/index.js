@@ -8,6 +8,14 @@ exports.register = function (server, options, next) {
 			reply.redirect('/DCBIA-OrthoLab/public');
 		}
 	});
+
+	server.route({
+		path: '/DCBIA-OrthoLab',
+		method: '*',
+		handler: function (request, reply) {
+			reply.redirect('/DCBIA-OrthoLab/public');
+		}
+	});
 	
 	server.route({
 		path: '/DCBIA-OrthoLab/public/{path*}',
