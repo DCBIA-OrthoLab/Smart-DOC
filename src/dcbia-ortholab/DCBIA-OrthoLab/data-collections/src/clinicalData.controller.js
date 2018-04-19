@@ -360,30 +360,27 @@ angular.module('data-collections')
 
 		    var lines = csv.split("\n");
 		    var result = [];
-		    var headers = _.map(lines[0].split(","), function(val){
-		      try{
-		        return eval(val);
-		      }catch(e){
-		      	if(_.isString(val)){
-		      		return $scope.csv.camelize(val);
-		      	}
-		      	return val;
-		      }
-		    });
-		    for(var i=1;i<lines.length;i++){
-		      var obj = {};
-		      var currentline= _.map(lines[i].split(","), function(val){
-		        try{
-		          return eval(val);
-		        }catch(e){
-		          return val;
-		        }
-		      });
-		      for(var j=0;j<headers.length;j++){
-		        obj[headers[j]] = currentline[j];
-		      }
-		      result.push(obj);
+		    if(lines.length > 0){
+		    	var headers = _.map(lines[0].split(","), function(val){
+			      try{
+			        return eval(val);
+			      }catch(e){
+			      	if(_.isString(val)){
+			      		return $scope.csv.camelize(val);
+			      	}
+			      	return val;
+			      }
+			    });
+			    for(var i=1;i<lines.length;i++){
+			      var obj = {};
+			      var currentline = lines[i].split(",");
+			      for(var j=0;j<headers.length;j++){
+			        obj[headers[j]] = currentline[j];
+			      }
+			      result.push(obj);
+			    }
 		    }
+		    
 		    return result;
 		}
 
