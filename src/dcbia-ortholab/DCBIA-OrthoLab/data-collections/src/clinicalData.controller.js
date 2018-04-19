@@ -78,7 +78,7 @@ angular.module('data-collections')
 				delete collectionDataKeys._rev;
 			}
 
-			if(!collectionDataKeys.scope.isArray)
+			if(collectionDataKeys.scope && !collectionDataKeys.scope.isArray)
 			{
 				delete collectionDataKeys.scope;
 			}
