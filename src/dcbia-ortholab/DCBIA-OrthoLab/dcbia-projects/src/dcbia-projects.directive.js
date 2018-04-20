@@ -650,9 +650,9 @@ angular.module('dcbia-projects')
 							if(Array.isArray(row[key])){					
 								_.each(row[key], function(item,k){
 									if(k === 0){
-										value = key[k];
+										value = parseFloat(key[k]);
 									}else{
-										value += key[k];
+										value += parseFloat(key[k]);
 									}
 								});
 							}else{
@@ -767,7 +767,7 @@ angular.module('dcbia-projects')
 			.then(function(res) {
 				$scope.clinical.data = [];
 				_.each(res,function(collection){
-					$scope.clinical.data = $scope.projects.mergeCollections($scope.clinical.data,collection.data);
+					$scope.clinical.data = $scope.projects.mergeCollections(parseFloat($scope.clinical.data),collection.data);
 				})
 				return $scope.clinical.data;
 			});
@@ -790,7 +790,7 @@ angular.module('dcbia-projects')
 				    // 	delete d._attachments;
 				    // 	return d;
 				    // });
-					$scope.morphological.data = $scope.projects.mergeCollections($scope.morphological.data,collection.data);
+					$scope.morphological.data = $scope.projects.mergeCollections(parseFloat($scope.morphological.data),collection.data);
 				})
 				return $scope.morphological.data;
 			});
