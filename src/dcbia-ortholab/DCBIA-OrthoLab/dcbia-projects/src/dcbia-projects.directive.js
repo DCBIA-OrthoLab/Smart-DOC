@@ -2,6 +2,7 @@ angular.module('dcbia-projects')
 .directive('projects', function($q, $routeParams, dcbia, clusterauth) {
 
 	function link($scope,$element, $filter){
+
 		clusterauth.getUser()
 		.then(function(res){
 			$scope.user = res;
