@@ -630,15 +630,14 @@ angular.module('dcbia-jobs')
   					_.each(covariateName, function(covkey){
 	  					if(!cov[covkey]){
 	  						cov[covkey] = 0;
-	  						console.log("dans undefined", typeof(cov[covkey]));
+	  						console.log("Changing value:", covkey);
 	  					}
 	  					else if(!(_.isObject(cov[covkey]))){
-	  						// console.log("val", typeof(cov[covkey]));
-	  						cov[covkey] = parseFloat(cov[covkey]);
-	  						console.log("val", cov[covkey]);
-	  					}
-	  					else{
-	  						console.log("val", typeof(cov[covkey]));
+	  						try{
+	  							cov[covkey] = parseFloat(cov[covkey]);
+	  						}catch(e){
+	  							console.error(covkey, cov[covkey]);
+	  						}
 	  					}
 	  				});
 	  				return cov;

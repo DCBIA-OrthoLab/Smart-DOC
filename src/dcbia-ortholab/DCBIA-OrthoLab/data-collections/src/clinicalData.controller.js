@@ -222,6 +222,7 @@ angular.module('data-collections')
 
 		$scope.clinical.createClinicalData = function(clinical){
 			clinical.type = "clinicalData";
+			//Check if clinical has all fields and add required fields
 			return dcbia.createClinicalData(clinical)
 			.catch(console.error);
 		}
