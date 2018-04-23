@@ -7,7 +7,7 @@ module.exports = function (server, conf) {
 	var clinicaldatapost = Joi.object({
         	type: Joi.string().valid('clinicalData').required(),
         	patientId: Joi.any().required(),
-        	date: Joi.date().required(),
+        	date: Joi.date().optional(),
         	scope: Joi.array().items(Joi.string()).optional()
         }).unknown();
 
