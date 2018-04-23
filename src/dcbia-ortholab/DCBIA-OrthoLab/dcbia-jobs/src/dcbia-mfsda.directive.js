@@ -442,7 +442,7 @@ angular.module('dcbia-jobs')
   				job.name = $scope.mfsda.name;
   			}
   			job.executable = "MFSDAv2.0.0.sh";
-  			job.version = "2.0.0";
+  			// job.version = "2.0.0";
   			job.parameters = [
   				{
   					flag: "--shapeData",
@@ -519,7 +519,7 @@ angular.module('dcbia-jobs')
   					});
   				}
   			})
-
+  			console.log("dataaaa", job);
   			return clusterpostService.createAndSubmitJob(job, _.pluck(mfsda.data, "name"), _.pluck(mfsda.data, "data"))
   			.then(function(res){
   				console.log(res);
@@ -628,8 +628,16 @@ angular.module('dcbia-jobs')
   			covariate = _.compact(_.map(covariate, function(cov){
   				if(!cov.isTemplate){
   					_.each(covariateName, function(covkey){
-	  					if(cov[covkey] === undefined){
+	  					if(!cov[covkey]){
 	  						cov[covkey] = 0;
+	  						console.log("Changing value:", covkey);
+	  					}
+	  					else if(!(_.isObject(cov[covkey]))){
+	  						try{
+	  							cov[covkey] = parseFloat(cov[covkey]);
+	  						}catch(e){
+	  							console.error(covkey, cov[covkey]);
+	  						}
 	  					}
 	  				});
 	  				return cov;

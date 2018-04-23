@@ -222,6 +222,7 @@ angular.module('data-collections')
 
 		$scope.clinical.createClinicalData = function(clinical){
 			clinical.type = "clinicalData";
+			//Check if clinical has all fields and add required fields
 			return dcbia.createClinicalData(clinical)
 			.catch(console.error);
 		}
@@ -373,6 +374,7 @@ angular.module('data-collections')
 			    });
 			    for(var i=1;i<lines.length;i++){
 			      var obj = {};
+
 			      var currentline = lines[i].split(",");
 			      for(var j=0;j<headers.length;j++){
 			        obj[headers[j]] = currentline[j];
