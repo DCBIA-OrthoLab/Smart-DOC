@@ -1,6 +1,6 @@
 {
   "name": "dcbia-jobs",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "Front end to launch jobs on a remote host.",
   "main": "dcbia-jobs.module.js",
   "scripts": {
