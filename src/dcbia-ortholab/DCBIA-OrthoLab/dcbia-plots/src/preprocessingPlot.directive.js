@@ -66,16 +66,16 @@ angular.module('dcbia-plots')
           .data(data.namesx)
           .enter().append("text")
             .text(function(d) { return d; })
-            .attr("x", function(d, i) { return i * gridSize; })
-            .attr("y", 0)
+            .attr("x", 0)
+            .attr("y", function(d, i) { return i * gridSize; })
             .style("text-anchor", "middle")
-            .attr("transform", "translate(" + gridSize / 2 + ", -6)")
+            .attr("transform", "translate(" + gridSize / 2 + ", -" + gridSize / 2 + ")rotate(-90)")
             .attr("class", function(d, i) { return ((i >= 7 && i <= 16) ? "covariatesLabel mono axis axis-covariates" : "covariatesLabel mono axis"); });
       
-      var colorScale = d3.scaleQuantile()
-          .domain(scale)
-          .range(colors);
-
+      var colorScale = d3.scaleLinear()
+        .domain(scale)
+        .range(colors)
+        .interpolate(d3.interpolateRgb);
 
         
       for (i=0; i<data.namesy.length; i++){
@@ -106,24 +106,25 @@ angular.module('dcbia-plots')
                 
           cards.exit().remove();
           div.exit().remove();
-          var legend = svg.selectAll(".legend")
-              .data([0].concat(colorScale.quantiles()), function(d) { return d; });
-          legend.enter().append("g")
-              .attr("class", "legend");
 
-          legend.append("rect")
-            .attr("x", function(d, i) { return legendElementWidth * i; })
-            .attr("y", data.namesy.length * gridSize + 25)
-            .attr("width", legendElementWidth)
-            .attr("height", gridSize / 2)
-            .style("fill", function(d, i) { return colors[i]; });
+          // var legend = svg.selectAll(".legend")
+          //     .data([0].concat(colorScale.domain()), function(d) { return d; });
+          // legend.enter().append("g")
+          //     .attr("class", "legend");
 
-          legend.append("text")
-            .attr("class", "mono")
-            .text(function(d,i) { return "≥ " + scale[i]; })
-            .attr("x", function(d, i) { return legendElementWidth * i; })
-            .attr("y", data.namesy.length * gridSize + 25 + gridSize);
-          legend.exit().remove();
+          // legend.append("rect")
+          //   .attr("x", function(d, i) { return legendElementWidth * i; })
+          //   .attr("y", data.namesy.length * gridSize + 25)
+          //   .attr("width", legendElementWidth)
+          //   .attr("height", gridSize / 2)
+          //   .style("fill", function(d, i) { return colors[i]; });
+
+          // legend.append("text")
+          //   .attr("class", "mono")
+          //   .text(function(d,i) { return "≥ " + scale[i]; })
+          //   .attr("x", function(d, i) { return legendElementWidth * i; })
+          //   .attr("y", data.namesy.length * gridSize + 25 + gridSize);
+          // legend.exit().remove();
 
         }
       }
