@@ -840,8 +840,8 @@ angular.module('dcbia-jobs')
 			pearsoncorr : {},
 			pvalues : {},
 			attributes : {
-            	colors : ["#ff0000", "#ffff00","#008000", "#0000ff"],
-            	scale : [0, 0.01, 0.05, 0.05001,1]
+            	colors : ["#960d0d", "#ffffff", "#0d4296"],
+            	scale : [-1, 0, 1]
 			}
 		};
 
@@ -875,7 +875,7 @@ angular.module('dcbia-jobs')
 	                for (i=0; i<res[1].data.pearsoncorr.length; i++){
 	                  pvalue[i] = [];
 	                  for(j=0; j<res[1].data.covariates.length; j++){
-	                    pvalue[i][j]= res[1].data.pearsoncorr[i][j][1];
+	                    pvalue[i][j]= res[1].data.pearsoncorr[i][j][0];
 	                  }
 	                }
                   heat_map_pearsoncorr = pvalue;
@@ -885,7 +885,7 @@ angular.module('dcbia-jobs')
                   for (i=0; i<res[0].data.pearsoncorr.length; i++){
                     temp[i] = [];
                     for(j=0; j<res[0].data.covariates.length; j++){
-                      temp[i][j]= res[0].data.pearsoncorr[i][j];
+                      temp[i][j]= res[0].data.pearsoncorr[i][j][0];
                     }
                   }
                   heat_map = temp;
