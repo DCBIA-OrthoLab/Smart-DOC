@@ -364,7 +364,7 @@ module.exports = function (server, conf) {
 				var docs = _.pluck(rows, 'doc');
 				var compactdocs = _.compact(docs);
 				if(docs.length !== compactdocs.length){
-					return server.methods.dcbia.getDocument(req.params.id)
+					return server.methods.dcbia.getDocument(collectionId)
 					.then(function(col){
 						col.items = _.compact(_.map(rows, function(row){
 							if(row.doc !== null){
