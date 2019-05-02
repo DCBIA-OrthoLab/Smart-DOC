@@ -535,6 +535,16 @@ angular.module('dcbia-jobs')
   				path: "./output/pearsoncorr.json"
   			},
   			{
+  				name: "percentage.csv",
+  				type: "file",
+  				path: "./output/percentage.csv"
+  			},
+  			{
+  				name: "percentage.json",
+  				type: "file",
+  				path: "./output/percentage.json"
+  			},
+  			{
   				name: "Plot_covariates_for_each_patient.pdf",
   				type: "file",
   				path: "./output/Plot_covariates_for_each_patient.pdf"
