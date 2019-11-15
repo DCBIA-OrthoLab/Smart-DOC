@@ -1,7 +1,8 @@
-var Hapi = require('hapi');
+var Hapi = require('@hapi/hapi');
 var fs = require('fs');
-var good = require('good');
+var good = require('@hapi/good');
 var path = require('path');
+var _ = require('underscore');
 
 var env = process.env.NODE_ENV;
 
@@ -18,11 +19,9 @@ const getConfigFile = function () {
   }
 }
 
-const startServer = function(cluster){
+const startServer = async (cluster) => {
 
     var conf = getConfigFile();
-    
-    var server = new Hapi.Server();
 
     var tls;
     if(conf.tls && conf.tls.key && conf.tls.cert){
@@ -31,49 +30,44 @@ const startServer = function(cluster){
           cert: fs.readFileSync(conf.tls.cert)
         };
     }
-
-    server.connection({ 
+    var server_options = { 
         host: conf.host,
         port: conf.port,
         tls: tls
-    });
+    }
+    if(process.env.NODE_ENV == 'test'){
+        server_options.routes = {
+            "cors": true
+        }
+    }
+    var server = new Hapi.Server(server_options);    
 
-    var plugins = [];
-
-    Object.keys(conf.plugins).forEach(function(pluginName){
-        var plugin = {};
-        plugin.register = require(pluginName);
-        plugin.options = conf.plugins[pluginName];
-        plugins.push(plugin);
-    });
+    var plugins = _.map(conf.plugins, function(options, pluginName){
+            return {
+                plugin: require(pluginName), 
+                options: options
+            }
+        });
 
     plugins.push({
-        register: good,
+        plugin: good,
         options: {
             reporters: {
                 myConsoleReporter: [{
-                    module: 'good-squeeze',
+                    module: '@hapi/good-squeeze',
                     name: 'Squeeze',
                     args: [{ log: '*', response: '*' }]
                 },
                 {
-                    module: 'dcbia-good',
-                    name: 'Filter',
-                    args: [{ log: '*', response: '*' }]
-                },
-                {
-                    module: 'good-console'
+                    module: '@hapi/good-console'
                 }, 'stdout'],
                 myFileReporter: [{
-                    module: 'good-squeeze',
+                    module: '@hapi/good-squeeze',
                     name: 'Squeeze',
                     args: [{ ops: '*' }]
                 }, {
-                    module: 'good-squeeze',
+                    module: '@hapi/good-squeeze',
                     name: 'SafeJson'
-                }, {
-                    module: 'good-file',
-                    args: ['all.log']
                 }]
             }
         }
@@ -88,20 +82,9 @@ const startServer = function(cluster){
         options: {}
     });
     
-
-    server.register(plugins, function(err){
-        if (err) {
-            throw err; // something bad happened loading the plugin
-        }
-
-    });
-
-    server.start(function () {
-        server.connections.forEach(function(connection){
-            server.log('info', 'server is listening port: ' + connection.info.uri + " label: " + connection.settings.labels);
-        });
-    });
-
+    await server.register(plugins);
+    await server.start();
+    console.log(`Server running at: ${server.info.uri}`);
 
 }
 

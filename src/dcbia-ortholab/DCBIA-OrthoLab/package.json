@@ -4,7 +4,7 @@
   "description": "Public content of the Orthlab pilot website.",
   "main": "app.module.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "grunt"
   },
   "repository": {
     "type": "git",

@@ -7,8 +7,8 @@
 		"lout": {},
 		"h2o2": {},
 		"hapi-auth-jwt": {},
-		"clusterpost-auth": {
-			"privateKey": "generateARandomKey",
+		"hapi-jwt-couch": {
+			"privateKey": "aprivatekey",
 			"saltRounds": 10,
 			"algorithm": { 
 				"algorithm": "HS256"
@@ -17,42 +17,25 @@
 				"algorithms": [ "HS256" ] 
 			},
 			"mailer": {
-				"nodemailer": {
-					"host": "smtp.gmail.com",
-				    "port": 465,
-				    "secure": true,
-				    "auth": {
-				        "user": "user@gmail.com",
-				        "pass": "pass"
-				    }
-				},
+				"nodemailer": "nodemailer-stub-transport",
 				"from": "Shiny tooth <shiny.tooth@gmail.com>",
 				"message": "Hello @USERNAME@,<br>Somebody asked me to send you a link to reset your password, hopefully it was you.<br>Follow this <a href='@SERVER@/public/#/login/reset?token=@TOKEN@'>link</a> to reset your password.<br>The link will expire in 30 minutes.<br>Bye."
 			},
 			"userdb" : {
 				"hostname": "http://localhost:5984",
-				"database": "shinytooth"
+				"database": "somedb"
 			}
 		},
 		"couch-provider": {
 			"default" : "shinytooth",
 			"shinytooth" : {
 				"hostname": "http://localhost:5984",
-				"database": "shinytooth"
+				"database": "somedb"
 			},
-			"namespace": ["dcbia", "clusterprovider"]
-		},
-		"clusterpost-provider": {
-			"executionservers" : {
-				"localhost" : {
-					"hostname" : "localhost", 
-					"user" : "prieto",
-					"identityfile" : "/Users/prieto/.ssh/id_rsa",
-					"sourcedir" : "/Users/prieto/NetBeansProjects/install/clusterpost-execution-shiny"
-				}
-			}
+			"namespace": "dcbia"
 		},
 		"dcbia-model": {},
 		"dcbia-ortholab": {}
 	}
 }
+

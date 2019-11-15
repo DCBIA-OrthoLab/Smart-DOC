@@ -131,7 +131,7 @@ module.exports = function (server, conf) {
 			validate: {
 				query: false,
 		        payload: false,
-		        params: false
+		        params: null
 			},
 			response: {
 				schema: Joi.array().items(clinicalcollection)
@@ -152,7 +152,7 @@ module.exports = function (server, conf) {
 			validate: {
 				query: false,
 		        payload: clinicalcollectionpost,
-		        params: false
+		        params: null
 			},
 			payload:{
 				output: 'data'
@@ -219,7 +219,7 @@ module.exports = function (server, conf) {
 			validate: {
 				query: false,
 		        payload: clinicalcollection,
-		        params: false
+		        params: null
 			},
 			payload:{
 				output: 'data'
@@ -239,7 +239,7 @@ module.exports = function (server, conf) {
 			handler: handlers.getAllClinicalCollectionData,
 			validate: {
 			  	query: false,
-			    params: false, 
+			    params: null, 
 			    payload: false
 			},
 			response: {
@@ -286,7 +286,7 @@ module.exports = function (server, conf) {
 			  	query: {
 			    	email: Joi.string().optional()
 			    },
-			    params: false, 
+			    params: null, 
 			    payload: false
 			},
 			response: {
@@ -311,7 +311,7 @@ module.exports = function (server, conf) {
 			    	date: Joi.date().optional()
 			    },
 		        payload: false,
-		        params: false
+		        params: null
 			},
 			response: {
 				schema: Joi.array().items(clinicaldata)
@@ -332,7 +332,7 @@ module.exports = function (server, conf) {
 			validate: {
 				query: false,
 		        payload: clinicaldatapost,
-		        params: false
+		        params: null
 			},
 			payload:{
 				output: 'data'
@@ -399,7 +399,7 @@ module.exports = function (server, conf) {
 			validate: {
 				query: false,
 		        payload: clinicaldata,
-		        params: false
+		        params: null
 			},
 			payload:{
 				output: 'data'
@@ -420,7 +420,7 @@ module.exports = function (server, conf) {
 			validate: {
 				query: false,
 		        payload: false,
-		        params: false
+		        params: null
 			},
 			response: {
 				schema: Joi.array().items(morphologicalcollection)
@@ -441,7 +441,7 @@ module.exports = function (server, conf) {
 			validate: {
 				query: false,
 		        payload: morphologicalcollectionpost,
-		        params: false
+		        params: null
 			},
 			payload:{
 				output: 'data'
@@ -508,7 +508,7 @@ module.exports = function (server, conf) {
 			validate: {
 				query: false,
 		        payload: morphologicalcollection,
-		        params: false
+		        params: null
 			},
 			payload:{
 				output: 'data'
@@ -528,7 +528,7 @@ module.exports = function (server, conf) {
 			handler: handlers.getAllMorphologicalCollectionData,
 			validate: {
 			  	query: false,
-			    params: false, 
+			    params: null, 
 			    payload: false
 			},
 			response: {
@@ -575,7 +575,7 @@ module.exports = function (server, conf) {
 			validate: {
 				query: false,
 		        payload: morphologicaldatapost,
-		        params: false
+		        params: null
 			},
 			payload:{
 				output: 'data'
@@ -644,7 +644,7 @@ module.exports = function (server, conf) {
 			    	patientId: Joi.string().optional(),
 			    	date: Joi.date().optional()
 			    },
-			    params: false, 
+			    params: null, 
 			    payload: false
 			},
 			response: {
@@ -689,7 +689,7 @@ module.exports = function (server, conf) {
 			validate: {
 				query: false,
 		        payload: morphologicaldata,
-		        params: false
+		        params: null
 			},
 			payload:{
 				output: 'data'
@@ -755,7 +755,7 @@ module.exports = function (server, conf) {
 			handler: handlers.getProjects,
 			validate: {
 			  	query: false,
-			    params: false, 
+			    params: null, 
 			    payload: false
 			},
 			response: {
@@ -800,7 +800,7 @@ module.exports = function (server, conf) {
 			validate: {
 				query: false,
 		        payload: project,
-		        params: false
+		        params: null
 			},
 			payload:{
 				output: 'data'
@@ -822,7 +822,7 @@ module.exports = function (server, conf) {
 			validate: {
 				query: false,
 		        payload: projectpost,
-		        params: false
+		        params: null
 			},
 			payload:{
 				output: 'data'

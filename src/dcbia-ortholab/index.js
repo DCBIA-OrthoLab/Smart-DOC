@@ -1,24 +1,9 @@
-exports.register = function (server, options, next) {
+exports.plugin = {};
+exports.plugin.register = function (server, options) {
 	server.path(__dirname);
 	
 	server.route({
-		path: '/',
-		method: '*',
-		handler: function (request, reply) {
-			reply.redirect('/DCBIA-OrthoLab/public');
-		}
-	});
-
-	server.route({
-		path: '/DCBIA-OrthoLab',
-		method: '*',
-		handler: function (request, reply) {
-			reply.redirect('/DCBIA-OrthoLab/public');
-		}
-	});
-	
-	server.route({
-		path: '/DCBIA-OrthoLab/public/{path*}',
+		path: '/{path*}',
 		method: 'GET',
 		config: {
 			handler: {
@@ -27,9 +12,6 @@ exports.register = function (server, options, next) {
 			description: 'This route serves the static website of ProbtrackBrainConnectivity. Everything inside the plugins/static/public/ directory will be directly accessible under this route.'
 		}
 	});
-    next();
 };
 
-exports.register.attributes = {
-    pkg: require('./package.json')
-};
+exports.plugin.pkg= require('./package.json');
