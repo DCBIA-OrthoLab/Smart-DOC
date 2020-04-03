@@ -2,13 +2,13 @@
 	"host": "localhost",
 	"port": 8180,
 	"plugins": {
-		"vision": {},
-		"inert": {},
+		"@hapi/vision": {},
+		"@hapi/inert": {},
 		"lout": {},
-		"h2o2": {},
-		"hapi-auth-jwt": {},
+		"@hapi/h2o2": {},
+		"@juanprietob/hapi-auth-jwt": {},
 		"hapi-jwt-couch": {
-			"privateKey": "aprivatekey",
+			"privateKey": "C8imXXi1kQ4KbHUOD94MwQxxAWmGebUQQbrb0Wkny4P7CUwyqSWRRN2REX3TBvkiclrQwgNUJBxuBNDXhIMUYA==",
 			"saltRounds": 10,
 			"algorithm": { 
 				"algorithm": "HS256"

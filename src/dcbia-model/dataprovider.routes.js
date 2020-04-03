@@ -2,7 +2,7 @@
 module.exports = function (server, conf) {
 	
 	var handlers = require('./dataprovider.handlers')(server, conf);
-	var Joi = require('joi');	
+	var Joi = require('@hapi/joi');	
 
 	var clinicaldatapost = Joi.object({
         	type: Joi.string().valid('clinicalData').required(),
@@ -111,10 +111,9 @@ module.exports = function (server, conf) {
 			name: Joi.string().required(),
         	type: Joi.string().valid('project').required(),
         	description: Joi.string().required(),
-        	patients: Joi.string().alphanum().optional(),
         	collections: Joi.array().items(Joi.object().keys({
         		_id: Joi.string().alphanum().required()
-        	})),
+        	})).optional(),
         	owner: Joi.string().email().optional()
         });
 
@@ -172,9 +171,9 @@ module.exports = function (server, conf) {
 			handler: handlers.getDocument,
 			validate: {
 			  	query: false,
-			    params: {
+			    params: Joi.object({
 			    	id: Joi.string().alphanum().required()
-			    }, 
+			    }), 
 			    payload: false
 			},
 			response: {
@@ -195,9 +194,9 @@ module.exports = function (server, conf) {
 			handler: handlers.deleteDocument,
 			validate: {
 			  	query: false,
-			    params: {
+			    params: Joi.object({
 			    	id: Joi.string().alphanum().required()
-			    }, 
+			    }), 
 			    payload: false
 			},
 			payload:{
@@ -261,9 +260,9 @@ module.exports = function (server, conf) {
 			handler: handlers.getClinicalCollectionData,
 			validate: {
 			  	query: false,
-			    params: {
+			    params: Joi.object({
 			    	id: Joi.string().alphanum().required()
-			    }, 
+			    }), 
 			    payload: false
 			},
 			response: {
@@ -283,9 +282,9 @@ module.exports = function (server, conf) {
             },
 			handler: handlers.getClinicalDataOwner,
 			validate: {
-			  	query: {
+			  	query: Joi.object({
 			    	email: Joi.string().optional()
-			    },
+			    }),
 			    params: null, 
 			    payload: false
 			},
@@ -306,10 +305,10 @@ module.exports = function (server, conf) {
             },
 			handler: handlers.getClinicalData,
 			validate: {
-				query: {
+				query: Joi.object({
 			    	patientId: Joi.string().optional(),
 			    	date: Joi.date().optional()
-			    },
+			    }),
 		        payload: false,
 		        params: null
 			},
@@ -352,9 +351,9 @@ module.exports = function (server, conf) {
 			handler: handlers.getDocument,
 			validate: {
 			  	query: false,
-			    params: {
+			    params: Joi.object({
 			    	id: Joi.string().alphanum().required()
-			    }, 
+			    }), 
 			    payload: false
 			},
 			response: {
@@ -375,9 +374,9 @@ module.exports = function (server, conf) {
 			handler: handlers.deleteDocument,
 			validate: {
 			  	query: false,
-			    params: {
+			    params: Joi.object({
 			    	id: Joi.string().alphanum().required()
-			    }, 
+			    }), 
 			    payload: false
 			},
 			payload:{
@@ -461,9 +460,9 @@ module.exports = function (server, conf) {
 			handler: handlers.getDocument,
 			validate: {
 			  	query: false,
-			    params: {
+			    params: Joi.object({
 			    	id: Joi.string().alphanum().required()
-			    }, 
+			    }), 
 			    payload: false
 			},
 			response: {
@@ -484,9 +483,9 @@ module.exports = function (server, conf) {
 			handler: handlers.deleteDocument,
 			validate: {
 			  	query: false,
-			    params: {
+			    params: Joi.object({
 			    	id: Joi.string().alphanum().required()
-			    }, 
+			    }), 
 			    payload: false
 			},
 			payload:{
@@ -550,9 +549,9 @@ module.exports = function (server, conf) {
 			handler: handlers.getMorphologicalCollectionData,
 			validate: {
 			  	query: false,
-			    params: {
+			    params: Joi.object({
 			    	id: Joi.string().alphanum().required()
-			    }, 
+			    }), 
 			    payload: false
 			},
 			response: {
@@ -595,9 +594,9 @@ module.exports = function (server, conf) {
 			handler: handlers.getDocument,
 			validate: {
 			  	query: false,
-			    params: {
+			    params: Joi.object({
 			    	id: Joi.string().alphanum().required()
-			    }, 
+			    }), 
 			    payload: false
 			},
 			response: {
@@ -618,13 +617,13 @@ module.exports = function (server, conf) {
 			handler: handlers.getMorphologicalDataByPatientId,
 			validate: {
 			  	query: false,
-			    params: {
+			    params: Joi.object({
 			    	id: Joi.string().alphanum().required()
-			    }, 
+			    }), 
 			    payload: false
 			},
 			response: {
-				schema: Joi.array(morphologicaldata)
+				schema: Joi.array().items(morphologicaldata)
 			},
 			description: 'Get the morphological data by patientId'
 	    }
@@ -640,15 +639,15 @@ module.exports = function (server, conf) {
             },
 			handler: handlers.getMorphologicalData,
 			validate: {
-			  	query: {
+			  	query: Joi.object({
 			    	patientId: Joi.string().optional(),
 			    	date: Joi.date().optional()
-			    },
+			    }),
 			    params: null, 
 			    payload: false
 			},
 			response: {
-				schema: Joi.array(morphologicaldata)
+				schema: Joi.array().items(morphologicaldata)
 			},
 			description: 'Get the morphological data by patientId'
 	    }
@@ -665,9 +664,9 @@ module.exports = function (server, conf) {
 			handler: handlers.deleteDocument,
 			validate: {
 			  	query: false,
-			    params: {
+			    params: Joi.object({
 			    	id: Joi.string().alphanum().required()
-			    }, 
+			    }), 
 			    payload: false
 			},
 			payload:{
@@ -709,10 +708,10 @@ module.exports = function (server, conf) {
 			handler: handlers.getAttachment,
 	      	validate: {
 		      	query: false,
-		        params: {
+		        params: Joi.object({
 		        	id: Joi.string().alphanum().required(),
 		        	name: Joi.string().required()
-		        },
+		        }),
 		        payload: false
 		    },
 		    description: 'Get attachment data'
@@ -730,10 +729,10 @@ module.exports = function (server, conf) {
 			handler: handlers.addAttachment,
 	      	validate: {
 		      	query: false,
-		        params: {
+		        params: Joi.object({
 		        	id: Joi.string().alphanum().required(),
 		        	name: Joi.string().required()
-		        },
+		        }),
 		        payload: true
 		    },
 		    payload: {
@@ -776,9 +775,9 @@ module.exports = function (server, conf) {
 			handler: handlers.getDocument,
 			validate: {
 			  	query: false,
-			    params: {
+			    params: Joi.object({
 			    	id: Joi.string()
-			    }, 
+			    }), 
 			    payload: false
 			},
 			response: {
@@ -842,9 +841,9 @@ module.exports = function (server, conf) {
 			handler: handlers.deleteDocument,
 			validate: {
 			  	query: false,
-			    params: {
+			    params: Joi.object({
 			    	id: Joi.string().alphanum().required()
-			    }, 
+			    }), 
 			    payload: false
 			},
 			payload:{
@@ -865,14 +864,14 @@ module.exports = function (server, conf) {
 			handler: handlers.getMorphologicalDataByCollectionIdPatientId,
 			validate: {
 			  	query: false,
-			    params: {
+			    params: Joi.object({
 			    	collectionId: Joi.string(),
 			    	patientId: Joi.string()
-			    }, 
+			    }), 
 			    payload: false
 			},
 			response: {
-				schema: Joi.array(morphologicaldata)
+				schema: Joi.array().items(morphologicaldata)
 			},
 			description: 'Get the attachment files from the database'
 	    }

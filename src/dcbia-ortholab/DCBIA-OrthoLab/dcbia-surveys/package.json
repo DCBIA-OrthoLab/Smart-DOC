@@ -24,7 +24,7 @@
   "bugs": {
     "url": "https://github.com/DCBIA-OrthoLab/shiny-tooth/issues"
   },
-   "devDependencies": {
+  "devDependencies": {
     "grunt": "^1.0.1",
     "grunt-angular-templates": "^1.1.0",
     "grunt-contrib-clean": "^1.0.0",
