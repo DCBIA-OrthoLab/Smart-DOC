@@ -17,13 +17,7 @@ module.exports = function (server, conf) {
 	/*
 	*/
 
-
-
-
-
-	    // create get fct to read and display files on react side?
-
-	handler.uploadFile = async (req, h) => {
+	handler.uploadZipFile = async (req, h) => {
 		var doc = req.payload.zipFile			
 		var uploadPath = req.payload.path
 
@@ -39,21 +33,19 @@ module.exports = function (server, conf) {
 
 			var zip = new admZip(path)
 
-
     // var zipEntries = zip.getEntries(); // an array of ZipEntry records
 
-		 	// console.log("-----UPLOAD HERE-------")
-		  //   zipEntries.forEach(function(zipEntry) {
-		  //       console.log(zipEntry['name']); 
-		  //       console.log(zipEntry.toString())
-
-
-		  //       zip.extractEntryTo(/*entry name*/zipEntry, /*target path*/"./data/sbrosset", /*maintainEntryPath*/false, /*overwrite*/true);
+		  //	zipEntries.forEach(function(zipEntry) {
+		  //    console.log(zipEntry['name']); 
+		  //    console.log(zipEntry.toString())
+		  //    zip.extractEntryTo(/*entry name*/zipEntry, /*target path*/"./data/sbrosset", /*maintainEntryPath*/false, /*overwrite*/true);
 
 		  //   });
 
 
-		    // false for not overwrite ? TO DO this case
+
+		  	// TO DO
+		    // false for not overwrite ? 
 			zip.extractAllTo(uploadPath,false)
 		    
 		    fs.unlinkSync(path)
@@ -67,51 +59,12 @@ module.exports = function (server, conf) {
 	}
 
 
+	handler.deleteFile = async (req, h) => {
+		var path = req.params.file;
 
+		if(!fs.existsSync(path)) 
+        	return false;
 
-	// handler.getFiles = async (req, h) => {
-	// 	var dirname = req.params.folder
-	// 	// if (req.payload.folder == null) {
-	// 	// 	folder = "./upload/"
-	// 	// } else {
-	// 	// 	folder = String(req.payload.folder)
-	// 	// }
-	// 	fileArray = [];
-	// 	return new Promise((resolve, reject) => {
-
-	// 		_.each(fs.readdirSync(dirname), function(filename){
-	      		
-	//       		var full_path = path.join(dirname, filename);
-	// 			var stats = fs.statSync(full_path);
-	// 			if (stats.isDirectory()) {
-	// 				fileArray.push({ filename: filename, type: 'd'})
-	// 			} else {
-	// 				fileArray.push({ filename: filename, type: 'f'})
-	// 			}
-	// 	 //    fs.readdir(folder, function(err, items) {
-	// 	 //    	console.log("items")
-	// 	 //    	console.log(items)
-	// 		// 	return resolve(items)
-	// 		//     // for (var i=0; i<items.length; i++) {
-
-	// 		//     //     files.push(items[i])
-	// 		//     // }
-	// 		//     // files.push(items)			
-	// 		// })
-	// 		});
-	// 		return resolve(fileArray);
-	// 	})
-
-	// 	return true;
-	// }
-
-
-	handler.delFile = async (req, h) => {
-		var body = req.params.body
-		var data = body.split(",");	
-		
-		var name = data[0];
-		var path = data[1];
 
 		var stats = fs.statSync(path)
 
@@ -129,24 +82,19 @@ module.exports = function (server, conf) {
 	}
 
 
-	
+	handler.getDirectoryMap = async (req, h) => {
+		const {query, auth} = req;
+		var credentials = auth.credentials;
+		var user = query.email ? query.email : credentials.email;
 
-	handler.getMap = async (req, h) => {
-		console.log("GET MAP HERE")
-		var username = req.params.username
-		// var fullpath = req.params.path
-		// var storeMap = {}
-		    	
-		// console.log(storeMap)
+		// console.log(credentials, user)
 
 	    var getMap = function(directory){
 	    	var directoryMap = []
 	    	_.each(fs.readdirSync(directory), function(filename){
 	    		var fullPath = path.join(directory, filename)
 
-
-
-	    		// this is for delete all dead symlink with shared folders
+	    		//  delete dead symlinks from shared folders
 	    		fs.lstat(fullPath, function(err,stats) {
 	    			if (stats.isSymbolicLink()) {
 	    				fs.exists(fullPath, function(link) {
@@ -162,7 +110,6 @@ module.exports = function (server, conf) {
 	    			}
 	    		})
 
-
 	    		var stats = fs.statSync(fullPath)
 	    		if (stats.isDirectory()){
 	    			directoryMap.push({type:'d', name:filename, path:fullPath, files:getMap(fullPath)})
@@ -174,19 +121,13 @@ module.exports = function (server, conf) {
 	    	})
 	    	return directoryMap
 	    }
-		return getMap("./data/"+username+"/");
+		return getMap(path.join(conf.datapath, user));
 	}
 
 
-  
-
-
-
-		
-
+ 
 
 	handler.searchFiles = async (req, h) => {
-		console.log("IN SEARCH HANDLER ---------")
 		var data = req.params.data
 		var d = data.split('&')
 		var fileSearched = d[0]
@@ -195,8 +136,6 @@ module.exports = function (server, conf) {
 		var directory = "./data/" + user
 		var result = []
 
-		console.log(fileSearched)
-		console.log(user)
 
 		if (fileSearched == ''){return result}
 
@@ -218,7 +157,6 @@ module.exports = function (server, conf) {
 		return searchRecurs(fileSearched,directory)
 	}
 
-	
 
 
 	handler.createFolder = async (req, h) => {
@@ -240,8 +178,6 @@ module.exports = function (server, conf) {
 			
 		return true
 	}	
-
-
 		
 
 	handler.downloadFiles = async (req, h) => {
@@ -259,32 +195,18 @@ module.exports = function (server, conf) {
 		}
 
 
-  // getDirectoryMap(dirname){
-  //   const self = this;
-  //   var directory_map = {};
-
-  //   _.each(fs.readdirSync(dirname), function(filename){
-  //     var full_path = path.join(dirname, filename);
-  //     var stats = fs.statSync(full_path);
-  //     if(stats.isDirectory()){
-  //       directory_map[filename] = self.getDirectoryMap(full_path);
-  //     }else{
-  //       directory_map[filename] = full_path;
-  //     }
-  //   });
-    
-  //   return directory_map;
-  // }
 
 
 
-  // need to fix : current folder with props -> update directly to have the right path
+
+
   handler.shareFiles = async (req, h) => {
-
+  	
+  	const {query, auth} = req;
   	// params
   	var filepath = req.payload.directory
   	var users = req.payload.users  	
-  	var currentUser = req.payload.user
+  	var currentUser = auth.credentials.email
 
   	// source path
   	var smthng = __dirname.split("").reverse().join("")
@@ -297,9 +219,6 @@ module.exports = function (server, conf) {
 	var i = f.indexOf('/')
 	var foldername = f.slice(0,i).split("").reverse().join("")
 	let sharePath
-	console.log(f)
-	console.log(foldername)
-
   	users.forEach((user) => {
 
 	  	sharePath = './data/'+user+'/sharedFiles/'+user+'-'+foldername
@@ -316,11 +235,12 @@ module.exports = function (server, conf) {
 
 
   handler.moveFiles = async (req, h) => {
-  	// params
+  	console.log(req.payload)
+
   	var files = req.payload.files
   	var dir = req.payload.directory
 	let filename, f, ind, name
-
+	
   	files.forEach(function(file) {
 
 	  	f = file.split("").reverse().join("")
@@ -331,12 +251,8 @@ module.exports = function (server, conf) {
   			if (err) {throw err} 
   		})
   	})
-
-
   	return true
   }
-
-
 
 
 
