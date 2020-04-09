@@ -9,7 +9,7 @@ module.exports = function (server, conf) {
         	files: Joi.array(),
         });
 
-	var shareInfos = Joi.object({}
+	var shareInfos = Joi.object({
 		users: Joi.array(),
 		directory: Joi.string(),
 	})
@@ -20,6 +20,10 @@ module.exports = function (server, conf) {
 	    method: 'POST',
 	    path: '/dcbia/data',
 	    config: {
+			auth: {
+                strategy: 'token',
+                scope: ['dentist']
+            },
 		    payload: {
 				maxBytes: 20971520000,
 				output: 'stream',
@@ -71,6 +75,10 @@ module.exports = function (server, conf) {
 		method: 'GET',
 		path: '/dcbia/search/{data*}',
 		config: {
+			auth: {
+                strategy: 'token',
+                scope: ['dentist']
+            },
 			handler: handlers.searchFiles
 		}
 	})
@@ -79,6 +87,10 @@ module.exports = function (server, conf) {
 		method: 'POST',
 		path: '/dcbia/createfolder',
 	    config: {
+			auth: {
+                strategy: 'token',
+                scope: ['dentist']
+            },
 		    payload: {
 				maxBytes: 2097152,
 				output: 'data',
@@ -92,6 +104,10 @@ module.exports = function (server, conf) {
 		method: 'GET',
 		path: '/dcbia/download/{filesList*}',
 		config: {
+			auth: {
+                strategy: 'token',
+                scope: ['dentist']
+            },
 			handler: handlers.downloadFiles
 		}
 	})
