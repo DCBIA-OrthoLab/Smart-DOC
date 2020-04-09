@@ -1,23 +1,21 @@
 {
-  "name": "shiny-tooth",
+  "name": "dcbia-server",
   "version": "1.0.0",
-  "description": "Web application to federate clinical, biological and imaging data for dentistry allowing hypothesis testing and group selection for clinical trials",
+  "description": "Main starting script for dcbia-server application shiny-tooth",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/DCBIA-OrthoLab/shiny-tooth.git"
+    "url": "git+https://github.com/DCBIA-OrthoLab/shiny-tooth.git"
   },
   "keywords": [
-    "Dentistry",
-    "data",
-    "federation",
-    "hypothesis",
-    "testing"
+    "Dental",
+    "craniofacial",
+    "network."
   ],
-  "author": "juanprietob@gmail.com",
+  "author": "sbrosset@umich.edu",
   "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/DCBIA-OrthoLab/shiny-tooth/issues"
@@ -25,33 +23,25 @@
   "homepage": "https://github.com/DCBIA-OrthoLab/shiny-tooth#readme",
   "dependencies": {
     "@hapi/boom": "^7.4.2",
-    "@hapi/code": "^8.0.1",
     "@hapi/good": "^8.2.0",
     "@hapi/good-console": "^8.1.0",
     "@hapi/good-squeeze": "^5.2.0",
     "@hapi/h2o2": "^8.3.0",
     "@hapi/hapi": "^18.3.1",
-    "@hapi/inert": "^5.2.0",
+    "@hapi/inert": "^5.2.2",
     "@hapi/vision": "^5.5.2",
     "@juanprietob/hapi-auth-jwt": "github:juanprietob/hapi-auth-jwt#master",
-    "adm-zip": "^0.4.13",
     "clusterpost-provider": "^4.2.0",
     "couch-provider": "^3.0.1",
     "couch-update-views": "^1.0.9",
     "create-react-library": "^2.6.7",
-    "dcbia-model": "file:src/dcbia-model",
-    "dcbia-ortholab": "file:src/dcbia-ortholab",
-    "dcbia-websocket": "file:src/dcbia-websocket",
+    "dcbia-model": "file:../dcbia-model",
+    "dcbia-ortholab": "file:../dcbia-ortholab",
     "hapi-jwt-couch": "^4.2.0",
     "lout": "^11.2.3",
     "nodemailer": "^6.3.1",
     "nodemailer-smtp-transport": "^2.7.4",
-    "nodemailer-stub-transport": "^1.1.0"
-  },
-  "devDependencies": {
-    "babel-cli": "^6.24.1",
-    "babel-preset-es2015": "^6.24.1",
-    "babel-preset-react": "^6.24.1",
-    "babelify": "^7.3.0"
+    "nodemailer-stub-transport": "^1.1.0",
+    "yauzl": "^2.10.0"
   }
 }
