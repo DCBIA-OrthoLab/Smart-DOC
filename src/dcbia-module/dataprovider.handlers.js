@@ -23,7 +23,7 @@ module.exports = function (server, conf) {
 
 		var filename = doc.hapi.filename
 		var name = filename.split(".");	name = name[0]
-		var path = uploadPath+"/"+filename
+		var path = path.join(uploadPath,filename)
 
 
 		var out = fs.createWriteStream(path)
@@ -87,8 +87,6 @@ module.exports = function (server, conf) {
 		var credentials = auth.credentials;
 		var user = query.email ? query.email : credentials.email;
 
-		// console.log(credentials, user)
-
 	    var getMap = function(directory){
 	    	var directoryMap = []
 	    	_.each(fs.readdirSync(directory), function(filename){
@@ -133,9 +131,8 @@ module.exports = function (server, conf) {
 		var fileSearched = d[0]
 		var user = d[1]
 		
-		var directory = "./data/" + user
 		var result = []
-
+		var dir = path.join(conf.datapath,user)
 
 		if (fileSearched == ''){return result}
 
@@ -154,28 +151,31 @@ module.exports = function (server, conf) {
 			})
 			return result
 		}
-		return searchRecurs(fileSearched,directory)
+		return searchRecurs(fileSearched,dir)
 	}
 
 
 
 	handler.createFolder = async (req, h) => {
+		const {query, auth} = req;
+		var currentUser = auth.credentials.email
 
-		var name = req.payload.name
-		var path = req.payload.path
+		var dirname = req.payload.name
+		var createpath = req.payload.path
+		var dirpath = path.join(createpath,dirname)
 
-		if (path.split('/').length < 4 
-			|| path.includes('sharedFiles') 
-			|| fs.existsSync(path+'/'+name) 
-			|| name.match("^[0-9a-zA-Z]+$") == null)
+		if (path.basename(createpath) == currentUser
+			|| dirpath.includes('sharedFiles') 
+			|| fs.existsSync(dirpath) 
+			|| dirname.match("^[0-9a-zA-Z]+$") == null)
 		{
-				return false		
+			return false
+
 		} else {
-			fs.mkdir(path+'/'+name, (err) => {
+			fs.mkdir(dirpath, (err) => {
 				if (err) throw err
 			})	
 		}
-			
 		return true
 	}	
 		
@@ -191,8 +191,9 @@ module.exports = function (server, conf) {
  		})
 
 		var sendThis = zip.toBuffer();
+		
 		return sendThis
-		}
+	}
 
 
 
@@ -208,21 +209,32 @@ module.exports = function (server, conf) {
   	var users = req.payload.users  	
   	var currentUser = auth.credentials.email
 
+  	console.log(filepath)
+  	console.log(users)
+  	console.log(currentUser)
+
+
   	// source path
   	var smthng = __dirname.split("").reverse().join("")
 	var ind = smthng.indexOf('/')
 	var dir = smthng.slice(ind+1).split("").reverse().join("")
 	var sourcePath = dir+'/dcbia-server/'+filepath
+	console.log(__dirname)
+	console.log(sourcePath)
+	console.log(path.relative(filepath, __dirname))
 
 	// share path
-  	var f = filepath.split("").reverse().join("")
-	var i = f.indexOf('/')
-	var foldername = f.slice(0,i).split("").reverse().join("")
+  	// var f = filepath.split("").reverse().join("")
+	// var i = f.indexOf('/')
+	// var foldername = f.slice(0,i).split("").reverse().join("")
+	foldername = path.basename(filepath)
+
+
 	let sharePath
   	users.forEach((user) => {
 
 	  	sharePath = './data/'+user+'/sharedFiles/'+user+'-'+foldername
-
+	  	console.log(sharePath)
 	  	if (!fs.existsSync(sharePath)) {
 	  		fs.symlink(sourcePath, sharePath, (err) => {
 				if (err) throw err
@@ -234,20 +246,20 @@ module.exports = function (server, conf) {
   }
 
 
+
+
   handler.moveFiles = async (req, h) => {
   	console.log(req.payload)
 
   	var files = req.payload.files
   	var dir = req.payload.directory
-	let filename, f, ind, name
+	let filename
 	
   	files.forEach(function(file) {
 
-	  	f = file.split("").reverse().join("")
-		ind = f.indexOf('/')
-		name = f.slice(0,ind).split("").reverse().join("")
-
-  		fs.rename(file,dir+'/'+name, (err) => {
+  		filename = path.basename(file)
+  		
+  		fs.rename(file,path.join(dir,filename), (err) => {
   			if (err) {throw err} 
   		})
   	})
