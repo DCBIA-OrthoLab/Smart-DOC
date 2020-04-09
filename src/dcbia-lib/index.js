@@ -302,4 +302,185 @@ module.exports = class DCBIALib extends HapiJWTCouch{
         });
         
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+// move one/many files to a folder
+// move in own files
+    moveFiles(infos){
+        var self = this;
+        return new Promise(function(resolve, reject){
+            var options = {
+                url : self.getServer() + "/dcbia/moveFiles",
+                method: "POST",
+                payload: infos, 
+                agentOptions: self.agentOptions,
+                auth: self.auth
+            }
+            request(options, function(err, res, body){
+                if(err){
+                    reject(err);
+                }else{
+                    resolve(body);
+                }
+            })
+        });    
+    }
+
+// share with one person
+// share with many
+    shareFiles(infos){
+        var self = this;
+        return new Promise(function(resolve, reject){
+            var options = {
+                url : self.getServer() + "/dcbia/shareFiles",
+                method: "POST",
+                agentOptions: self.agentOptions,
+                auth: self.auth
+            }
+            request(options, function(err, res, body){
+                if(err){
+                    reject(err);
+                }else{
+                    resolve(body);
+                }
+            })
+        });    
+    }
+
+// download one/many file - from - shared/personnal folders
+    downloadFiles(files){
+        var self = this;
+        return new Promise(function(resolve, reject){
+            var options = {
+                url : self.getServer() + "/dcbia/download/",
+                method: "GET",
+                agentOptions: self.agentOptions,
+                auth: self.auth
+            }
+            request(options, function(err, res, body){
+                if(err){
+                    reject(err);
+                }else{
+                    resolve(body);
+                }
+            })
+        });    
+    }
+
+
+// create folder where ?
+    createFolder(name, path){
+        var self = this;
+        return new Promise(function(resolve, reject){
+            var options = {
+                url : self.getServer() + "/dcbia/createfolder",
+                method: "POST",
+                agentOptions: self.agentOptions,
+                auth: self.auth
+            }
+            request(options, function(err, res, body){
+                if(err){
+                    reject(err);
+                }else{
+                    resolve(body);
+                }
+            })
+        });    
+    }
+
+
+// search in : personnal/shared - find one/many/zero
+    searchFiles(search){
+        var self = this;
+        return new Promise(function(resolve, reject){
+            var options = {
+                url : self.getServer() + "/dcbia/search/",
+                method: "GET",
+                agentOptions: self.agentOptions,
+                auth: self.auth
+            }
+            request(options, function(err, res, body){
+                if(err){
+                    reject(err);
+                }else{
+                    resolve(body);
+                }
+            })
+        });    
+    }
+
+
+// delete one/many - files/folder
+    deleteFile(file){
+        var self = this;
+        return new Promise(function(resolve, reject){
+            var options = {
+                url : self.getServer() + "'/dcbia/data'",
+                method: "DELETE",
+                agentOptions: self.agentOptions,
+                auth: self.auth
+            }
+            request(options, function(err, res, body){
+                if(err){
+                    reject(err);
+                }else{
+                    resolve(body);
+                }
+            })
+        });    
+    }
+
+// upload zip with one/many files
+    uploadZipFile(zipfile){
+        var self = this;
+        return new Promise(function(resolve, reject){
+            var options = {
+                url : self.getServer() + "'/dcbia/data'",
+                method: "POST",
+                agentOptions: self.agentOptions,
+                auth: self.auth
+            }
+            request(options, function(err, res, body){
+                if(err){
+                    reject(err);
+                }else{
+                    resolve(body);
+                }
+            })
+        });    
+    }
+
+
+// get map with own account/admin account - nbr of folders ? etc
+    getDirectoryMap(qs){
+        var self = this;
+        return new Promise(function(resolve, reject){
+            var options = {
+                url : self.getServer() + "/dcbia/map",
+                method: "GET",
+                qs: qs,
+                agentOptions: self.agentOptions,
+                auth: self.auth
+            }
+            request(options, function(err, res, body){
+                if(err){
+                    reject(err);
+                }else{
+                    resolve(body);
+                }
+            })
+        });    
+    }
+    
 }

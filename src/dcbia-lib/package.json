@@ -22,7 +22,12 @@
   },
   "homepage": "https://github.com/DCBIA-OrthoLab/shiny-tooth#readme",
   "dependencies": {
+    "bluebird": "^3.7.2",
     "csvtojson": "^1.1.9",
     "hapi-jwt-couch-lib": "^1.0.1"
+  },
+  "devDependencies": {
+    "@hapi/code": "^8.0.1",
+    "@hapi/lab": "^22.0.4"
   }
 }
