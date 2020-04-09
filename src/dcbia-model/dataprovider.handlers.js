@@ -1,11 +1,13 @@
 var request = require('request');
 var _ = require('underscore');
 var Promise = require('bluebird');
-var Boom = require('boom');
+var Boom = require('@hapi/boom');
 var spawn = require('child_process').spawn;
 var couchUpdateViews = require('couch-update-views');
 var path = require('path');
 var qs = require('querystring');
+var fs = require('fs');
+var admZip = require('adm-zip');
 
 module.exports = function (server, conf) {
 	
@@ -54,7 +56,11 @@ module.exports = function (server, conf) {
 	var handler = {};
 	/*
 	*/
-	handler.createDocument = function(req, rep){
+
+
+
+
+	handler.createDocument = function(req, h){
 		
 		var doc = req.payload;
 		var credentials = req.auth.credentials;
@@ -63,7 +69,7 @@ module.exports = function (server, conf) {
 			doc.owner = credentials.email;
 		}
 
-		server.methods.dcbia.uploadDocuments(doc)
+		return server.methods.dcbia.uploadDocuments(doc)
 		.then(function(res){
 			if(res.length === 1){
 				return res[0];
@@ -71,24 +77,22 @@ module.exports = function (server, conf) {
 				return res;
 			}
 		})
-		.then(rep)
 		.catch(function(e){
-			rep(Boom.badRequest(e));
+			return Boom.badRequest(e);
 		});
 		
 	}
 
 	/*
 	*/
-	handler.getDocument = function(req, rep){
+	handler.getDocument = function(req, h){
 		
-		server.methods.dcbia.getDocument(req.params.id)
+		return server.methods.dcbia.getDocument(req.params.id)
 		.then(function(doc){
 			return server.methods.dcbia.validateOwnershipPromise(doc, req.auth.credentials);
 		})
-		.then(rep)
 		.catch(function(e){
-			rep(Boom.wrap(e));
+			return Boom.wrap(e);
 		});
 		
 	}
@@ -100,25 +104,24 @@ module.exports = function (server, conf) {
 		var doc = req.payload;
 		var credentials = req.auth.credentials;
 
-		server.methods.dcbia.uploadDocuments(doc)
+		return server.methods.dcbia.uploadDocuments(doc)
 		.then(function(res){
-			rep(res[0]);
+			return res[0];
 		})
 		.catch(function(e){
-			rep(Boom.wrap(e));
+			return Boom.wrap(e);
 		});
 	}
 
 	/*
 	*/
 	handler.addAttachment = function(req, rep){
-		server.methods.dcbia.getDocument(req.params.id)
+		return server.methods.dcbia.getDocument(req.params.id)
 		.then(function(doc){
 			return server.methods.dcbia.addDocumentAttachment(doc, req.params.name, req.payload);
 		})
-		.then(rep)
 		.catch(function(e){
-			rep(Boom.wrap(e));
+			return Boom.wrap(e);
 		});
 	}
 
@@ -128,7 +131,7 @@ module.exports = function (server, conf) {
 		var docid = req.params.id;
 		var name = req.params.name;
 
-		server.methods.dcbia.getDocument(docid)
+		return server.methods.dcbia.getDocument(docid)
 		.then(function(doc){
 			return server.methods.dcbia.validateOwnershipPromise(doc, req.auth.credentials);
 		})
@@ -136,23 +139,22 @@ module.exports = function (server, conf) {
 			if(doc._attachments && doc._attachments[name]){
 				rep.proxy(server.methods.dcbia.getDocumentURIAttachment(docid + "/" + req.params.name));
 			}else{
-				rep(Boom.notFound(docid + "/" + name));
+				return Boom.notFound(docid + "/" + name);
 			}
 		})
 		.catch(function(e){
-			rep(Boom.wrap(e));
+			return Boom.wrap(e);
 		});
 	}
 
 	handler.deleteDocument = function(req, rep){
 
-		server.methods.dcbia.getDocument(req.params.id)
+		return server.methods.dcbia.getDocument(req.params.id)
 		.then(function(doc){
 			return server.methods.dcbia.deleteDocument(doc);
 		})
-		.then(rep)
 		.catch(function(e){
-			rep(Boom.wrap(e));
+			return Boom.wrap(e);
 		});
 	}
 
@@ -164,16 +166,15 @@ module.exports = function (server, conf) {
 		var email = credentials.email;
 		
 		var view = '_design/searchClinicalData/_view/collectionName?include_docs=true';
-
-		server.methods.dcbia.getView(view)
+		
+		return server.methods.dcbia.getView(view)
 		.then(function(rows){
 			var docs = _.pluck(rows, 'doc');
 			var compactdocs = _.compact(docs);
 			return compactdocs;
 		})
-		.then(rep)
 		.catch(function(e){
-			rep(Boom.wrap(e));
+			return Boom.wrap(e);
 		});
 	}
 
@@ -185,15 +186,14 @@ module.exports = function (server, conf) {
 		
 		var view = '_design/searchClinicalData/_view/patientId?include_docs=true';
 
-		server.methods.dcbia.getView(view)
+		return server.methods.dcbia.getView(view)
 		.then(function(rows){
 			var docs = _.pluck(rows, 'doc');
 			var compactdocs = _.compact(docs);
 			return compactdocs;
 		})
-		.then(rep)
 		.catch(function(e){
-			rep(Boom.wrap(e));
+			return Boom.wrap(e);
 		});
 	}
 
@@ -205,7 +205,7 @@ module.exports = function (server, conf) {
 		
 		var view = '_design/getClinicalDataCollection/_view/items?include_docs=true&key="' + req.params.id + '"';
 
-		server.methods.dcbia.getView(view)
+		return server.methods.dcbia.getView(view)
 		.then(function(rows){
 			var docs = _.pluck(rows, 'doc');
 			var compactdocs = _.compact(docs);
@@ -228,9 +228,8 @@ module.exports = function (server, conf) {
 				return compactdocs;
 			}
 		})
-		.then(rep)
 		.catch(function(e){
-			rep(Boom.wrap(e));
+			return Boom.wrap(e);
 		});
 	}
 
@@ -250,15 +249,14 @@ module.exports = function (server, conf) {
 			view = '_design/getSurvey/_view/userItems?key="' + email +'"';
 		}
 
-		server.methods.dcbia.getView(view)
+		return server.methods.dcbia.getView(view)
 		.then(function(rows){
 			var docs = _.pluck(rows, 'value');
 			var compactdocs = _.compact(docs);
 			return compactdocs;
 		})
-		.then(rep)
 		.catch(function(e){
-			rep(Boom.wrap(e));
+			return Boom.wrap(e);
 		});
 	}
 
@@ -298,7 +296,7 @@ module.exports = function (server, conf) {
 			view = '_design/searchClinicalData/_view/patientId?' + qs.stringify(params);
 		}
 
-		server.methods.dcbia.getView(view)
+		return server.methods.dcbia.getView(view)
 		.then(function(rows){			
 			var docs = _.pluck(rows, 'doc');
 			var compactdocs = _.compact(docs);
@@ -306,9 +304,8 @@ module.exports = function (server, conf) {
 				return server.methods.dcbia.validateOwnership(doc, credentials);
 			});
 		})
-		.then(rep)
 		.catch(function(e){
-			rep(Boom.wrap(e));
+			return Boom.wrap(e);
 		});
 	}
 
@@ -319,15 +316,14 @@ module.exports = function (server, conf) {
 		
 		var view = '_design/searchMorphologicalData/_view/collectionName?include_docs=true';
 
-		server.methods.dcbia.getView(view)
+		return server.methods.dcbia.getView(view)
 		.then(function(rows){
 			var docs = _.pluck(rows, 'doc');
 			var compactdocs = _.compact(docs);
 			return compactdocs;
 		})
-		.then(rep)
 		.catch(function(e){
-			rep(Boom.wrap(e));
+			return Boom.wrap(e);
 		});
 	
 	}
@@ -338,15 +334,14 @@ module.exports = function (server, conf) {
 		
 		var view = '_design/searchMorphologicalData/_view/patientId?include_docs=true';
 
-		server.methods.dcbia.getView(view)
+		return server.methods.dcbia.getView(view)
 		.then(function(rows){
 			var docs = _.pluck(rows, 'doc');
 			var compactdocs = _.compact(docs);
 			return compactdocs;
 		})
-		.then(rep)
 		.catch(function(e){
-			rep(Boom.wrap(e));
+			return Boom.wrap(e);
 		});
 	}
 
@@ -395,10 +390,9 @@ module.exports = function (server, conf) {
 		var credentials = req.auth.credentials;
 		var email = credentials.email;
 		
-		getMorphologicalCollectionData(req.params.id)
-		.then(rep)
+		return getMorphologicalCollectionData(req.params.id)
 		.catch(function(e){
-			rep(Boom.wrap(e));
+			return (Boom.wrap(e));
 		});
 		
 	}
@@ -411,13 +405,13 @@ module.exports = function (server, conf) {
 		
 		var view = '_design/searchMorphologicalData/_view/patientId?include_docs=true&key="' + req.params.id + '"';
 
-		server.methods.dcbia.getView(view)
+		return server.methods.dcbia.getView(view)
 		.then(function(rows){
 			var docs = _.pluck(rows, 'doc');
-			rep(docs);
+			return docs;
 		})
 		.catch(function(err){
-			rep(Boom.wrap(err));
+			return (Boom.wrap(err));
 		});
 
 	}
@@ -458,7 +452,7 @@ module.exports = function (server, conf) {
 			view = '_design/searchMorphologicalData/_view/patientId?' + qs.stringify(params);
 		}
 
-		server.methods.dcbia.getView(view)
+		return server.methods.dcbia.getView(view)
 		.then(function(rows){		
 			
 			var docs = _.pluck(rows, 'doc');
@@ -467,9 +461,8 @@ module.exports = function (server, conf) {
 				return server.methods.dcbia.validateOwnership(doc, credentials);
 			});
 		})
-		.then(rep)
 		.catch(function(e){
-			rep(Boom.wrap(e));
+			return (Boom.wrap(e));
 		});
 	}
 
@@ -477,15 +470,14 @@ module.exports = function (server, conf) {
 		
 		var view = '_design/getProject/_view/projectItems?include_docs=true';
 		
-		server.methods.dcbia.getView(view)
+		return server.methods.dcbia.getView(view)
 		.then(function(rows){
 			var docs = _.pluck(rows, 'doc');
 			var compactdocs = _.compact(docs);
 			return compactdocs;
 		})
-		.then(rep)
 		.catch(function(e){
-			rep(Boom.wrap(e));
+			return (Boom.wrap(e));
 		});
 	
 	}
@@ -502,9 +494,8 @@ module.exports = function (server, conf) {
 
 			});
 		})
-		.then(rep)
 		.catch(function(e){
-			rep(Boom.wrap(e));
+			return (Boom.wrap(e));
 		});
 		
 	
