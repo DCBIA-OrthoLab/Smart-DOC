@@ -1,10 +1,13 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import { Link } from 'react-router-dom';
+import store from "./redux/store";
+import {withRouter} from 'react-router-dom';
+import {Home, User, Users, Cpu, Settings, LogOut, LogIn, FilePlus} from 'react-feather';
 import NavDropdown from 'react-bootstrap/NavDropdown';
 import Navbar from 'react-bootstrap/Navbar';
-import Nav from 'react-bootstrap/Nav'
-import {Home, User, Circle, Folder, LogOut, LogIn, BarChart, FilePlus} from 'react-feather';
-import { connect } from 'react-redux';
-import {withRouter} from 'react-router-dom';
+import Nav from 'react-bootstrap/Nav';
+import Image from 'react-bootstrap/Image';
 
 class NavBar extends Component{
   constructor(props) {
@@ -15,48 +18,27 @@ class NavBar extends Component{
     }
   }
 
-
-  getTaks(){
-    const {user, history} = this.props;
-    if(user && user.scope && user.scope.indexOf('default') !== -1){
-      return <t onClick={()=>{history.push('/tasks')}}><Circle color="#ffffff"/> Tasks</t>
-    }
-  }
- 
-  getClinicalData(){
-    const {user, history} = this.props;
-    if(user && user.scope && user.scope.indexOf('default') !== -1){
-      return <t onClick={()=>{history.push('/dcbia/morphologicalData')}}><BarChart color="#ffffff"/> Morphological Data</t>
+  getComputing(){
+    const {user} = this.props;
+    if(user && user.scope && user.scope.indexOf('clusterpost') != -1){
+      return <Nav.Link><Link class="nav-link" to="/computing"><Cpu/> Computing</Link></Nav.Link>
     }
   }
 
-  getMorphologicalData(){
+  getSettings(){
     const {user, history} = this.props;
-    if(user && user.scope && user.scope.indexOf('default') !== -1){
-      return <t onClick={()=>{history.push('/dcbia/ClinicalData')}}><BarChart color="#ffffff"/> Clinical Data</t>
+
+    var strSettings = <Settings/>;
+
+
+    if(user && user.scope && user.scope.indexOf('admin') != -1){
+      return <NavDropdown title={<t><Settings/> Settings</t>} id="basic-nav-dropdown">
+          <NavDropdown.Item onClick={()=>{history.push('/admin/users')}}><Users/> Users</NavDropdown.Item>
+          <NavDropdown.Divider/>
+          <NavDropdown.Item onClick={()=>{history.push('/admin/servers')}}><Cpu/> Computing</NavDropdown.Item>
+        </NavDropdown>
     }
   }
-  
-  getProjects(){
-    const {user, history} = this.props;
-    if(user && user.scope && user.scope.indexOf('default') !== -1){
-      return <t onClick={()=>{history.push('/dcbia/projects')}}><Folder color="#ffffff"/> Projects</t>  
-    }
-  }
-
-  getHome(){
-    const {user, history} = this.props;
-    if(user && user.scope && user.scope.indexOf('default') !== -1){
-      return <t onClick={()=>{history.push('/home')}}><Home color="#ffffff"/> Home</t>
-    }
-  }  
-
-  getUpload(){
-    const {user, history} = this.props;
-    if(user && user.scope && user.scope.indexOf('default') !== -1){
-      return <t onClick={()=>{history.push('/dcbia/data')}}><FilePlus color="#ffffff"/> Data</t>
-    }
-  }  
 
   onUserLogin(){
     this.props.userLogin(!this.state.showLogin);
@@ -64,55 +46,53 @@ class NavBar extends Component{
     this.props.history.push('/login');
   }
 
+  getUpload(){
+    const {user} = this.props;
+    if(user && user.scope && user.scope.indexOf('clusterpost') != -1){
+      return <Link class="nav-link" to="/data"><FilePlus/> Data</Link>
+    }
+  }  
+
   getUserDropDown(){
     const {user, history} = this.props;
     
-    if(user && user.scope && user.scope.indexOf('default') !== -1){
-      return <NavDropdown title={<t><User/>Account</t>} id="basic-nav-dropdown">
+    if(user && user.scope && user.scope.indexOf('default') != -1){
+      return <NavDropdown title={<User/>} id="basic-nav-dropdown">
           <NavDropdown.Item onClick={()=>{history.push('/user')}}><User/> Profile</NavDropdown.Item>
           <NavDropdown.Divider/>
           <NavDropdown.Item onClick={()=>{history.push('/logout')}}><LogOut/> Logout</NavDropdown.Item>
         </NavDropdown>
     }else{
-      return <NavDropdown title={<t><User/>Account</t>} id="basic-nav-dropdown">
+      return <NavDropdown title={<User/>} id="basic-nav-dropdown">
           <NavDropdown.Item onClick={this.onUserLogin.bind(this)}><LogIn/> Login</NavDropdown.Item>
         </NavDropdown>
     }
   }
-  
 
   render() {
     const self = this;
+    const {user} = self.props;
 
-    return (
-      <Navbar collapseOnSelect bg="primary" expand="lg">
-        <Navbar.Toggle aria-controls="responsive-navbar-nav" />
-        <Navbar.Collapse id="responsive-navbar-nav">
-          <Nav fill variant="pills" defaultActiveKey="/home">
-           
-            <Nav.Item className="mr-2 ml-2">
-              {self.getHome()} </Nav.Item>
-            <Nav.Item className="mr-2 ml-2">
-              {self.getUpload()} </Nav.Item>
-            <Nav.Item className="mr-2 ml-2"> 
-              {self.getClinicalData()} </Nav.Item>
-            <Nav.Item className="mr-2 ml-2"> 
-              {self.getMorphologicalData()} </Nav.Item>
-            <Nav.Item className="mr-2 ml-2"> 
-              {self.getProjects()} </Nav.Item>
-            <Nav.Item className="mr-2 ml-2"> 
-              {self.getTaks()} </Nav.Item> 
-          </Nav>
+    return (<Navbar bg="light" expand="lg">
+      <Navbar.Brand href="#/"><Image src="images/icon.png" style={{height: "10vh"}}/></Navbar.Brand>
+      <Navbar.Toggle aria-controls="basic-navbar-nav" />
+      <Navbar.Collapse id="basic-navbar-nav">
+        <Nav className="mr-auto">
+          <Nav.Link><Link class="nav-link" to="/home"><Home/> Home</Link></Nav.Link>
+          {self.getComputing()}
+          <Nav.Link>
+            {self.getUpload()}
+          </Nav.Link>
+          <Nav.Link>
+            {self.getSettings()}
+          </Nav.Link>
+          <Nav.Link>
+            {self.getUserDropDown()}
+          </Nav.Link>
+        </Nav>
+      </Navbar.Collapse>
+    </Navbar>);               
 
-          <Nav className="ml-auto">
-            <Nav.Item className="mr-2 ml-2 "> 
-              {self.getUserDropDown()} </Nav.Item>
-          </Nav>
-
-
-        </Navbar.Collapse>
-      </Navbar>
-    )
   }
 }
 
