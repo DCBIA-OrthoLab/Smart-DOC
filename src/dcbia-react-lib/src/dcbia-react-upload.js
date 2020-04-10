@@ -8,7 +8,7 @@ import {Trash2, Folder, Plus, ArrowLeft, ArrowDown, ArrowRight, MinusSquare, Plu
 import DcbiaReactService from './dcbia-react-service'
 
 
-import {JWTAuth, JWTAuthInterceptor, JWTAuthProfile, JWTAuthService, JWTAuthUsers} from 'react-hapi-jwt-auth';
+// import {JWTAuth, JWTAuthInterceptor, JWTAuthProfile, JWTAuthService, JWTAuthUsers} from 'react-hapi-jwt-auth';
 
 
 class Upload extends Component {
@@ -80,8 +80,7 @@ class Upload extends Component {
 
 // one get Tree for all cases (displayfiles, go back, etc)
 	getTree() {
-		console.log("-------GET TREE-------")
-		console.log(this.state.histTest)
+		// console.log(this.state.histTest)
 		if (this.state.histTest.length == 0) { 
 			return(this.state.treeMap)
 		} else {
@@ -156,7 +155,7 @@ class Upload extends Component {
 			
 			self.dcbiareactservice.uploadZipFile(data)
 			.then(response => { 
-				console.log(response)
+				// console.log(response)
 				this.setState({fileToUpload: null})
 
 				setTimeout(() => {
@@ -256,7 +255,7 @@ class Upload extends Component {
 
 
 		console.log("----TEST CLICK----")
-		console.log(this.props.users)
+		// console.log(this.props.users)
 		// this.updateDirectoryMap()
 		// const jwtauth = new JWTAuthService();
 
@@ -272,7 +271,6 @@ class Upload extends Component {
 		
 		    Object.keys(obj).forEach(key => {
 		    	if (obj[key].type === "d") {
-		    		console.log(obj[key])
 			    	if (obj[key].path == "data/Archive") {
 
 			    	} else {
@@ -346,7 +344,7 @@ class Upload extends Component {
 
 		self.dcbiareactservice.deleteFile(fileToDelete)
 		.then(res => { 
-			console.log(res)
+			// console.log(res)
 			
 			self.updateDirectoryMap()		
 
@@ -361,19 +359,14 @@ class Upload extends Component {
 	handleSearchFile(e) {
 		const self = this
 		var search = e.target.value
-		var user = this.props.user["email"]
-
-		var data = search + '&' + user
-		// console.log("SEARCHED")
-		// console.log(search)
 
 		var bool = this.state.searchFiles
 		if (search !== '') {this.setState({searchFiles: true})} 
 			else {this.setState({searchFiles: false})}
 
-		self.dcbiareactservice.searchFiles(data)
+		self.dcbiareactservice.searchFiles(search)
 			.then(res => { 
-				console.log(res)
+				// console.log(res)
 				self.setState({suggestions: res.data})
 			})
 	}
@@ -423,7 +416,6 @@ class Upload extends Component {
 						
 {/*						{f.type=='f' && this.state.projectMode && this.state.filesList[f.path].inProject ? <CheckSquare color='#FF0000' size="20" /> : null}
 */}
-						{console.log(f)}
 						
 						{f.type=='d' ? 
 							this.state.filesList[f.path].expand==false ? 
@@ -608,7 +600,7 @@ class Upload extends Component {
 					self.setState({loadingDownload: false})
 				})
 				.catch(error => {
-				    console.log(error.response)
+				    // console.log(error.response)
 				});
 		}
 	}
@@ -616,14 +608,14 @@ class Upload extends Component {
 	wut() {
 
 		// this.setState({uploadPath: e.target.values})
-		console.log("Output Here")
+		// console.log("Output Here")
 
-		console.log("tree map")
-		console.log(this.state.treeMap)
-		console.log("files list")
-		console.log(this.state.filesList)
-		console.log("history map")
-		console.log(this.state.historyMap)
+		// console.log("tree map")
+		// console.log(this.state.treeMap)
+		// console.log("files list")
+		// console.log(this.state.filesList)
+		// console.log("history map")
+		// console.log(this.state.historyMap)
 
 		// console.log("-----TEST-----")
 		// console.log(this.state.filesList)
@@ -685,7 +677,6 @@ class Upload extends Component {
 
 			this.dcbiareactservice.createFolder(formData)
 			.then(res => { 
-				console.log("RESPONSERTGHJ")
 				
 				// error in creation
 				if (!res.data) {
@@ -779,7 +770,7 @@ class Upload extends Component {
 
 		self.dcbiareactservice.shareFiles(infos)
 		.then(response => { 
-			console.log(response)
+			// console.log(response)
 
 			this.setState({showPopUpShare: false, dirToShare: null})			
 		})
@@ -808,7 +799,7 @@ class Upload extends Component {
 
 		self.dcbiareactservice.moveFiles(infos)
 		.then(response => { 
-			console.log(response)
+			// console.log(response)
 
 			self.cleanSelecteFiles()
 			self.setState({showMove: false})
@@ -944,7 +935,7 @@ class Upload extends Component {
 					<Button variant="danger" onClick={() => this.setState({showImportProject: false})} >
 						Cancel
 					</Button>
-					<Button variant="success" disabled onClick={() => console.log("oui")}>
+					<Button variant="success" disabled onClick={() => console.log("project")}>
 						Import
 					</Button>
 				</Modal.Footer>
@@ -1217,9 +1208,9 @@ class Upload extends Component {
 					</Col>
 
 					</Row>
-					<Button onClick = {()=>this.testClick()}> test fct </Button>
+{/*					<Button onClick = {()=>this.testClick()}> test fct </Button>
 					<Button onClick = {()=>this.iterateMap(this.state.treeMap)}> tree map </Button>
-				</Col>
+*/}				</Col>
 				</Row>
 
 					

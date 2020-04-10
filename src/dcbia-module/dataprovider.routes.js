@@ -25,7 +25,7 @@ module.exports = function (server, conf) {
                 scope: ['dentist']
             },
 		    payload: {
-				maxBytes: 20971520000,
+				maxBytes: 1024 * 1024 * 1024,
 				output: 'stream',
 				parse: true
 		    },	        
@@ -92,7 +92,7 @@ module.exports = function (server, conf) {
                 scope: ['dentist']
             },
 		    payload: {
-				maxBytes: 2097152,
+				maxBytes: 1024 * 1024 * 1024,
 				output: 'data',
 				parse: true
 		    },	        

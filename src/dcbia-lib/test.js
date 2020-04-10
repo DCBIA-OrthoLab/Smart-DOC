@@ -140,17 +140,77 @@ lab.experiment("Test dcbia lib", function(){
 
 /////////////
 
+    // lab.test('returns true when user folder map does not exists', function(){
+    //     return dcbia.getDirectoryMap()
+    //     .then(function(res){
+    //         console.log(res)
+    //         // expect(res[0].name == "myFiles").to.be.true()
+    //         // expect(1+1).to.be.equal(2)
+    //     }); 
+    // });
+    lab.test('returns true when user folder map is returned', function(){
+        return dcbia.getDirectoryMap()
+        .then(function(res){
+            console.log(res)
 
-    // var file = 'data/sbrosset@umich.edu/myFiles/scanToDelete.nii'
+            //Check that map is equal to test.zip
+            // Code.expect(JSON.parse(res)["ok"]).to.be.true();
+        }); 
+    });
+
+
+
+    lab.test('returns true when user search and find files', function(){
+        return dcbia.searchFiles()
+        .then(function(res){
+            // console.log(res)
+            // expect(res[0].name == "myFiles").to.be.true()
+            // expect(1+1).to.be.equal(2)
+        }); 
+    });
+    
+
+    // var fileToDelete = 'data/sbrosset@umich.edu/myFiles/scanToDelete.nii'
 
     // lab.test('returns true when user delete files', function(){
-    //     return dcbia.deleteFile(file)
+    //     return dcbia.deleteFile(fileToDelete)
+    //     .then(function(res){
+    //         console.log(res)
+    //         // expect(res[0].name == "myFiles").to.be.true()
+    //         // expect(1+1).to.be.equal(2)
+    //     }); 
+    // });
+
+
+    // var zipfile = 
+    // lab.test('returns true when user upload a zipfile', function(){
+    //     return dcbia.uploadZipFile()
     //     .then(function(res){
     //         // console.log(res)
     //         // expect(res[0].name == "myFiles").to.be.true()
     //         // expect(1+1).to.be.equal(2)
     //     }); 
     // });
+
+
+
+    // var formData = new FormData()
+    // formData.append("name", "folderName")
+    // formData.append("path", 'data/sbrosset@umich.edu/myFiles')
+
+    // lab.test('returns true when user creates a folder', function(){
+    //     return dcbia.createFolder(formData)
+    //     .then(function(res){
+    //         console.log(res)
+    //         // expect(res[0].name == "myFiles").to.be.true()
+    //         // expect(1+1).to.be.equal(2)
+    //     }); 
+    // });
+
+
+
+
+
 
 
 
@@ -199,23 +259,8 @@ lab.experiment("Test dcbia lib", function(){
     //     }); 
     // });
 
-    // lab.test('returns true when user creates a folder', function(){
-    //     return dcbia.createFolder()
-    //     .then(function(res){
-    //         // console.log(res)
-    //         // expect(res[0].name == "myFiles").to.be.true()
-    //         // expect(1+1).to.be.equal(2)
-    //     }); 
-    // });
 
-    // lab.test('returns true when user search and find files', function(){
-    //     return dcbia.searchFiles()
-    //     .then(function(res){
-    //         // console.log(res)
-    //         // expect(res[0].name == "myFiles").to.be.true()
-    //         // expect(1+1).to.be.equal(2)
-    //     }); 
-    // });
+
 
     // lab.test('returns false when user search and don\'t find files', function(){
     //     return dcbia.searchFiles()
@@ -228,31 +273,9 @@ lab.experiment("Test dcbia lib", function(){
 
 
 
-    // lab.test('returns true when user upload a zipfile', function(){
-    //     return dcbia.uploadZipFile()
-    //     .then(function(res){
-    //         // console.log(res)
-    //         // expect(res[0].name == "myFiles").to.be.true()
-    //         // expect(1+1).to.be.equal(2)
-    //     }); 
-    // });
 
-    // lab.test('returns true when user folder map does not exists', function(){
-    //     return dcbia.getDirectoryMap()
-    //     .then(function(res){
-    //         // console.log(res)
-    //         // expect(res[0].name == "myFiles").to.be.true()
-    //         // expect(1+1).to.be.equal(2)
-    //     }); 
-    // });
 
-    // lab.test('returns true when user folder map is returned', function(){
-    //     return dcbia.getDirectoryMap()
-    //     .then(function(res){
-    //         // console.log(res)//Check that map is equal to test.zip
-    //         // Code.expect(JSON.parse(res)["ok"]).to.be.true();
-    //     }); 
-    // });
+
 
 
 

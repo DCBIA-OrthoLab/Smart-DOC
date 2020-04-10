@@ -23,15 +23,15 @@ module.exports = function (server, conf) {
 
 		var filename = doc.hapi.filename
 		var name = filename.split(".");	name = name[0]
-		var path = path.join(uploadPath,filename)
+		var zipPath = path.join(uploadPath,filename)
 
 
-		var out = fs.createWriteStream(path)
+		var out = fs.createWriteStream(zipPath)
 		doc.pipe(out)
 
 		doc.on('end',function() {
 
-			var zip = new admZip(path)
+			var zip = new admZip(zipPath)
 
     // var zipEntries = zip.getEntries(); // an array of ZipEntry records
 
@@ -48,13 +48,13 @@ module.exports = function (server, conf) {
 		    // false for not overwrite ? 
 			zip.extractAllTo(uploadPath,false)
 		    
-		    fs.unlinkSync(path)
+		    fs.unlinkSync(zipPath)
 
 			// MacOs file //
-			fs.rmdir(`${uploadPath}`+"/__MACOSX", (err) => {
-				if (err) throw err; })
+		// 	fs.rmdir(`${uploadPath}`+"/__MACOSX", (err) => {
+		// 		if (err) throw err; })
+		
 		});
-
 		return true;
 	}
 
@@ -97,7 +97,6 @@ module.exports = function (server, conf) {
 	    			if (stats.isSymbolicLink()) {
 	    				fs.exists(fullPath, function(link) {
 	    					if (!link) { 
-
 								fs.unlink(fullPath, (err) => {
 									if (err) throw err;
 								})
@@ -111,26 +110,38 @@ module.exports = function (server, conf) {
 	    		var stats = fs.statSync(fullPath)
 	    		if (stats.isDirectory()){
 	    			directoryMap.push({type:'d', name:filename, path:fullPath, files:getMap(fullPath)})
-	    			// directoryMap[filename] = getMap(fullPath)
 	    		} else {
 	    			directoryMap.push({type:'f', name:filename, path:fullPath})
-	    			// directoryMap[filename] = fullPath
 	    		}
 	    	})
 	    	return directoryMap
 	    }
+
+
+
+	    var personnalPath = path.join(conf.datapath, user)
+
+	    if (!fs.existsSync(personnalPath)) {
+			fs.mkdirSync(path.join(personnalPath,'myFiles'), { recursive: true }, (err) => {if (err) throw err})
+			fs.mkdirSync(path.join(personnalPath,'sharedFiles'), (err) => {if (err) throw err})
+	    } 
+
 		return getMap(path.join(conf.datapath, user));
 	}
+
+			 
+	
 
 
  
 
 	handler.searchFiles = async (req, h) => {
-		var data = req.params.data
-		var d = data.split('&')
-		var fileSearched = d[0]
-		var user = d[1]
-		
+
+		const {query, auth} = req;
+		var user = auth.credentials.email;
+
+		var fileSearched = req.params.data
+
 		var result = []
 		var dir = path.join(conf.datapath,user)
 
@@ -152,6 +163,7 @@ module.exports = function (server, conf) {
 			return result
 		}
 		return searchRecurs(fileSearched,dir)
+	// return "oui"
 	}
 
 
@@ -209,32 +221,16 @@ module.exports = function (server, conf) {
   	var users = req.payload.users  	
   	var currentUser = auth.credentials.email
 
-  	console.log(filepath)
-  	console.log(users)
-  	console.log(currentUser)
+	var relativePath = path.relative(__dirname,filepath)
+	sourcePath = path.join(__dirname,relativePath)
 
-
-  	// source path
-  	var smthng = __dirname.split("").reverse().join("")
-	var ind = smthng.indexOf('/')
-	var dir = smthng.slice(ind+1).split("").reverse().join("")
-	var sourcePath = dir+'/dcbia-server/'+filepath
-	console.log(__dirname)
-	console.log(sourcePath)
-	console.log(path.relative(filepath, __dirname))
-
-	// share path
-  	// var f = filepath.split("").reverse().join("")
-	// var i = f.indexOf('/')
-	// var foldername = f.slice(0,i).split("").reverse().join("")
 	foldername = path.basename(filepath)
 
 
-	let sharePath
+	let sharePath, shareName
   	users.forEach((user) => {
 
-	  	sharePath = './data/'+user+'/sharedFiles/'+user+'-'+foldername
-	  	console.log(sharePath)
+  		sharePath = path.join(conf.datapath,user,"sharedFiles",user.concat('-',foldername))
 	  	if (!fs.existsSync(sharePath)) {
 	  		fs.symlink(sourcePath, sharePath, (err) => {
 				if (err) throw err
