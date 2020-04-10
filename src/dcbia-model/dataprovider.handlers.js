@@ -7,7 +7,6 @@ var couchUpdateViews = require('couch-update-views');
 var path = require('path');
 var qs = require('querystring');
 var fs = require('fs');
-var admZip = require('adm-zip');
 
 module.exports = function (server, conf) {
 	

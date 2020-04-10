@@ -7,9 +7,9 @@ exports.plugin.register = function (server, options) {
 		method: 'GET',
 		config: {
 			handler: {
-				directory: { path: './DCBIA-OrthoLab', listing: false, index: true }
+				directory: { path: './node_modules/dcbia-react-main/build', listing: false, index: true }
 			},
-			description: 'This route serves the static website of ProbtrackBrainConnectivity. Everything inside the plugins/static/public/ directory will be directly accessible under this route.'
+			description: 'This route serves the static website of DCBIA.'
 		}
 	});
 };

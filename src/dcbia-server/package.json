@@ -34,14 +34,12 @@
     "clusterpost-provider": "^4.2.0",
     "couch-provider": "^3.0.1",
     "couch-update-views": "^1.0.9",
-    "create-react-library": "^2.6.7",
     "dcbia-model": "file:../dcbia-model",
     "dcbia-ortholab": "file:../dcbia-ortholab",
     "hapi-jwt-couch": "^4.2.0",
     "lout": "^11.2.3",
     "nodemailer": "^6.3.1",
     "nodemailer-smtp-transport": "^2.7.4",
-    "nodemailer-stub-transport": "^1.1.0",
-    "yauzl": "^2.10.0"
+    "nodemailer-stub-transport": "^1.1.0"
   }
 }

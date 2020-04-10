@@ -8,5 +8,8 @@
   },
   "author": "juanprietob@gmail.com",
   "license": "Apache-2.0",
-  "dependencies": {}
+  "dependencies": {
+    "dcbia-react-main": "file:../dcbia-react-main",
+    "project": "file:../dcbia-react-main"
+  }
 }

@@ -9,6 +9,9 @@ import Activity from './Activity'
 import {JWTAuth, JWTAuthInterceptor, JWTAuthProfile, JWTAuthService, JWTAuthUsers} from 'react-hapi-jwt-auth';
 
 import Container from 'react-bootstrap/Container';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
+import Card from 'react-bootstrap/Card';
 import Modal from 'react-bootstrap/Modal';
 import Jumbotron from 'react-bootstrap/Jumbotron';
 import { connect } from "react-redux";
@@ -17,7 +20,8 @@ import axios from 'axios';
 import store from "./redux/store";
 
 import {DcbiaReactProjects, DcbiaReactMorphologicalData, DcbiaReactClinicalData, DcbiaReactUpload} from 'dcbia-react-lib'
-
+import {ClusterpostJobs, ClusterpostTokens, ClusterpostDashboard} from 'clusterpost-list-react'
+import {MedImgSurf} from 'react-med-img-viewer';
 
 
 class App extends Component {
@@ -54,6 +58,15 @@ class App extends Component {
     const jwtauth = new JWTAuthService();
     jwtauth.setHttp(http);
 
+    http({
+      method: 'GET',
+      url: '/surf/condyle.vtk',
+      responseType: 'text'
+    })
+    .then((res)=>{
+      self.setState({...self.state, landingVtk: res.data});
+    })
+
     Promise.all([jwtauth.getUser(), jwtauth.getUsers()])
     .then(function(result){
       var user = result[0];
@@ -68,17 +81,42 @@ class App extends Component {
 
     });    
       
+  }
 
-
- 
-
-
+  showLanding(){
+    const {landingVtk} = this.state;
+    return (
+      <Container fluid="true">
+        <Row>
+          <Col sm={6}>
+            <Card>
+              <Card.Img variant="top" src="images/teeth.png"/>
+              <Card.Body>
+                <Card.Text>
+                  An open-source, free comprehensive platform for data sharing and computation
+                  allowing dental researchers scientists to support patient-specific decision making and assessment of the disease progression.
+                </Card.Text>
+              </Card.Body>
+            </Card>
+          </Col>
+          <Col sm={6}>
+            <MedImgSurf data={[{data: landingVtk, color: [0,255,255]}]}/>
+          </Col>
+        </Row>
+      </Container>);
   }
  
   showHome(){
     return (
-      <Container>
-          <Activity/>
+      <Container fluid="true">
+          <ClusterpostDashboard/>
+      </Container>);
+  }
+
+  showComputing(){
+    return (
+      <Container fluid="true">
+          <ClusterpostJobs/>
       </Container>);
   }
 
@@ -88,38 +126,21 @@ class App extends Component {
     )
   }
 
-  showTasks(){
-    return (
-      <Container>      
-          <div> Tasks To Do </div>  
-      </Container>);
+  adminUsers(){
+    return (<div class="container">
+        <div class="row justify-content-center">
+          <JWTAuthUsers></JWTAuthUsers>
+        </div>
+      </div>);
   }
 
-  showProjects(){
-    return (
-      <Container>
-          <DcbiaReactProjects/>      
-      </Container>);
-  }
-
-  showMorphologicalData(){
-    return (
-      <Container>
-          <DcbiaReactMorphologicalData/>      
-      </Container>);
-  }
-
-  showclinicalData(){
-    return (
-      <Container>
-          <DcbiaReactClinicalData/>      
-      </Container>);
-  }
-
-
-
-
-  
+  adminServers(){
+    return (<div class="container">
+      <div class="row justify-content-center">
+        <ClusterpostTokens></ClusterpostTokens>
+      </div>
+    </div>);
+  }  
 
   componentWillReceiveProps(newProps){
      if(newProps.user !== this.props.user){
@@ -185,13 +206,12 @@ class App extends Component {
             <Route path="/login" component={this.login.bind(this)}/>
             <Route path="/logout" component={this.login.bind(this)}/>
             <Route path="/user" component={this.profile.bind(this)}/>
-            <Route path="/dcbia/morphologicalData" component={this.showMorphologicalData.bind(this)}/>
-            <Route path="/dcbia/clinicalData" component={this.showclinicalData.bind(this)}/>
-            <Route path="/dcbia/projects" component={this.showProjects.bind(this)}/>
-            <Route path="/dcbia/data" component={this.showUpload.bind(this)}/>
-
-            <Route path="/tasks" component={this.showTasks.bind(this)}/>
-            <Route exact path="/Home" component={this.showHome.bind(this)}/>
+            <Route path="/data" component={this.showUpload.bind(this)}/>
+            <Route path="/computing" component={this.showComputing.bind(this)}/>
+            <Route path="/admin/users" component={this.adminUsers.bind(this)}/>
+            <Route path="/admin/servers" component={this.adminServers.bind(this)}/>
+            <Route path="/home" component={this.showHome.bind(this)}/>
+            <Route exact path="/" component={this.showLanding.bind(this)}/>
           </Container> 
         </HashRouter>
         </div>
