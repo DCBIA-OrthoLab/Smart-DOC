@@ -4,7 +4,7 @@ var fs = require('fs');
 var Promise = require('bluebird');
 var path = require('path');
 var _ = require('underscore');
-var Joi = require('joi');
+var Joi = require('@hapi/joi');
 var qs = require('querystring');
 var os = require('os');
 var HapiJWTCouch = require('hapi-jwt-couch-lib');
@@ -310,7 +310,26 @@ module.exports = class DCBIALib extends HapiJWTCouch{
 
 
 
-
+// get map with own account/admin account - nbr of folders ? etc
+    getDirectoryMap(qs){
+        var self = this;
+        return new Promise(function(resolve, reject){
+            var options = {
+                url : self.getServer() + "/dcbia/map",
+                method: "GET",
+                qs: qs,
+                agentOptions: self.agentOptions,
+                auth: self.auth
+            }
+            request(options, function(err, res, body){
+                if(err){
+                    reject(err);
+                }else{
+                    resolve(body);
+                }
+            })
+        });    
+    }
 
 
 
@@ -363,7 +382,7 @@ module.exports = class DCBIALib extends HapiJWTCouch{
         var self = this;
         return new Promise(function(resolve, reject){
             var options = {
-                url : self.getServer() + "/dcbia/download/",
+                url : self.getServer() + "/dcbia/download/{filesList}",
                 method: "GET",
                 agentOptions: self.agentOptions,
                 auth: self.auth
@@ -405,7 +424,7 @@ module.exports = class DCBIALib extends HapiJWTCouch{
         var self = this;
         return new Promise(function(resolve, reject){
             var options = {
-                url : self.getServer() + "/dcbia/search/",
+                url : self.getServer() + "/dcbia/search/{data}",
                 method: "GET",
                 agentOptions: self.agentOptions,
                 auth: self.auth
@@ -426,7 +445,7 @@ module.exports = class DCBIALib extends HapiJWTCouch{
         var self = this;
         return new Promise(function(resolve, reject){
             var options = {
-                url : self.getServer() + "'/dcbia/data'",
+                url : self.getServer() + "/dcbia/"+file,
                 method: "DELETE",
                 agentOptions: self.agentOptions,
                 auth: self.auth
@@ -446,7 +465,7 @@ module.exports = class DCBIALib extends HapiJWTCouch{
         var self = this;
         return new Promise(function(resolve, reject){
             var options = {
-                url : self.getServer() + "'/dcbia/data'",
+                url : self.getServer() + "/dcbia/data",
                 method: "POST",
                 agentOptions: self.agentOptions,
                 auth: self.auth
@@ -462,25 +481,6 @@ module.exports = class DCBIALib extends HapiJWTCouch{
     }
 
 
-// get map with own account/admin account - nbr of folders ? etc
-    getDirectoryMap(qs){
-        var self = this;
-        return new Promise(function(resolve, reject){
-            var options = {
-                url : self.getServer() + "/dcbia/map",
-                method: "GET",
-                qs: qs,
-                agentOptions: self.agentOptions,
-                auth: self.auth
-            }
-            request(options, function(err, res, body){
-                if(err){
-                    reject(err);
-                }else{
-                    resolve(body);
-                }
-            })
-        });    
-    }
+
     
 }
