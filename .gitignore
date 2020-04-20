@@ -19,3 +19,4 @@ doc/sharingDataArticle/article.ps
 .dcbia-config.json
 conf.my.dentalaws.json
 doc/sharingDataArticle/images/temp/*.png
+src/dcbia-server/data/
