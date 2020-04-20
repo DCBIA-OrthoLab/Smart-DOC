@@ -5,9 +5,11 @@ import {Container, Button, Table, Card, Col, Row, DropdownButton, Dropdown, Form
 
 import {Trash2, Folder, Plus, ArrowLeft, ArrowDown, ArrowRight, MinusSquare, PlusSquare, CheckSquare, XSquare, X, CornerDownLeft, FolderMinus, FolderPlus, MoreVertical, ChevronLeft, ChevronsLeft, Share2, Circle, Download, File, UploadCloud, Move} from 'react-feather'
 
+import Dropzone from 'react-dropzone'
+
 import DcbiaReactService from './dcbia-react-service'
 
-
+const _ = require('underscore');
 // import {JWTAuth, JWTAuthInterceptor, JWTAuthProfile, JWTAuthService, JWTAuthUsers} from 'react-hapi-jwt-auth';
 
 
@@ -27,13 +29,13 @@ class Upload extends Component {
 			filesList: {},
 			loadingUpload: false,
 			loadingDownload: false,
-
+			showUploadDragDrop: false,
 
 			searchFiles: false,
 
 			// for expand folder
 			// openFolder: false,
-			currentFolder: this.props.user ? './data/'+this.props.user["email"] : null,
+			currentFolder: "./myFiles",
 
 			// historyMap: [],
 			histTest: [],
@@ -129,52 +131,16 @@ class Upload extends Component {
 
 
 
-		// --------------  Choose and Upload file -------------- //
-
-	// handleInput(e) {
-	// 	var formData = new FormData()
-	// 	formData.append("zipFile", e.target.files[0])
-	// 	// formData.append("path",this.state.currentFolder)
-	// 	// formData.append("user",this.props.user["name"])
-	//     this.setState({
-	// 		fileToUpload: formData,
-	// 	})
-	// }
-
-	handleUpload() {
+	// --------------  Choose and Upload file -------------- //
+	handleUpload(filelist) {
 		const self = this
-		// let data = this.state.fileToUpload
-		var data = document.getElementById('inputUpload').files[0]
-		var path = this.state.currentFolder
-
-		if(data) {
-			console.log("uploading file")
-
-			var formData = new FormData()
-			formData.append("file", data)
-			formData.append("path", path)
-			
-			this.setState({loadingUpload: true})
-			
-			self.dcbiareactservice.uploadZipFile(formData)
-			.then(response => { 
-
-				// setTimeout(() => {
-				self.updateDirectoryMap()
-				this.setState({loadingUpload: false, showUpload: false})
-				// }, 4000)
-
-				document.getElementById("inputUpload").value = ""
-				
-			})
-
-			.catch(error => {
-			    console.log(error.response)
-			});
-
-			
-			// self.updateFilesList({path: self.state.fileToUpload.get("path")+"/"+self.state.fileToUpload.get("zipFile").name})
-		}
+		const {currentFolder} = self.state;
+		return Promise.all(_.map(filelist, (file)=>{
+			return self.dcbiareactservice.uploadFile(currentFolder + file.path, file);
+		}))
+		.then(()=>{
+			self.updateDirectoryMap();
+		})
 	}
 
 
@@ -358,10 +324,7 @@ class Upload extends Component {
 
 		self.dcbiareactservice.deleteFile(fileToDelete)
 		.then(res => { 
-			// console.log(res)
-			
-			self.updateDirectoryMap()		
-
+			self.updateDirectoryMap();
 		})
 	}
 
@@ -1047,45 +1010,22 @@ class Upload extends Component {
 ///////////////////////////////////////////////////////////////////////////////////////
 
 
+	getFileManager(){
+		const self = this;
+		const {searchFiles, projectMode, selected, currentFolder, showUploadDragDrop} = self.state;
 
-
-///////////////////////////////////////////////////////////////////////////////////////
-
-	render() {
-		const self = this
-
-		return(
-			<Container style={{"max-width":'100%'}}>
-
-				{this.state.showDelete ? this.popUpDelete() : null}
-				{this.state.showCreateFolder ? this.popUpCreateFolder() : null}
-				{this.state.showUpload ? this.popUpUpload() : null}
-				{this.state.showImportProject ? this.popUpImportProject() : null}
-				{this.state.showPopUpShare ? this.popUpShare() : null}
-				{this.state.showMove ? this.popUpMoveFiles() : null}
-				{this.state.showErrorCreateFolder ? this.popUpError() : null}
-{/*				{this.state.showDragNDrop ? this.popUpDrop() : null}
-*/}
-
-
-{/* Card : display all files */}
-{/*///////////////////////////////////////////////*/}
-				<Row>
-	  			<Col style={{"max-width": '65%'}}>
-				<Card className="mt-3" style={{borderColor: "#1b273e", borderWidth: 3, borderRadius: 10}}>
-
+		return (
+			<Card className="mt-3" style={{borderColor: "#1b273e", borderWidth: 3, borderRadius: 10}}>
 				<Card.Header as="h5" className="info" style={{color: "#1b273e", backgroundColor: "#e0e4ec", borderRadius: 10}}>
 					Manage Files
 				</Card.Header>
-					
-					
-					<Navbar bg="light">
+				<Navbar bg="light">
 					<Nav className="mr-auto">
 						<Form inline>
 							<Button variant="outline-primary">Search files</Button>
-							<FormControl id="searchFilesForm" onChange={this.handleSearchFile.bind(this)} type="text" placeholder="file name" className="mr-sm-2" autoComplete="off"/>
+							<FormControl id="searchFilesForm" onChange={(e)=>{self.handleSearchFile(e)}} type="text" placeholder="file name" className="mr-sm-2" autoComplete="off"/>
 
-							<Overlay target={document.getElementById("searchFilesForm")} show={this.state.searchFiles} placement="right">
+							<Overlay target={document.getElementById("searchFilesForm")} show={searchFiles} placement="right">
 								{({placement,...props}) => (
 									<div {...props}
 										style={{
@@ -1094,244 +1034,186 @@ class Upload extends Component {
 										borderRadius: 7,
 										padding: '10px 10px',
 										...props.style,}}>
-										{this.displaySearchedFiles()}
+										{self.displaySearchedFiles()}
 									</div>
 								)}
 							</Overlay>
 
-							<Button variant="outline-primary" type="submit" onClick={() => this.setState({showCreateFolder: true})}>
+							<Button variant="outline-primary" type="submit" onClick={() => self.setState({...self.state, showCreateFolder: true})}>
 								create folder
 							</Button>
 							<FormControl id="formFolderName" type="text" placeholder="Enter folder name" className="mr-sm-2" />
 						</Form>
 					</Nav>
-
-						<Row className="ml-3"style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-							<OverlayTrigger overlay={<Tooltip> Project files selection</Tooltip>} placement={'top'}>
-								{this.state.projectMode ?
-								<Button variant='success' type='radio' className="mr-sm-2" onClick={() => this.setState({projectMode: false})}>Select files</Button>
-								: <Button style={{backgroundColor: '#66B2FF', borderColor: "#66B2FF"}} type='radio' className="mr-sm-2" onClick={() => this.setState({projectMode: true})}>Select files</Button>}
-							</OverlayTrigger>
-						
-							<Col className="ml-3" style={{}}>
-							<Row>
-								<OverlayTrigger overlay={<Tooltip>Download selected files</Tooltip>} placement={'top'}>
-									{this.state.selected ?  
-										<Card style={{width: "auto", height: "auto", "backgroundColor": "#FFA500", cursor:'pointer'}}
-											  onClick={() => this.downloadFiles()}>
-											<Download style={{"color": "white"}}> </Download>
-										</Card>
-										: <Card style={{width: "auto", height: "auto", "backgroundColor": "grey"}}>
-											<Download style={{"color": "white"}}> </Download>
-										</Card>
-									}
-								</OverlayTrigger>
-							</Row>
-							<Row>
-								<i style={{fontSize: 10, color: "#FFA500"}}>Download</i>
-							</Row>
-							</Col>
-
-
-							<Col className="ml-3">
-							<Row>
-								<OverlayTrigger overlay={<Tooltip>Import selected files to project</Tooltip>} placement={'top'}>
-									{this.state.selected ? 
-										<Card style={{width: "auto", height: "auto", "backgroundColor": "#008000", cursor:'pointer'}}
-										  	  onClick={() => this.setState({showImportProject: true})}>
-											<UploadCloud style={{color: "white"}}/>
-										</Card>
-										: <Card style={{width: "auto", height: "auto", "backgroundColor": "grey"}}>
-											<UploadCloud style={{color: "white"}}/>
-										</Card>
-									}
-								</OverlayTrigger>
-							</Row>
-							<Row>
-								<i style={{fontSize: 10, color: "#008000"}}>Import project</i>
-							</Row>
-							</Col>
-
-
-							<Col className="ml-3">
-							<Row>
-							
-								{this.state.selected ? 
-									<Card style={{width: "auto", height: "auto", "backgroundColor": "red", cursor:'pointer'}}
-										  draggable
-										  onDrag={(e) => this.handleDrag(e)}
-										  onDragStart={(e) => this.handleDragStart(e)}>
-										<Move id="moveFiles" style={{color: "white"}}/>
+					<Row className="ml-3" style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+						<OverlayTrigger overlay={<Tooltip> Project files selection</Tooltip>} placement={'top'}>
+							{projectMode ?
+							<Button variant='success' type='radio' className="mr-sm-2" onClick={() => self.setState({...self.state, projectMode: false})}>Select files</Button>
+							: <Button style={{backgroundColor: '#66B2FF', borderColor: "#66B2FF"}} type='radio' className="mr-sm-2" onClick={() => self.setState({...self.state, projectMode: true})}>Select files</Button>}
+						</OverlayTrigger>
+					
+						<Col>
+							<OverlayTrigger overlay={<Tooltip>Download selected files</Tooltip>} placement={'top'}>
+								{selected ?  
+									<Card style={{width: "auto", height: "auto", "backgroundColor": "#FFA500", cursor:'pointer'}}
+										  onClick={() => self.downloadFiles()}>
+										<Download style={{"color": "white"}}> </Download>
 									</Card>
 									: <Card style={{width: "auto", height: "auto", "backgroundColor": "grey"}}>
-										<Move style={{color: "white"}}/>
+										<Download style={{"color": "white"}}> </Download>
 									</Card>
-								}	
-							
-							</Row>
-							<Row>
-								<i style={{fontSize: 10, color: "red"}}>Move files</i>
-							</Row>
-							</Col>
+								}
+							</OverlayTrigger>
+						</Col>
+						<Col>
+							<OverlayTrigger overlay={<Tooltip>Upload files</Tooltip>} placement={'top'}>
+								<Button variant="primary" onClick={()=>{self.setState({...self.state, showUploadDragDrop: true})}}>
+									<UploadCloud/>
+								</Button>
+							</OverlayTrigger>
 
+							<Modal
+								show={showUploadDragDrop}
+								onHide={() =>{self.setState({...self.state, showUploadDragDrop: false})}}
+								size='xl'
+								>
+						        <Modal.Header closeButton>
+						        	<Modal.Title id="example-custom-modal-styling-title">
+						        		Upload 
+					        		</Modal.Title>
+				        		</Modal.Header>
+				        		<Modal.Body>
+				        			<Dropzone onDrop={(acceptedFiles)=>{self.handleUpload(acceptedFiles).then(()=>{self.setState({...self.state, showUploadDragDrop: false})})}}>
+				        				{({getRootProps, getInputProps}) => (
+						        			<Container fluid="true" style={{padding: 0, height: "50vh"}} {...getRootProps()}>
+						        				<Alert variant="primary" style={{height: "100%"}}>
+						        					<Alert.Heading>Drag & Drop some files</Alert.Heading>
+						        					<Col md={{ span: 8, offset: 2 }} style={{"text-align": "center"}}>
+						        						<UploadCloud size={"40vh"}/>
+					        							<input {...getInputProps()} />
+					        						</Col>
+					        						<hr />
+					        					</Alert>
+								            </Container>
+							            )}
+									</Dropzone>
+			        			</Modal.Body>
+							</Modal>
+						</Col>
+						<Col>
+							{selected ? 
+								<Card style={{width: "auto", height: "auto", "backgroundColor": "red", cursor:'pointer'}}
+									  draggable
+									  onDrag={(e) => self.handleDrag(e)}
+									  onDragStart={(e) => self.handleDragStart(e)}>
+									<Move id="moveFiles" style={{color: "white"}}/>
+								</Card>
+								: <Card style={{width: "auto", height: "auto", "backgroundColor": "grey"}}>
+									<Move style={{color: "white"}}/>
+								</Card>
+							}
+						</Col>
+					</Row>
 
-						</Row>
-
-					</Navbar>
-
+				</Navbar>
 				<Card.Body>
 					<Container>
-{/*							{this.state.openFolder ? this.displayFiles(this.state.historyMap[this.state.historyMap.length - 1]) : this.displayFiles(this.state.treeMap)}
-*/}					<Row>
-					<Col>
-					<Alert variant="dark"> 
-						<strong style={{"word-break": "break-all", "color":"#4f6185"}}> {this.state.currentFolder}</strong>  
-					</Alert>
-					</Col>
-					<Col md="auto">
-{/*						<p><strong style={{color: 'black'}}>Selection</strong></p> &nbsp;
-*/}						
-{/*						<Button className="mr-sm-2" disabled={!this.state.projectMode} onClick={() => this.setState({showImportProject: true})}> Import files</Button>
-*/}					</Col>
-					</Row>
-					<Alert variant="dark">
-					{this.displayFiles(this.getTree())}
-					</Alert>
+						<Row>
+							<Col>
+								<Alert variant="dark"> 
+									<strong style={{"word-break": "break-all", "color":"#4f6185"}}> {currentFolder}</strong>  
+								</Alert>
+							</Col>
+						</Row>
+						<Alert variant="dark">
+						{this.displayFiles(this.getTree())}
+						</Alert>
 					</Container>
-					<Row><Col>
-
-{/*						{this.state.downloadMode ?
-							<Button variant='warning' size="sm" type='radio' className="mr-sm-2" onClick={() => this.setState({downloadMode: false})}>Select files</Button>
-							: <Button variant='primary' size="sm" type='radio' className="mr-sm-2" onClick={() => this.setState({downloadMode: true})}>Select files</Button>}
-*/}						
-{/*						{this.state.loadingDownload ? 							
-							<Button variant="info" disabled>
-							<Spinner variant="dark" animation="border" size="sm" role="status"/>
-							<span className="sr-only">Loading...</span>
-							</Button> :
-							<Button variant="outline-primary" size="sm" className="mr-sm-2" onClick={() => this.downloadFiles()}>Download</Button>}
-*/}							{/*<Button variant="outline-primary" size="sm" className="mr-sm-2" onClick={() => this.setState({showMove: true})}>move files to current folder</Button>*/}
-
-					</Col>
-
-					<Col>
-
-{/*					<ButtonGroup>
-
-
-					<Button size="sm" variant="outline-info">share files</Button>
-
-					<DropdownButton id="salut" size="sm" variant="info" value onSelect={function(evt){console.log("selected")}} title="Users">
-						
-
-						<Dropdown.Item eventKey="put user here">user 1</Dropdown.Item>
-						<Dropdown.Item eventKey="here too">this should</Dropdown.Item>
-						<Dropdown.Item eventKey="here">get from props</Dropdown.Item>
-					</DropdownButton>
-					</ButtonGroup>
-*/}
-
-
-					</Col>
-					<Col md='auto'>
-						<OverlayTrigger overlay={<Tooltip>back to previous folder</Tooltip>}
-										placement={'right'}>
-						<ChevronLeft style={{cursor:'pointer'}} onClick={() => this.backFolder()}/>
-						</OverlayTrigger>
-					</Col>
-					<Col md='auto'>
-						<OverlayTrigger overlay={<Tooltip>back to main folder</Tooltip>}
-										placement={'right'}>
-						<ChevronsLeft style={{cursor:'pointer'}} onClick={() => this.setState({currentFolder: './data/'+this.props.user["email"], histTest: []})}/> 
-						</OverlayTrigger>
-					</Col></Row>
-					{/*<Row><Col>
-						<Button variant="outline-primary" size="sm" className="mt-1" onClick={() => this.setState({showMove: true})}>move files to current folder</Button>
-					</Col></Row>*/}
-				</Card.Body>
-				</Card>
-				</Col>
-				
-{/*///////////////////////////////////////////////*/}
-
-
-{/* Card : manage upload/folders */}
-{/*///////////////////////////////////////////////*/}
-				<Col style={{"max-width": '35%'}}>
-				<Row>
-				<Col>
-				<Card className="mt-3 mb-3" style={{borderRadius: 10, borderColor: "#1b273e", borderWidth: 1}}> 
-				<Card.Header as="h5" className="info" style={{color: "#1b273e", backgroundColor: "#e0e4ec", borderRadius: 10}}>
-					Upload files
-				</Card.Header>
-				<Card.Body>
-					<Card.Title>
-						<input id="inputUpload" type="file" name="myZipFile"/>
-					</Card.Title>
-					<Card.Text>
-						{this.state.loadingUpload ? 
-							<Button variant="info" disabled>
-							<Spinner variant="dark" animation="border" size="sm" role="status"/>
-							<span className="sr-only">Loading...</span>
-							</Button> :
-							<Button variant="info" onClick={() => this.setState({showUpload: true})}> Upload </Button>}
-						&nbsp; <i>Upload in</i> <strong style={{color: "Navy"}}>{this.state.currentFolder}</strong>
-						</Card.Text>
-					</Card.Body>
-	  			</Card>
-	  			</Col>
-	  			</Row>
-		  	
-					
-
-
-
-
-
-
-
-{/*///////////////////////////////////////////////*/}
-
-
-{/* Card : Project/Searched files */}
-
-{/*///////////////////////////////////////////////*/}
 					<Row>
-{/*					{this.state.searchFiles == '' ? null :
-					<Col>
-					<Card bg="success" text="white" border="primary">
-					<Card.Header> Searched Files </Card.Header>
-					<Card.Body>
-					{this.displaySearchedFiles()}
-					</Card.Body>
-					</Card>
-					</Col>}
-*/}
-					<Col>
-					<Card style={{borderColor: "#1b273e", borderRadius: 10, borderWidth: 1}}>
-					<Card.Header as="h5" className="info" style={{color: "#1b273e", backgroundColor: "#e0e4ec", borderRadius: 10}}>
-						Selected files
-					</Card.Header>
-					<Card.Body>
-					{this.displaySelectedFiles()}</Card.Body>
-					</Card>
-					</Col>
-
+						<Col md='auto'>
+							<OverlayTrigger overlay={<Tooltip>back to previous folder</Tooltip>}
+											placement={'right'}>
+							<ChevronLeft style={{cursor:'pointer'}} onClick={() => this.backFolder()}/>
+							</OverlayTrigger>
+						</Col>
+						<Col md='auto'>
+							<OverlayTrigger overlay={<Tooltip>back to main folder</Tooltip>}
+											placement={'right'}>
+							<ChevronsLeft style={{cursor:'pointer'}} onClick={() => this.setState({currentFolder: './data/'+this.props.user["email"], histTest: []})}/> 
+							</OverlayTrigger>
+						</Col>
 					</Row>
-{/*					<Button onClick = {()=>this.testClick()}> test fct </Button>
-					<Button onClick = {()=>this.iterateMap(this.state.treeMap)}> tree map </Button>
-*/}				</Col>
+			</Card.Body>
+		</Card>);
+	}
+
+	getUploadManager(){
+		const self = this;
+		const {loadingUpload, currentFolder} = self.state;
+		return (
+		<Container>
+			<Row>
+				<Col>
+					<Card className="mt-3 mb-3" style={{borderRadius: 10, borderColor: "#1b273e", borderWidth: 1}}> 
+						<Card.Header as="h5" className="info" style={{color: "#1b273e", backgroundColor: "#e0e4ec", borderRadius: 10}}>
+							Upload files
+						</Card.Header>
+						<Card.Body>
+							<Card.Title>
+								<input id="inputUpload" type="file" name="myZipFile"/>
+							</Card.Title>
+							<Card.Text>
+								{loadingUpload ? 
+									<Button variant="info" disabled>
+									<Spinner variant="dark" animation="border" size="sm" role="status"/>
+									<span className="sr-only">Loading...</span>
+									</Button> :
+									<Button variant="info" onClick={() => this.setState({showUpload: true})}> Upload </Button>}
+								&nbsp; <i>Upload in</i> <strong style={{color: "Navy"}}>{currentFolder}</strong>
+								</Card.Text>
+							</Card.Body>
+			  			</Card>
+	  			</Col>
+			</Row>
+			<Row>
+				<Col>
+					<Card style={{borderColor: "#1b273e", borderRadius: 10, borderWidth: 1}}>
+						<Card.Header as="h5" className="info" style={{color: "#1b273e", backgroundColor: "#e0e4ec", borderRadius: 10}}>
+							Selected files
+						</Card.Header>
+						<Card.Body>
+							{this.displaySelectedFiles()}
+						</Card.Body>
+					</Card>
+				</Col>
+			</Row>
+		</Container>)
+	}
+
+///////////////////////////////////////////////////////////////////////////////////////
+
+	render() {
+		const self = this
+
+		return(
+			<Container fluid>
+
+				{this.state.showDelete ? this.popUpDelete() : null}
+				{this.state.showCreateFolder ? this.popUpCreateFolder() : null}
+				{this.state.showUpload ? this.popUpUpload() : null}
+				{this.state.showImportProject ? this.popUpImportProject() : null}
+				{this.state.showPopUpShare ? this.popUpShare() : null}
+				{this.state.showMove ? this.popUpMoveFiles() : null}
+				{this.state.showErrorCreateFolder ? this.popUpError() : null}
+				<Row>
+					<Col xs={8} md={8}>
+						{self.getFileManager()}
+					</Col>
+					<Col xs={4} md={4}>
+						{self.getUploadManager()}
+					</Col>
 				</Row>
-
-					
-
-			
 			</Container>
-
-// {/*///////////////////////////////////////////////*/}
-// 				
-		
-
 		)
 	}
 }

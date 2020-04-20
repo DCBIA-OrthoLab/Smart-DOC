@@ -254,7 +254,13 @@ export default class DcbiaReactService {
     });
   }
 
-
+  uploadFile(path, data){
+    return this.http({
+      method: 'POST',
+      url: '/dcbia/upload/' + path,
+      data: data
+    });
+  }
 
   getDirectoryMap(username) {
     return this.http({
@@ -264,11 +270,10 @@ export default class DcbiaReactService {
     });
   }
 
- deleteFile(file){
+ deleteFile(path){
   return this.http({
     method: 'DELETE',
-    url: '/dcbia/delete',
-    data: file
+    url: '/dcbia/delete/' + path
   })
  }
 
