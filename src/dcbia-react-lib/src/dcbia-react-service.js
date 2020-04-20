@@ -249,7 +249,7 @@ export default class DcbiaReactService {
   uploadZipFile(data){
     return this.http({
       method: 'POST',
-      url: '/dcbia/data',
+      url: '/dcbia/uploadZipFile',
       data: data
     });
   }
@@ -267,7 +267,8 @@ export default class DcbiaReactService {
  deleteFile(file){
   return this.http({
     method: 'DELETE',
-    url: '/dcbia/' + file,
+    url: '/dcbia/delete',
+    data: file
   })
  }
 
@@ -288,8 +289,9 @@ export default class DcbiaReactService {
 
  downloadFiles(filesList) {
   return this.http({
-    method: 'GET',
-    url: '/dcbia/download/' + filesList,
+    method: 'POST',
+    url: '/dcbia/download',
+    data: filesList,
     responseType: 'blob',
   })
  }

@@ -3,12 +3,16 @@ import React, {Component} from 'react'
 import { connect } from "react-redux";
 import {Container, Button, Table, Card, Col, Row, DropdownButton, Dropdown, Form, Modal, Alert, OverlayTrigger, Overlay, Tooltip, Popover, Badge, ButtonToolbar, ButtonGroup, InputGroup, FormControl, Spinner, Navbar, Nav} from 'react-bootstrap'
 
-import {Trash2, Folder, Plus, ArrowLeft, ArrowDown, ArrowRight, MinusSquare, PlusSquare, CheckSquare, XSquare, X, CornerDownLeft, FolderMinus, FolderPlus, MoreVertical, ChevronLeft, ChevronsLeft, Share2, Circle} from 'react-feather'
+import {Trash2, Folder, Plus, ArrowLeft, ArrowDown, ArrowRight, MinusSquare, PlusSquare, CheckSquare, XSquare, X, CornerDownLeft, FolderMinus, FolderPlus, MoreVertical, ChevronLeft, ChevronsLeft, Share2, Circle, Download, File, UploadCloud, Move} from 'react-feather'
 
 import DcbiaReactService from './dcbia-react-service'
 
 
 // import {JWTAuth, JWTAuthInterceptor, JWTAuthProfile, JWTAuthService, JWTAuthUsers} from 'react-hapi-jwt-auth';
+
+
+
+// 53 58 64
 
 
 class Upload extends Component {
@@ -43,16 +47,15 @@ class Upload extends Component {
 
 			projectMode: false,
 
-			testvalue: "OUI",
 			// for delete management (PopUp)
 			showDelete: false,
 			fileToDelete: "",
 
+			selected: false,
 
 			dirToShare: null,
 			showPopUpShare: false,
 
-			downloadMode: false,
 			// for DragNDrop management (PopUp)
 			// showDragNDrop: false,
 			// .. . .. use fileToUpload .. . .. 
@@ -122,46 +125,44 @@ class Upload extends Component {
 		this.dcbiareactservice.setHttp(this.props.http);	
 
 		self.updateDirectoryMap()
-	
-
 	}
-
-
 
 
 
 		// --------------  Choose and Upload file -------------- //
 
-	handleInput(e) {
-		var formData = new FormData()
-		formData.append("zipFile", e.target.files[0])
-		// formData.append("path",this.state.currentFolder)
-		// formData.append("user",this.props.user["name"])
-	    this.setState({
-			fileToUpload: formData,
-		})
-	}
+	// handleInput(e) {
+	// 	var formData = new FormData()
+	// 	formData.append("zipFile", e.target.files[0])
+	// 	// formData.append("path",this.state.currentFolder)
+	// 	// formData.append("user",this.props.user["name"])
+	//     this.setState({
+	// 		fileToUpload: formData,
+	// 	})
+	// }
 
 	handleUpload() {
 		const self = this
-		let data = this.state.fileToUpload
+		// let data = this.state.fileToUpload
+		var data = document.getElementById('inputUpload').files[0]
+		var path = this.state.currentFolder
 
 		if(data) {
 			console.log("uploading file")
 
-			data.append("path",this.state.currentFolder)
+			var formData = new FormData()
+			formData.append("file", data)
+			formData.append("path", path)
 			
 			this.setState({loadingUpload: true})
 			
-			self.dcbiareactservice.uploadZipFile(data)
+			self.dcbiareactservice.uploadZipFile(formData)
 			.then(response => { 
-				// console.log(response)
-				this.setState({fileToUpload: null})
 
-				setTimeout(() => {
+				// setTimeout(() => {
 				self.updateDirectoryMap()
 				this.setState({loadingUpload: false, showUpload: false})
-				}, 4000)
+				// }, 4000)
 
 				document.getElementById("inputUpload").value = ""
 				
@@ -171,15 +172,15 @@ class Upload extends Component {
 			    console.log(error.response)
 			});
 
-			// 
-			// self.update`FilesList({path: self.state.fileToUpload.get("path")+"/"+self.state.fileToUpload.get("zipFile").name})
+			
+			// self.updateFilesList({path: self.state.fileToUpload.get("path")+"/"+self.state.fileToUpload.get("zipFile").name})
 		}
 	}
 
 
 
 	popUpUpload() {
-		if (!this.state.fileToUpload) {return}
+		if (document.getElementById('inputUpload').value == '') {return} else {
 		return (
 			<Modal show={this.state.showUpload} onHide={() => this.setState({showUpload: false})}>
 				<Modal.Header closeButton>
@@ -202,7 +203,7 @@ class Upload extends Component {
 
 				</Modal.Footer>
 			</Modal>
-		)
+		)}
 	}
 
 
@@ -255,6 +256,7 @@ class Upload extends Component {
 
 
 		console.log("----TEST CLICK----")
+		console.log(console.log(this.state.fileToUpload))
 		// console.log(this.props.users)
 		// this.updateDirectoryMap()
 		// const jwtauth = new JWTAuthService();
@@ -287,6 +289,19 @@ class Upload extends Component {
 		var bool = files[f.path].selected
 		files[f.path].selected = !bool
 		this.setState({filesList: files})
+
+
+		var somethingSelected = false
+    	Object.keys(files).forEach(key => {
+    		if (files[key].selected == true) {
+    			somethingSelected = true
+    		}
+    	})
+    	if (somethingSelected) {
+    		this.setState({selected: true})
+    	} else {
+    		this.setState({selected: false})
+    	}
 	}
 
 
@@ -305,7 +320,6 @@ class Upload extends Component {
 
 
 
-
 	popUpDelete() {
 		return (
 			<Modal show={this.state.showDelete} onHide={() => this.setState({showDelete: false, fileToDelete: ""})}>
@@ -314,7 +328,7 @@ class Upload extends Component {
 				</Modal.Header>
 
 				<Modal.Body>
-					Confirm delete file - <strong>{this.state.fileToDelete.name}</strong> located at <strong>{this.state.fileToDelete.path}</strong>
+					<text style={{"word-break": "break-all"}}> Confirm delete file - <strong>{this.state.fileToDelete.name}</strong> located at <strong>{this.state.fileToDelete.path}</strong></text>
 				</Modal.Body>
 				<Modal.Footer>
 					<Button variant="danger" onClick={() => this.setState({showDelete: false, fileToDelete: ""})} >
@@ -392,7 +406,45 @@ class Upload extends Component {
 	}
 
 
+	handleDrop(e,f) {
+		const self = this
+		
+	    e.preventDefault();
+	    e.stopPropagation();
+	
+	    if (f.type=="d" && !f.path.includes("sharedFiles") && f.name!=="myFiles") {
+	    	this.handleMoveFiles(f)
+		}
 
+
+	}
+	
+	handleDragOver(e) {
+	    e.preventDefault();
+	    e.stopPropagation();
+	}
+
+	handleDragLeave(e) {
+	    e.preventDefault();
+	    e.stopPropagation();
+	}
+
+	handleDragEnter(e) {
+	    e.preventDefault();
+	    e.stopPropagation();
+	}
+
+	handleDrag(e) {
+	    e.preventDefault();
+	    e.stopPropagation();
+	}
+
+	handleDragStart(e) {
+		console.log('dragstart');
+	    e.stopPropagation();
+	}
+
+// onDrag onDragEnd  onDragExit onDragStart  
 
 
 	displayFiles(param) {
@@ -408,15 +460,25 @@ class Upload extends Component {
 
 					
 					<React.Fragment>
+
+				{/*Card DragNDrop*/}
+				<Card style={{backgroundColor: "#D7D8D9", borderColor: "#D7D8D9"}}
+					onDrop={(e) => this.handleDrop(e,f)}
+					onDragOver={(e) => this.handleDragOver(e)}
+					onDragLeave={(e) => this.handleDragLeave(e)}
+					onDragEnter={(e) => this.handleDragEnter(e)}>
+					
+
 						<Row>
 						<Col>
-
 				{/*add files now as we display them so we do operation on it: expand, inproject, etc*/}
 					{this.updateFilesList(f)}
 						
 {/*						{f.type=='f' && this.state.projectMode && this.state.filesList[f.path].inProject ? <CheckSquare color='#FF0000' size="20" /> : null}
 */}
 						
+						
+
 						{f.type=='d' ? 
 							this.state.filesList[f.path].expand==false ? 
 								<FolderPlus style={{color: "green", cursor:"pointer"}} onClick={() => this.testOnClickArrowDown(f)}/> 
@@ -425,15 +487,17 @@ class Upload extends Component {
 						} &nbsp;
 
 						
-						{f.type=='d' ? <Badge pill variant="info" color="red"
-										// onDrop={(e) => this.handleDrop(e,f)}
-										// onDragOver={(e) => this.handleDragOver(e)}
-										// onDragLeave={(e) => this.handleDragLeave(e)}
-										// onDragEnter={(e) => this.handleDragEnter(e)}
-										onClick={() => this.openFolder(f)}
-										style={{cursor:'pointer'}}
-										>{f.name}</Badge> 
-						:  <i style={{color: 'SteelBlue'}}>{f.name}</i> 
+						{f.type=='d' ? 
+							f.name=='myFiles'||f.name=='sharedFiles' ? 
+								<Badge size="11" 
+									   onClick={() => this.openFolder(f)}
+									   style={{backgroundColor: '#4f6185' ,cursor:'pointer'}}
+									><text style={{color: "white"}}>{f.name}</text></Badge> 
+								: <Badge pill
+										 onClick={() => this.openFolder(f)}
+										 style={{cursor:'pointer', backgroundColor: '#9796b4'}}
+									><text style={{color: "white"}}>{f.name}</text></Badge> 
+							:  <i style={{color: 'SteelBlue'}}>{f.name}</i>
 						} 
 						
 						{f.type=='d' && f.name!=="myFiles" && !f.path.includes("sharedFiles") ? <Share2 style={{color: "#CC444B", height: 15, cursor:"pointer"}} onClick={() => this.setState({dirToShare: f.path, showPopUpShare: true})} /> : null}
@@ -451,10 +515,10 @@ class Upload extends Component {
 							: null 
 						}*/}
 
-						{this.state.projectMode || this.state.downloadMode || f.path.includes("sharedFiles") || f.name=="myFiles" ? null :
+						{this.state.projectMode || f.path.includes("sharedFiles") || f.name=="myFiles" ? null :
 						<Trash2 style={{color: "black", height: 15, cursor:"pointer"}} onClick={()=>this.setState({showDelete: true, fileToDelete: f})}/>}
 						
-						{f.type=='f' && (this.state.downloadMode == true || this.state.projectMode == true) ? 
+						{f.type=='f' && this.state.projectMode == true ? 
 						<input type="checkbox" checked={this.state.filesList[f.path].selected} onClick={() => this.addSelectedFiles(f)}/>						
 						: null} 
 
@@ -463,8 +527,8 @@ class Upload extends Component {
 						: null}
 						</Col>
 						</Row>
+				</Card>
 						<Row>
-
 						<Col md={{offset:"1"}}>
 					{f.type=='d' && this.state.filesList[f.path].expand == true ? this.displayFiles(f.files):null}
 						</Col>
@@ -491,7 +555,7 @@ class Upload extends Component {
 
 	
 
-	displayProjectFiles() {
+	displaySelectedFiles() {
 		var projectFiles = []
 		var files = this.state.filesList
 		for (var elem in files) {
@@ -505,7 +569,7 @@ class Upload extends Component {
 						<Row>
 							 {/*<CornerDownLeft style={{cursor:'pointer'}} onClick={() => this.goToFile(f.name)}/>*/}
 							&nbsp; <X style={{color: "red", cursor: "pointer"}} onClick={() => this.addSelectedFiles({path: f.name})}/>
-							&nbsp; <i>{f.name}</i>
+							&nbsp; <i style={{"word-break": "break-all"}}>{f.name}</i>
 						</Row>
 					)}			
 	
@@ -680,12 +744,12 @@ class Upload extends Component {
 				
 				// error in creation
 				if (!res.data) {
-					this.setState({showErrorCreateFolder: true})
+					this.setState({showErrorCreateFolder: true, showCreateFolder: false})
+				} else {
+
+					this.updateDirectoryMap()
+					this.setState({showCreateFolder: false})
 				}
-
-				this.updateDirectoryMap()
-
-				this.setState({showCreateFolder: false})
 			})
 		}	
 
@@ -778,12 +842,12 @@ class Upload extends Component {
 
 	}
 
-	handleMoveFiles() {
+	handleMoveFiles(f) {
 		const self = this
 
 		var files = this.state.filesList
 		var filesToMove = []
-		var directory = this.state.currentFolder
+		var directory = f.path
 
     	Object.keys(files).forEach(key => {
     		if (files[key].selected == true) {
@@ -839,7 +903,7 @@ class Upload extends Component {
     	Object.values(files).forEach(value => {
     		value["selected"] = false
     	})
-    	this.setState({filesList: files})
+    	this.setState({filesList: files, selected: false})
 
 	}
 
@@ -929,7 +993,7 @@ class Upload extends Component {
 
 				<Modal.Body>
 					<strong>Files list</strong>
-					{this.displayProjectFiles()}
+					{this.displaySelectedFiles()}
 				</Modal.Body>
 				<Modal.Footer>
 					<Button variant="danger" onClick={() => this.setState({showImportProject: false})} >
@@ -981,49 +1045,18 @@ class Upload extends Component {
 
 
 ///////////////////////////////////////////////////////////////////////////////////////
-	// handleDrop(e,f = null) {
-	// 	const self = this
-
-	//     e.preventDefault();
-	//     e.stopPropagation();
-
-	// 	var formData = new FormData()
-	// 	formData.append("zipFile", e.dataTransfer.files[0])
-	// 	formData.append("path",f.path)
-
-	// 	// self.dcbiareactservice.uploadFile(formData)
-	// 	// .then(res => { 
-	// 	// 	// self.updateDirectoryMap()
-	// 	// 	// console.log("----call file list-----")
-	// 	// 	// self.updateFilesList({path: f.path})
-
-	// 	// })
-
-	// 	this.setState({showDragNDrop: true, fileToUpload: f})
-	// }
 
 
-	// handleDragOver(e) {
-	//     e.preventDefault();
-	//     e.stopPropagation();
-	// }
 
-	// handleDragLeave(e) {
-	//     e.preventDefault();
-	//     e.stopPropagation();
-	// }
 
-	// handleDragEnter(e) {
-	//     e.preventDefault();
-	//     e.stopPropagation();
-	// }
 ///////////////////////////////////////////////////////////////////////////////////////
 
 	render() {
 		const self = this
 
 		return(
-			<Card style={{'margin-top':"1%",'margin-left':"1%",'margin-right':"1%"}}>
+			<Container style={{"max-width":'100%'}}>
+
 				{this.state.showDelete ? this.popUpDelete() : null}
 				{this.state.showCreateFolder ? this.popUpCreateFolder() : null}
 				{this.state.showUpload ? this.popUpUpload() : null}
@@ -1037,75 +1070,148 @@ class Upload extends Component {
 
 {/* Card : display all files */}
 {/*///////////////////////////////////////////////*/}
-	  			<Row>
-	  			<Col style={{"max-width": '50%'}}>
-				<Card border='primary' style={{borderRadius: 10}}>
+				<Row>
+	  			<Col style={{"max-width": '65%'}}>
+				<Card className="mt-3" style={{borderColor: "#1b273e", borderWidth: 3, borderRadius: 10}}>
 
-				<Card.Header>
-					<Form inline>
-						<Button variant="outline-primary">Search files</Button>
-						<FormControl id="searchFilesForm" onChange={this.handleSearchFile.bind(this)} type="text" placeholder="file name" className="mr-sm-2" autoComplete="off"/>
-
-						<Overlay target={document.getElementById("searchFilesForm")} show={this.state.searchFiles} placement="bottom">
-							{({placement,...props}) => (
-								<div {...props}
-									style={{
-									backgroundColor: '#53A451',
-									color: 'white',
-									borderRadius: 7,
-									padding: '10px 10px',
-									...props.style,}}>
-									{this.displaySearchedFiles()}
-								</div>
-							)}
-						</Overlay>
-
-						<Button variant="outline-primary" type="submit" onClick={() => this.setState({showCreateFolder: true})}>
-							create folder
-						</Button>
-						<FormControl id="formFolderName" type="text" placeholder="Enter folder name" className="mr-sm-2" />
-
-					</Form>
+				<Card.Header as="h5" className="info" style={{color: "#1b273e", backgroundColor: "#e0e4ec", borderRadius: 10}}>
+					Manage Files
 				</Card.Header>
+					
+					
+					<Navbar bg="light">
+					<Nav className="mr-auto">
+						<Form inline>
+							<Button variant="outline-primary">Search files</Button>
+							<FormControl id="searchFilesForm" onChange={this.handleSearchFile.bind(this)} type="text" placeholder="file name" className="mr-sm-2" autoComplete="off"/>
+
+							<Overlay target={document.getElementById("searchFilesForm")} show={this.state.searchFiles} placement="right">
+								{({placement,...props}) => (
+									<div {...props}
+										style={{
+										backgroundColor: '#53A451',
+										color: 'white',
+										borderRadius: 7,
+										padding: '10px 10px',
+										...props.style,}}>
+										{this.displaySearchedFiles()}
+									</div>
+								)}
+							</Overlay>
+
+							<Button variant="outline-primary" type="submit" onClick={() => this.setState({showCreateFolder: true})}>
+								create folder
+							</Button>
+							<FormControl id="formFolderName" type="text" placeholder="Enter folder name" className="mr-sm-2" />
+						</Form>
+					</Nav>
+
+						<Row className="ml-3"style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+							<OverlayTrigger overlay={<Tooltip> Project files selection</Tooltip>} placement={'top'}>
+								{this.state.projectMode ?
+								<Button variant='success' type='radio' className="mr-sm-2" onClick={() => this.setState({projectMode: false})}>Select files</Button>
+								: <Button style={{backgroundColor: '#66B2FF', borderColor: "#66B2FF"}} type='radio' className="mr-sm-2" onClick={() => this.setState({projectMode: true})}>Select files</Button>}
+							</OverlayTrigger>
+						
+							<Col className="ml-3" style={{}}>
+							<Row>
+								<OverlayTrigger overlay={<Tooltip>Download selected files</Tooltip>} placement={'top'}>
+									{this.state.selected ?  
+										<Card style={{width: "auto", height: "auto", "backgroundColor": "#FFA500", cursor:'pointer'}}
+											  onClick={() => this.downloadFiles()}>
+											<Download style={{"color": "white"}}> </Download>
+										</Card>
+										: <Card style={{width: "auto", height: "auto", "backgroundColor": "grey"}}>
+											<Download style={{"color": "white"}}> </Download>
+										</Card>
+									}
+								</OverlayTrigger>
+							</Row>
+							<Row>
+								<i style={{fontSize: 10, color: "#FFA500"}}>Download</i>
+							</Row>
+							</Col>
+
+
+							<Col className="ml-3">
+							<Row>
+								<OverlayTrigger overlay={<Tooltip>Import selected files to project</Tooltip>} placement={'top'}>
+									{this.state.selected ? 
+										<Card style={{width: "auto", height: "auto", "backgroundColor": "#008000", cursor:'pointer'}}
+										  	  onClick={() => this.setState({showImportProject: true})}>
+											<UploadCloud style={{color: "white"}}/>
+										</Card>
+										: <Card style={{width: "auto", height: "auto", "backgroundColor": "grey"}}>
+											<UploadCloud style={{color: "white"}}/>
+										</Card>
+									}
+								</OverlayTrigger>
+							</Row>
+							<Row>
+								<i style={{fontSize: 10, color: "#008000"}}>Import project</i>
+							</Row>
+							</Col>
+
+
+							<Col className="ml-3">
+							<Row>
+							
+								{this.state.selected ? 
+									<Card style={{width: "auto", height: "auto", "backgroundColor": "red", cursor:'pointer'}}
+										  draggable
+										  onDrag={(e) => this.handleDrag(e)}
+										  onDragStart={(e) => this.handleDragStart(e)}>
+										<Move id="moveFiles" style={{color: "white"}}/>
+									</Card>
+									: <Card style={{width: "auto", height: "auto", "backgroundColor": "grey"}}>
+										<Move style={{color: "white"}}/>
+									</Card>
+								}	
+							
+							</Row>
+							<Row>
+								<i style={{fontSize: 10, color: "red"}}>Move files</i>
+							</Row>
+							</Col>
+
+
+						</Row>
+
+					</Navbar>
 
 				<Card.Body>
-
 					<Container>
 {/*							{this.state.openFolder ? this.displayFiles(this.state.historyMap[this.state.historyMap.length - 1]) : this.displayFiles(this.state.treeMap)}
 */}					<Row>
 					<Col>
 					<Alert variant="dark"> 
-						<p><strong>Manage files</strong></p>
-						<strong style={{"word-break": "break-all", "color":"#4AA0B5"}}> {this.state.currentFolder}</strong>  
+						<strong style={{"word-break": "break-all", "color":"#4f6185"}}> {this.state.currentFolder}</strong>  
 					</Alert>
 					</Col>
 					<Col md="auto">
-					<Alert variant="primary">
-						<p><strong style={{color: 'black'}}>Manage project</strong></p> &nbsp;
-						<OverlayTrigger overlay={<Tooltip> Project files selection</Tooltip>} placement={'top'}>
-							{this.state.projectMode ?
-							<Button variant='success' type='radio' className="mr-sm-2" onClick={() => this.setState({projectMode: false})}>Select files</Button>
-							: <Button variant='primary' type='radio' className="mr-sm-2" onClick={() => this.setState({projectMode: true})}>Select files</Button>}
-						</OverlayTrigger>
-						<Button className="mr-sm-2" disabled={!this.state.projectMode} onClick={() => this.setState({showImportProject: true})}> Import files</Button>
-					</Alert>
-					</Col>
+{/*						<p><strong style={{color: 'black'}}>Selection</strong></p> &nbsp;
+*/}						
+{/*						<Button className="mr-sm-2" disabled={!this.state.projectMode} onClick={() => this.setState({showImportProject: true})}> Import files</Button>
+*/}					</Col>
 					</Row>
 					<Alert variant="dark">
 					{this.displayFiles(this.getTree())}
 					</Alert>
 					</Container>
 					<Row><Col>
-						{this.state.downloadMode ?
+
+{/*						{this.state.downloadMode ?
 							<Button variant='warning' size="sm" type='radio' className="mr-sm-2" onClick={() => this.setState({downloadMode: false})}>Select files</Button>
 							: <Button variant='primary' size="sm" type='radio' className="mr-sm-2" onClick={() => this.setState({downloadMode: true})}>Select files</Button>}
-						
-						{this.state.loadingDownload ? 							
+*/}						
+{/*						{this.state.loadingDownload ? 							
 							<Button variant="info" disabled>
 							<Spinner variant="dark" animation="border" size="sm" role="status"/>
 							<span className="sr-only">Loading...</span>
 							</Button> :
-							<Button variant="outline-primary" size="sm" placement="left" onClick={() => this.downloadFiles()}>Download</Button>}
+							<Button variant="outline-primary" size="sm" className="mr-sm-2" onClick={() => this.downloadFiles()}>Download</Button>}
+*/}							{/*<Button variant="outline-primary" size="sm" className="mr-sm-2" onClick={() => this.setState({showMove: true})}>move files to current folder</Button>*/}
+
 					</Col>
 
 					<Col>
@@ -1139,9 +1245,9 @@ class Upload extends Component {
 						<ChevronsLeft style={{cursor:'pointer'}} onClick={() => this.setState({currentFolder: './data/'+this.props.user["email"], histTest: []})}/> 
 						</OverlayTrigger>
 					</Col></Row>
-					<Row><Col>
-						<Button variant="outline-primary" size="sm" className="mt-1" onClick={() => this.setState({showMove: true})}> move files to current folder </Button>
-					</Col></Row>
+					{/*<Row><Col>
+						<Button variant="outline-primary" size="sm" className="mt-1" onClick={() => this.setState({showMove: true})}>move files to current folder</Button>
+					</Col></Row>*/}
 				</Card.Body>
 				</Card>
 				</Col>
@@ -1151,14 +1257,16 @@ class Upload extends Component {
 
 {/* Card : manage upload/folders */}
 {/*///////////////////////////////////////////////*/}
-				<Col style={{"max-width": '50%'}}>
+				<Col style={{"max-width": '35%'}}>
 				<Row>
 				<Col>
-				<Card border='info' className="mb-3" style={{borderRadius: 10}}> 
-				<Card.Header> Select and upload files </Card.Header>
+				<Card className="mt-3 mb-3" style={{borderRadius: 10, borderColor: "#1b273e", borderWidth: 1}}> 
+				<Card.Header as="h5" className="info" style={{color: "#1b273e", backgroundColor: "#e0e4ec", borderRadius: 10}}>
+					Upload files
+				</Card.Header>
 				<Card.Body>
 					<Card.Title>
-						<input id="inputUpload" type="file" name="myZipFile" onChange={this.handleInput.bind(this)}/>
+						<input id="inputUpload" type="file" name="myZipFile"/>
 					</Card.Title>
 					<Card.Text>
 						{this.state.loadingUpload ? 
@@ -1200,10 +1308,12 @@ class Upload extends Component {
 					</Col>}
 */}
 					<Col>
-					<Card border="success" style={{borderRadius: 10}}>
-					<Card.Header>Selected files</Card.Header>
+					<Card style={{borderColor: "#1b273e", borderRadius: 10, borderWidth: 1}}>
+					<Card.Header as="h5" className="info" style={{color: "#1b273e", backgroundColor: "#e0e4ec", borderRadius: 10}}>
+						Selected files
+					</Card.Header>
 					<Card.Body>
-					{this.displayProjectFiles()}</Card.Body>
+					{this.displaySelectedFiles()}</Card.Body>
 					</Card>
 					</Col>
 
@@ -1215,7 +1325,8 @@ class Upload extends Component {
 
 					
 
-			</Card>
+			
+			</Container>
 
 // {/*///////////////////////////////////////////////*/}
 // 				

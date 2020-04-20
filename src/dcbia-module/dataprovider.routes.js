@@ -4,32 +4,26 @@ module.exports = function (server, conf) {
 	var handlers = require('./dataprovider.handlers')(server, conf);
 	var Joi = require('@hapi/joi');	
 	
-	var infos = Joi.object({
-        	directory: Joi.string(),
-        	files: Joi.array(),
-        });
-
-	var shareInfos = Joi.object({
-		users: Joi.array(),
-		directory: Joi.string(),
-	})
-
-
 
 	server.route({
 	    method: 'POST',
-	    path: '/dcbia/data',
+	    path: '/dcbia/uploadZipFile',
 	    config: {
 			auth: {
                 strategy: 'token',
                 scope: ['dentist']
             },
+	        handler: handlers.uploadZipFile,
+		    validate : {
+		    	query: false,
+		    	params: null,
+		    	payload: true
+		    },
 		    payload: {
 				maxBytes: 1024 * 1024 * 1024,
 				output: 'stream',
 				parse: true
 		    },	        
-	        handler: handlers.uploadZipFile,
 	        description: 'upload a zipfile on server'
 	    }
 	});
@@ -43,14 +37,14 @@ module.exports = function (server, conf) {
                 strategy: 'token',
                 scope: ['dentist']
             },
-            validate: {
+			handler: handlers.getDirectoryMap,
+           	validate: {
 			  	query: Joi.object().keys({
 			    	email: Joi.string().email()
 			    }).optional(),
 			    params: null, 
 			    payload: false
 			},
-			handler: handlers.getDirectoryMap
 		}
 	})
 
@@ -59,27 +53,49 @@ module.exports = function (server, conf) {
 
 	server.route({
 		method: 'DELETE',
-		path: '/dcbia/{file*}',
+		path: '/dcbia/delete',
 		config: {
 			auth: {
                 strategy: 'token',
                 scope: ['dentist']
             },
-
 			handler: handlers.deleteFile,
-			description: "delete file"
+			validate: {
+				query: false,
+				params: null,
+				payload: true
+			},
+		    payload: {
+				maxBytes: 1024 * 1024 * 1024,
+				output: 'data',
+		    },	        
+
+			description: "delete a file from the server"
 		}
 	})
 
+
+
+
+
+
 	server.route({
 		method: 'GET',
-		path: '/dcbia/search/{data*}',
+		path: '/dcbia/search/{data}',
 		config: {
 			auth: {
                 strategy: 'token',
                 scope: ['dentist']
             },
-			handler: handlers.searchFiles
+			handler: handlers.searchFiles,
+			validate: {
+				query: false,
+				params: Joi.object({
+					data: Joi.string().required()
+				}),
+				payload: false
+			},
+			description: 'search for a file in the user personnal space'
 		}
 	})
 
@@ -91,25 +107,35 @@ module.exports = function (server, conf) {
                 strategy: 'token',
                 scope: ['dentist']
             },
-		    payload: {
-				maxBytes: 1024 * 1024 * 1024,
-				output: 'data',
-				parse: true
-		    },	        
 	        handler: handlers.createFolder,
-		} 
+	        validate: {
+	        	query: false,
+	        	payload: Joi.object({
+	        		name: Joi.string().required(),
+	        		path: Joi.string().required()
+	        	}),
+	        	params: null
+	        },
+	    description: 'create a folder at the path in the user personnal space'
+	    }
 	})
 
 	server.route({
-		method: 'GET',
-		path: '/dcbia/download/{filesList*}',
+		method: 'POST',
+		path: '/dcbia/download',
 		config: {
 			auth: {
                 strategy: 'token',
                 scope: ['dentist']
             },
-			handler: handlers.downloadFiles
-		}
+			handler: handlers.downloadFiles,
+			validate: {
+				query: false,
+				payload: true,
+				params: null
+			},
+		description: 'download list of selected files'
+		},
 	})
 
 	server.route({
@@ -123,7 +149,10 @@ module.exports = function (server, conf) {
 			handler: handlers.shareFiles,
 			validate: {
 				query: false,
-			    payload: shareInfos,
+			    payload: Joi.object({
+					users: Joi.array(),
+					directory: Joi.string(),
+				}),
 			    params: null		    
 			},
 		}
@@ -141,7 +170,10 @@ module.exports = function (server, conf) {
 			handler: handlers.moveFiles,
 			validate: {
 				query: false,
-			    payload: infos,
+			    payload: Joi.object({
+			    	directory: Joi.string(),
+			    	files: Joi.array(),
+			    }),
 			    params: null		    
 			},
 		}
