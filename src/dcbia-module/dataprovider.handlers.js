@@ -18,13 +18,12 @@ module.exports = function (server, conf) {
 	*/
 
 	handler.uploadZipFile = async (req, h) => {
-		var doc = req.payload.zipFile			
+		var doc = req.payload.file			
 		var uploadPath = req.payload.path
 
 		var filename = doc.hapi.filename
-		var name = filename.split(".");	name = name[0]
-		var zipPath = path.join(uploadPath,filename)
 
+		var zipPath = path.join(uploadPath,filename)
 
 		var out = fs.createWriteStream(zipPath)
 		doc.pipe(out)
@@ -33,18 +32,6 @@ module.exports = function (server, conf) {
 
 			var zip = new admZip(zipPath)
 
-    // var zipEntries = zip.getEntries(); // an array of ZipEntry records
-
-		  //	zipEntries.forEach(function(zipEntry) {
-		  //    console.log(zipEntry['name']); 
-		  //    console.log(zipEntry.toString())
-		  //    zip.extractEntryTo(/*entry name*/zipEntry, /*target path*/"./data/sbrosset", /*maintainEntryPath*/false, /*overwrite*/true);
-
-		  //   });
-
-
-
-		  	// TO DO
 		    // false for not overwrite ? 
 			zip.extractAllTo(uploadPath,false)
 		    
@@ -60,7 +47,7 @@ module.exports = function (server, conf) {
 
 
 	handler.deleteFile = async (req, h) => {
-		var path = req.params.file;
+		var path = req.payload;
 
 		if(!fs.existsSync(path)) 
         	return false;
@@ -69,7 +56,8 @@ module.exports = function (server, conf) {
 		var stats = fs.statSync(path)
 
 		if(stats.isDirectory()){
-			fs.rmdir(path, { recursive: true }, (err) => {
+			// fs.rmdir(path, { recursive: true }, (err) => {
+			fs.rmdir(path, (err) => {
 				if (err) throw err;
 			});
 		} else {
@@ -163,7 +151,6 @@ module.exports = function (server, conf) {
 			return result
 		}
 		return searchRecurs(fileSearched,dir)
-	// return "oui"
 	}
 
 
@@ -193,8 +180,9 @@ module.exports = function (server, conf) {
 		
 
 	handler.downloadFiles = async (req, h) => {
-		var list = req.params.filesList
-		list = list.split(',')
+		var files = req.payload
+
+		list = Object.values(files)
 
 		var zip = new admZip()
 
