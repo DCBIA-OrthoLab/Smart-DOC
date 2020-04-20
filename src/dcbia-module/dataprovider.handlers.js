@@ -1,72 +1,75 @@
-var request = require('request');
-var _ = require('underscore');
-var Promise = require('bluebird');
-var Boom = require('@hapi/boom');
-var spawn = require('child_process').spawn;
-var couchUpdateViews = require('couch-update-views');
-var path = require('path');
-var qs = require('querystring');
-var fs = require('fs');
-var admZip = require('adm-zip');
+
+const _ = require('underscore');
+const Promise = require('bluebird');
+const Boom = require('@hapi/boom');
+const spawn = require('child_process').spawn;
+const path = require('path');
+const qs = require('querystring');
+const fs = require('fs');
+const admZip = require('adm-zip');
 
 module.exports = function (server, conf) {
 	
 	
+	const deleteRecursive = (filepath)=>{
+		try{
+			if(fs.statSync(filepath).isDirectory()){
+				fs.readdirSync(filepath).forEach(function(file) {
+					var currentpath = path.join(filepath, file);
+					deleteRecursive(currentpath);
+				});
+				fs.rmdirSync(filepath);
+			}else{
+				fs.unlinkSync(filepath);
+			}
+		    return true;	
+		}catch(e){
+			console.error(e);
+			return false;
+		}
+		
+	}
 
 	var handler = {};
 	/*
 	*/
 
-	handler.uploadZipFile = async (req, h) => {
-		var doc = req.payload.file			
-		var uploadPath = req.payload.path
+	handler.uploadFile = async (req, h) => {
+		const {auth, params, payload} = req;
+		const {credentials} = auth;
+		const {target_path} = params;
 
-		var filename = doc.hapi.filename
+		return new Promise((resolve, reject)=>{
+			
+			var filename = path.join(conf.datapath, credentials.email, target_path);
+			var dirname = path.dirname(filename);
 
-		var zipPath = path.join(uploadPath,filename)
+			if(!fs.existsSync(path)){
+				fs.mkdirSync(dirname, { recursive: true }, (err) => {if (err) reject(err)});
+			}
 
-		var out = fs.createWriteStream(zipPath)
-		doc.pipe(out)
+			payload.pipe(fs.createWriteStream(filename))
 
-		doc.on('end',function() {
-
-			var zip = new admZip(zipPath)
-
-		    // false for not overwrite ? 
-			zip.extractAllTo(uploadPath,false)
-		    
-		    fs.unlinkSync(zipPath)
-
-			// MacOs file //
-		// 	fs.rmdir(`${uploadPath}`+"/__MACOSX", (err) => {
-		// 		if (err) throw err; })
-		
+			payload.on('end',function() {
+				resolve("File uploaded!");
+			});
 		});
-		return true;
 	}
 
 
 	handler.deleteFile = async (req, h) => {
-		var path = req.payload;
+		const {auth, params, payload} = req;
+		const {credentials} = auth;
+		const {target_path} = params;
 
-		if(!fs.existsSync(path)) 
-        	return false;
-
-
-		var stats = fs.statSync(path)
-
-		if(stats.isDirectory()){
-			// fs.rmdir(path, { recursive: true }, (err) => {
-			fs.rmdir(path, (err) => {
-				if (err) throw err;
-			});
-		} else {
-			fs.unlink(path, (err) => {
-				if (err) throw err;
-			})
-		}
-
-		return true;
+		return new Promise((resolve, reject)=>{
+			var filename = path.join(conf.datapath, credentials.email, target_path);
+			if(deleteRecursive(filename)){
+				resolve("File deleted!");
+			}else{
+				reject("Cannot delete:", target_path);
+			}
+		});
 	}
 
 
@@ -75,7 +78,7 @@ module.exports = function (server, conf) {
 		var credentials = auth.credentials;
 		var user = query.email ? query.email : credentials.email;
 
-	    var getMap = function(directory){
+	    var getMap = function(directory, root_folder){
 	    	var directoryMap = []
 	    	_.each(fs.readdirSync(directory), function(filename){
 	    		var fullPath = path.join(directory, filename)
@@ -97,24 +100,22 @@ module.exports = function (server, conf) {
 
 	    		var stats = fs.statSync(fullPath)
 	    		if (stats.isDirectory()){
-	    			directoryMap.push({type:'d', name:filename, path:fullPath, files:getMap(fullPath)})
+	    			directoryMap.push({type:'d', name: filename, path: path.relative(root_folder, fullPath), files: getMap(fullPath, root_folder)})
 	    		} else {
-	    			directoryMap.push({type:'f', name:filename, path:fullPath})
+	    			directoryMap.push({type:'f', name: filename, path: path.relative(root_folder, fullPath)})
 	    		}
 	    	})
 	    	return directoryMap
 	    }
-
-
 
 	    var personnalPath = path.join(conf.datapath, user)
 
 	    if (!fs.existsSync(personnalPath)) {
 			fs.mkdirSync(path.join(personnalPath,'myFiles'), { recursive: true }, (err) => {if (err) throw err})
 			fs.mkdirSync(path.join(personnalPath,'sharedFiles'), (err) => {if (err) throw err})
-	    } 
-
-		return getMap(path.join(conf.datapath, user));
+	    }
+	    
+		return getMap(personnalPath, personnalPath);
 	}
 
 			 
@@ -194,11 +195,6 @@ module.exports = function (server, conf) {
 		
 		return sendThis
 	}
-
-
-
-
-
 
 
   handler.shareFiles = async (req, h) => {

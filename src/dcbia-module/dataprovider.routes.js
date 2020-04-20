@@ -7,16 +7,18 @@ module.exports = function (server, conf) {
 
 	server.route({
 	    method: 'POST',
-	    path: '/dcbia/uploadZipFile',
+	    path: '/dcbia/upload/{target_path*}',
 	    config: {
 			auth: {
                 strategy: 'token',
                 scope: ['dentist']
             },
-	        handler: handlers.uploadZipFile,
+	        handler: handlers.uploadFile,
 		    validate : {
 		    	query: false,
-		    	params: null,
+		    	params: Joi.object({
+					target_path: Joi.string().required()
+		    	}),
 		    	payload: true
 		    },
 		    payload: {
@@ -24,7 +26,7 @@ module.exports = function (server, conf) {
 				output: 'stream',
 				parse: true
 		    },	        
-	        description: 'upload a zipfile on server'
+	        description: 'upload a file on the server'
 	    }
 	});
 
@@ -53,7 +55,7 @@ module.exports = function (server, conf) {
 
 	server.route({
 		method: 'DELETE',
-		path: '/dcbia/delete',
+		path: '/dcbia/delete/{target_path*}',
 		config: {
 			auth: {
                 strategy: 'token',
@@ -62,14 +64,14 @@ module.exports = function (server, conf) {
 			handler: handlers.deleteFile,
 			validate: {
 				query: false,
-				params: null,
-				payload: true
+				params: Joi.object({
+					target_path: Joi.string().required()
+		    	}),
+				payload: false
 			},
-		    payload: {
-				maxBytes: 1024 * 1024 * 1024,
-				output: 'data',
-		    },	        
-
+			payload:{
+				output: 'data'
+			},
 			description: "delete a file from the server"
 		}
 	})
