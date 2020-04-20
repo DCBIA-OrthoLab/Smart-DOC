@@ -35,7 +35,7 @@
     "couch-provider": "^3.0.1",
     "couch-update-views": "^1.0.9",
     "dcbia-model": "file:../dcbia-model",
-    "dcbia-module": "file:../dcbia-module",
+    "dcbia-module": "file:../dcbia-filebrowser",
     "dcbia-ortholab": "file:../dcbia-ortholab",
     "hapi-jwt-couch": "^4.2.0",
     "lout": "^11.2.3",
