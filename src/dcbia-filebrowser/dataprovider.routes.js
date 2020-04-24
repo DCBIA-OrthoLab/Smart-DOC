@@ -114,7 +114,7 @@ module.exports = function (server, conf) {
 	        	query: false,
 	        	payload: Joi.object({
 	        		name: Joi.string().required(),
-	        		path: Joi.string().required()
+	        		targetpath: Joi.string().required()
 	        	}),
 	        	params: null
 	        },
@@ -173,8 +173,8 @@ module.exports = function (server, conf) {
 			validate: {
 				query: false,
 			    payload: Joi.object({
-			    	directory: Joi.string(),
-			    	files: Joi.array(),
+			    	source: Joi.string(),
+			    	target: Joi.string(),
 			    }),
 			    params: null		    
 			},
