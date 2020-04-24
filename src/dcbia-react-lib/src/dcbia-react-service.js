@@ -246,13 +246,13 @@ export default class DcbiaReactService {
 
 
 
-  uploadZipFile(data){
-    return this.http({
-      method: 'POST',
-      url: '/dcbia/uploadZipFile',
-      data: data
-    });
-  }
+  // uploadZipFile(data){
+  //   return this.http({
+  //     method: 'POST',
+  //     url: '/dcbia/uploadZipFile',
+  //     data: data
+  //   });
+  // }
 
   uploadFile(path, data){
     return this.http({
