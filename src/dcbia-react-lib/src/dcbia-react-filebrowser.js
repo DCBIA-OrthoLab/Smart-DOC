@@ -11,7 +11,7 @@ import DcbiaReactService from './dcbia-react-service'
 
 const _ = require('underscore');
 // import {JWTAuth, JWTAuthInterceptor, JWTAuthProfile, JWTAuthService, JWTAuthUsers} from 'react-hapi-jwt-auth';
-
+const Promise = require('bluebird')
 
 
 // 53 58 64
@@ -120,16 +120,17 @@ class Filebrowser extends Component {
 			uploadPath = uploadPath.replace('root/','')
 		}
 
-		return Promise.all(_.map(filelist, (file)=>{
+		return Promise.map(filelist, (file)=>{
 			if (self.isInFolder(self.state.treeMap, uploadPath+file.path))
 			{
-				return 'File already uploaded'
+				return Promise.resolve('File already uploaded')
 			} else {
 				return self.dcbiareactservice.uploadFile(uploadPath + file.path, file);
 			}
 
 
-		}))
+		}, {concurrency:1}
+		)
 		.then(()=>{
 			self.updateDirectoryMap();
 		})
@@ -682,7 +683,7 @@ class Filebrowser extends Component {
 				</Modal.Header>
 
 				<Modal.Body>
-					Confirm creating folder - <strong>{document.getElementById("formFolderName").value}</strong>
+					Confirm creating folder - <strong>{document.getElementById("formFolderName").value}</strong>c
 				</Modal.Body>
 				<Modal.Footer>
 					<Button variant="danger" onClick={() => this.setState({showCreateFolder: false})} >
