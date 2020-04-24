@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import store from "./redux/store";
 import {withRouter} from 'react-router-dom';
-import {Home, User, Users, Cpu, Settings, LogOut, LogIn, FilePlus} from 'react-feather';
+import {Home, User, Users, Cpu, Settings, LogOut, LogIn, File, FilePlus} from 'react-feather';
 import NavDropdown from 'react-bootstrap/NavDropdown';
 import Navbar from 'react-bootstrap/Navbar';
 import Nav from 'react-bootstrap/Nav';
@@ -49,7 +49,14 @@ class NavBar extends Component{
   getUpload(){
     const {user} = this.props;
     if(user && user.scope && user.scope.indexOf('clusterpost') != -1){
-      return <Link class="nav-link" to="/data"><FilePlus/> Data</Link>
+      return <Nav.Link><Link class="nav-link" to="/filebrowser"><File/> File browser</Link></Nav.Link>
+    }
+  }  
+
+  getCreatetask(){
+    const {user} = this.props;
+    if(user && user.scope && user.scope.indexOf('clusterpost') != -1){
+      return <Nav.Link><Link class="nav-link" to="/createtask"><FilePlus/> Create task</Link></Nav.Link>
     }
   }  
 
@@ -78,11 +85,11 @@ class NavBar extends Component{
       <Navbar.Toggle aria-controls="basic-navbar-nav" />
       <Navbar.Collapse id="basic-navbar-nav">
         <Nav className="mr-auto">
-          <Nav.Link><Link class="nav-link" to="/home"><Home/> Home</Link></Nav.Link>
-          {self.getComputing()}
-          <Nav.Link>
-            {self.getUpload()}
+          <Nav.Link><Link class="nav-link" to="/home"><Home/> Home</Link>
           </Nav.Link>
+            {self.getUpload()}
+            {self.getCreatetask()}
+            {self.getComputing()}
           <Nav.Link>
             {self.getSettings()}
           </Nav.Link>

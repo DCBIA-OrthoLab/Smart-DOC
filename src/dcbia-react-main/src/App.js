@@ -19,9 +19,9 @@ import { connect } from "react-redux";
 import axios from 'axios';
 import store from "./redux/store";
 
-import {DcbiaReactProjects, DcbiaReactMorphologicalData, DcbiaReactClinicalData, DcbiaReactUpload} from 'dcbia-react-lib'
+import {DcbiaReactProjects, DcbiaReactMorphologicalData, DcbiaReactClinicalData, DcbiaReactFilebrowser} from 'dcbia-react-lib'
 import {ClusterpostJobs, ClusterpostTokens, ClusterpostDashboard} from 'clusterpost-list-react'
-import {MedImgSurf} from 'react-med-img-viewer';
+// import {MedImgSurf} from 'react-med-img-viewer';
 
 
 class App extends Component {
@@ -100,8 +100,8 @@ class App extends Component {
             </Card>
           </Col>
           <Col sm={6}>
-            <MedImgSurf data={[{data: landingVtk, color: [0,255,255]}]}/>
-          </Col>
+{/*            <MedImgSurf data={[{data: landingVtk, color: [0,255,255]}]}/>
+*/}          </Col>
         </Row>
       </Container>);
   }
@@ -120,9 +120,15 @@ class App extends Component {
       </Container>);
   }
 
-  showUpload(){
+  showFilebrowser(){
     return (
-      <DcbiaReactUpload users={this.state.users}/>
+      <DcbiaReactFilebrowser users={this.state.users} createtask={false}/>
+    )
+  }
+
+  showCreatetask(){
+    return (
+      <DcbiaReactFilebrowser createtask={true}/>
     )
   }
 
@@ -206,7 +212,8 @@ class App extends Component {
             <Route path="/login" component={this.login.bind(this)}/>
             <Route path="/logout" component={this.login.bind(this)}/>
             <Route path="/user" component={this.profile.bind(this)}/>
-            <Route path="/data" component={this.showUpload.bind(this)}/>
+            <Route path="/filebrowser" component={this.showFilebrowser.bind(this)}/>
+            <Route path="/createtask" component={this.showCreatetask.bind(this)}/>
             <Route path="/computing" component={this.showComputing.bind(this)}/>
             <Route path="/admin/users" component={this.adminUsers.bind(this)}/>
             <Route path="/admin/servers" component={this.adminServers.bind(this)}/>
