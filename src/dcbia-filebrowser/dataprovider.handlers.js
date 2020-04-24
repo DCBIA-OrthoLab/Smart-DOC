@@ -43,7 +43,7 @@ module.exports = function (server, conf) {
 			
 			var filename = path.join(conf.datapath, credentials.email, target_path);
 			var dirname = path.dirname(filename);
-
+			
 			if(!fs.existsSync(path)){
 				fs.mkdirSync(dirname, { recursive: true }, (err) => {if (err) reject(err)});
 			}
@@ -64,6 +64,7 @@ module.exports = function (server, conf) {
 
 		return new Promise((resolve, reject)=>{
 			var filename = path.join(conf.datapath, credentials.email, target_path);
+
 			if(deleteRecursive(filename)){
 				resolve("File deleted!");
 			}else{
@@ -97,6 +98,8 @@ module.exports = function (server, conf) {
 	    				})
 	    			}
 	    		})
+
+	    		if (filename==".DS_Store") {fs.unlinkSync(fullPath)}
 
 	    		var stats = fs.statSync(fullPath)
 	    		if (stats.isDirectory()){
@@ -157,22 +160,21 @@ module.exports = function (server, conf) {
 
 
 	handler.createFolder = async (req, h) => {
-		const {query, auth} = req;
-		var currentUser = auth.credentials.email
+	const {auth, params, payload} = req;
+	const {credentials} = auth;
+	const {name, targetpath} = payload
 
-		var dirname = req.payload.name
-		var createpath = req.payload.path
-		var dirpath = path.join(createpath,dirname)
+	var directorypath = path.join(conf.datapath, credentials.email, targetpath, name)
 
-		if (path.basename(createpath) == currentUser
-			|| dirpath.includes('sharedFiles') 
-			|| fs.existsSync(dirpath) 
-			|| dirname.match("^[0-9a-zA-Z]+$") == null)
+	if (path.basename(targetpath) == credentials.email
+			|| directorypath.includes('sharedFiles') 
+			|| fs.existsSync(directorypath) 
+			|| name.match("^[0-9a-zA-Z]+$") == null)
 		{
 			return false
 
 		} else {
-			fs.mkdir(dirpath, (err) => {
+			fs.mkdir(directorypath, (err) => {
 				if (err) throw err
 			})	
 		}
@@ -181,14 +183,15 @@ module.exports = function (server, conf) {
 		
 
 	handler.downloadFiles = async (req, h) => {
-		var files = req.payload
+		const {auth, payload} = req;
+		const {credentials} = auth;
 
-		list = Object.values(files)
+		list = Object.values(payload)
 
 		var zip = new admZip()
 
-		list.forEach((element) => {
- 			zip.addLocalFile(element);
+		list.forEach((file) => {
+ 			zip.addLocalFile(path.join(conf.datapath, credentials.email, file));
  		})
 
 		var sendThis = zip.toBuffer();
@@ -198,52 +201,66 @@ module.exports = function (server, conf) {
 
 
   handler.shareFiles = async (req, h) => {
-  	
-  	const {query, auth} = req;
-  	// params
-  	var filepath = req.payload.directory
-  	var users = req.payload.users  	
-  	var currentUser = auth.credentials.email
+  	const {query, auth, payload} = req;
+  	const {directory, users} = payload;
+  	const {credentials} = auth;
 
-	var relativePath = path.relative(__dirname,filepath)
-	sourcePath = path.join(__dirname,relativePath)
-
-	foldername = path.basename(filepath)
+  	const sourcePath = path.join(conf.datapath,credentials.email,directory)
+	var relativePath = path.relative(__dirname,sourcePath)
+	var fullPath = path.join(__dirname, relativePath)
 
 
-	let sharePath, shareName
-  	users.forEach((user) => {
 
-  		sharePath = path.join(conf.datapath,user,"sharedFiles",user.concat('-',foldername))
-	  	if (!fs.existsSync(sharePath)) {
-	  		fs.symlink(sourcePath, sharePath, (err) => {
+	users.forEach((user) => {
+		var targetPath = path.join(conf.datapath, user, 'sharedFiles', path.basename(directory))
+	  	if (!fs.existsSync(targetPath)) {
+			fs.symlinkSync(fullPath, targetPath, (err) => {
 				if (err) throw err
-	 		})
-	  	} else { console.log("already shared")}
-  	})
+			})
+		}
+	})	
+
 
   	return true
   }
 
 
 
+		// const {auth, params, payload} = req;
+		// const {credentials} = auth;
+		// const {target_path} = params;
 
-  handler.moveFiles = async (req, h) => {
-  	console.log(req.payload)
 
-  	var files = req.payload.files
-  	var dir = req.payload.directory
-	let filename
-	
-  	files.forEach(function(file) {
+  handler.moveFiles = async (req, h) => {  
+  	const {credentials} = req.auth
+  	const {source, target} = req.payload
+  	const sourcePath = path.join(conf.datapath, credentials.email, source)
+  	const targetPath = path.join(conf.datapath, credentials.email, target, path.basename(source))
 
-  		filename = path.basename(file)
-  		
-  		fs.rename(file,path.join(dir,filename), (err) => {
-  			if (err) {throw err} 
-  		})
+  	console.log(sourcePath)
+  	console.log(targetPath)
+
+
+  	fs.renameSync(sourcePath, targetPath, (err) =>{
+  		if (err) {throw err}
+
+  		console.log("rfghj")
   	})
-  	return true
+ //  	var files = req.payload.files
+ //  	var dir = req.payload.directory
+	// let filename
+	
+ //  	files.forEach(function(file) {
+
+ //  		filename = path.basename(file)
+  		
+ //  		fs.rename(file,path.join(dir,filename), (err) => {
+ //  			if (err) {throw err} 
+ //  		})
+ //  	})
+ //  	return true
+return true
+
   }
 
 

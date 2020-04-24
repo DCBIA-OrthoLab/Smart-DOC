@@ -7,7 +7,6 @@ import _ from 'underscore';
 import {FilePlus} from 'react-feather'
 
 import DcbiaReactService from './dcbia-react-service'
-import Filebrowser from './dcbia-react-filebrowser'
 
 class MorphologicalData extends Component {
 	constructor(props) {
@@ -91,8 +90,8 @@ class MorphologicalData extends Component {
 				</Card>
 					{this.getAddData()}
 				<Card>
-					<Filebrowser data={self.state}/>
-				</Card>
+{/*					<Filebrowser data={self.state}/>
+*/}				</Card>
             </Container>
 		)
 	}
