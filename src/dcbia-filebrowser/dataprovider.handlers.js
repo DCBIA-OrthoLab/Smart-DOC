@@ -43,7 +43,7 @@ module.exports = function (server, conf) {
 			
 			var filename = path.join(conf.datapath, credentials.email, target_path);
 			var dirname = path.dirname(filename);
-			
+
 			if(!fs.existsSync(path)){
 				fs.mkdirSync(dirname, { recursive: true }, (err) => {if (err) reject(err)});
 			}
@@ -61,7 +61,7 @@ module.exports = function (server, conf) {
 		const {auth, params, payload} = req;
 		const {credentials} = auth;
 		const {target_path} = params;
-
+		console.log(target_path)
 		return new Promise((resolve, reject)=>{
 			var filename = path.join(conf.datapath, credentials.email, target_path);
 
@@ -114,8 +114,7 @@ module.exports = function (server, conf) {
 	    var personnalPath = path.join(conf.datapath, user)
 
 	    if (!fs.existsSync(personnalPath)) {
-			fs.mkdirSync(path.join(personnalPath,'myFiles'), { recursive: true }, (err) => {if (err) throw err})
-			fs.mkdirSync(path.join(personnalPath,'sharedFiles'), (err) => {if (err) throw err})
+			fs.mkdirSync(path.join(personnalPath,'sharedFiles'), { recursive: true }, (err) => {if (err) throw err})
 	    }
 	    
 		return getMap(personnalPath, personnalPath);
@@ -128,33 +127,38 @@ module.exports = function (server, conf) {
  
 
 	handler.searchFiles = async (req, h) => {
-
-		const {query, auth} = req;
-		var user = auth.credentials.email;
-
-		var fileSearched = req.params.data
+		const {auth, params, payload} = req;
+		const {credentials} = auth;
+		const {data} = params
 
 		var result = []
-		var dir = path.join(conf.datapath,user)
+		var dir = path.join(conf.datapath, credentials.email)
+		
+		console.log(dir)
+		console.log(data)
+		
+		if (data == ''){return result}
 
-		if (fileSearched == ''){return result}
-
-		var searchRecurs = function(fileSearched,directory){
+		var searchRecurs = function(data,directory){
 			
 			_.each(fs.readdirSync(directory), function(file){	
 				var fullPath = path.join(directory,file)
 				var stats = fs.statSync(fullPath)
 				if(stats.isDirectory()){
-					searchRecurs(fileSearched,fullPath)
+					if (file.toUpperCase().includes(data.toUpperCase())){
+						result.push({ filename: file, path: fullPath, isDir: true})
+					}
+					searchRecurs(data,fullPath)
 				}else{
-					if (file.toUpperCase().includes(fileSearched.toUpperCase())){
-						result.push({ filename: file, path: fullPath})
+					if (file.toUpperCase().includes(data.toUpperCase())){
+						result.push({ filename: file, path: fullPath, isDir: false})
 					}
 				}
 			})
 			return result
 		}
-		return searchRecurs(fileSearched,dir)
+
+		return searchRecurs(data,dir)
 	}
 
 
@@ -162,14 +166,14 @@ module.exports = function (server, conf) {
 	handler.createFolder = async (req, h) => {
 	const {auth, params, payload} = req;
 	const {credentials} = auth;
-	const {name, targetpath} = payload
+	const {newfolder} = params
 
-	var directorypath = path.join(conf.datapath, credentials.email, targetpath, name)
+	var directorypath = path.join(conf.datapath, credentials.email, newfolder)
+	var name = path.basename(directorypath)
 
-	if (path.basename(targetpath) == credentials.email
-			|| directorypath.includes('sharedFiles') 
+	if (directorypath.includes('sharedFiles') 
 			|| fs.existsSync(directorypath) 
-			|| name.match("^[0-9a-zA-Z]+$") == null)
+			|| name.match("^[0-9a-zA-Z-_+ ]+$") == null)
 		{
 			return false
 
@@ -183,20 +187,27 @@ module.exports = function (server, conf) {
 		
 
 	handler.downloadFiles = async (req, h) => {
-		const {auth, payload} = req;
+		const {auth, params} = req;
 		const {credentials} = auth;
-
-		list = Object.values(payload)
+		const {file} = params
+		// list = Object.values(payload)
 
 		var zip = new admZip()
 
-		list.forEach((file) => {
- 			zip.addLocalFile(path.join(conf.datapath, credentials.email, file));
- 		})
+		// list.forEach((file) => {
+ 	// 		zip.addLocalFile(path.join(conf.datapath, credentials.email, file));
+ 	// 	})
 
-		var sendThis = zip.toBuffer();
+ 		var filepath = path.join(conf.datapath, credentials.email, file)
+ 		console.log(filepath)
+ 	// // 	zip.addLocalFile(path.join(conf.datapath, credentials.email, payload))
+ 		data = fs.readFileSync(filepath)
+		// // var sendThis = zip.toBuffer();
 		
-		return sendThis
+		// // return sendThis
+		// console.log(file)
+		console.log(data)
+		return data
 	}
 
 
@@ -213,6 +224,10 @@ module.exports = function (server, conf) {
 
 	users.forEach((user) => {
 		var targetPath = path.join(conf.datapath, user, 'sharedFiles', path.basename(directory))
+	  	
+	  	console.log(fullPath)
+	  	console.log(targetPath)
+
 	  	if (!fs.existsSync(targetPath)) {
 			fs.symlinkSync(fullPath, targetPath, (err) => {
 				if (err) throw err
@@ -226,43 +241,49 @@ module.exports = function (server, conf) {
 
 
 
-		// const {auth, params, payload} = req;
-		// const {credentials} = auth;
-		// const {target_path} = params;
 
 
   handler.moveFiles = async (req, h) => {  
-  	const {credentials} = req.auth
-  	const {source, target} = req.payload
-  	const sourcePath = path.join(conf.datapath, credentials.email, source)
-  	const targetPath = path.join(conf.datapath, credentials.email, target, path.basename(source))
+  	const {credentials} = req.auth;
+  	const {source, target} = req.payload;
 
-  	console.log(sourcePath)
-  	console.log(targetPath)
+  	const sourcePath = path.join(conf.datapath, credentials.email, source);
+  	var targetPath = path.join(conf.datapath, credentials.email, target);
 
+  	var stat = fs.statSync(targetPath);
+
+  	if(stat.isDirectory()){
+  		targetPath = path.join(targetPath, path.basename(sourcePath));
+  	}
 
   	fs.renameSync(sourcePath, targetPath, (err) =>{
   		if (err) {throw err}
 
-  		console.log("rfghj")
   	})
- //  	var files = req.payload.files
- //  	var dir = req.payload.directory
-	// let filename
-	
- //  	files.forEach(function(file) {
 
- //  		filename = path.basename(file)
-  		
- //  		fs.rename(file,path.join(dir,filename), (err) => {
- //  			if (err) {throw err} 
- //  		})
- //  	})
- //  	return true
-return true
-
+  	return true;
   }
 
+
+  handler.renameFile = async(req, h) => {
+	const {credentials} = req.auth;
+	const {source, newname} = req.payload;
+
+	const oldPath = path.join(conf.datapath, credentials.email, source)
+	var targetPath = path.join(conf.datapath, credentials.email, path.dirname(source), newname)
+
+	stats = fs.statSync(oldPath);
+	if(!stats.isDirectory()){
+		targetPath = targetPath+path.extname(source)
+	}
+
+	fs.rename(oldPath, targetPath, err => {
+		if (err) {throw err};
+	})
+
+  	return true
+
+  }
 
 
 	return handler;
