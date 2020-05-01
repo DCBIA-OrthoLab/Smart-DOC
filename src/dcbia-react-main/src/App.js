@@ -100,8 +100,8 @@ class App extends Component {
             </Card>
           </Col>
           <Col sm={6}>
-{/*            <MedImgSurf data={[{data: landingVtk, color: [0,255,255]}]}/>
-*/}          </Col>
+            <MedImgSurf data={[{data: landingVtk, color: [0,255,255]}]}/>
+          </Col>
         </Row>
       </Container>);
   }

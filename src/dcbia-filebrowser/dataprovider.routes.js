@@ -31,6 +31,9 @@ module.exports = function (server, conf) {
 	});
 
 
+
+
+
 	server.route({
 		method: 'GET',
 		path: '/dcbia/map',
@@ -101,9 +104,11 @@ module.exports = function (server, conf) {
 		}
 	})
 
+
+
 	server.route({
 		method: 'POST',
-		path: '/dcbia/createfolder',
+		path: '/dcbia/createfolder/{newfolder}',
 	    config: {
 			auth: {
                 strategy: 'token',
@@ -112,19 +117,18 @@ module.exports = function (server, conf) {
 	        handler: handlers.createFolder,
 	        validate: {
 	        	query: false,
-	        	payload: Joi.object({
-	        		name: Joi.string().required(),
-	        		targetpath: Joi.string().required()
+	        	params: Joi.object({
+	        		newfolder: Joi.string().required()
 	        	}),
-	        	params: null
+	        	payload: false
 	        },
 	    description: 'create a folder at the path in the user personnal space'
 	    }
 	})
 
 	server.route({
-		method: 'POST',
-		path: '/dcbia/download',
+		method: 'GET',
+		path: '/dcbia/download/{file}',
 		config: {
 			auth: {
                 strategy: 'token',
@@ -133,8 +137,11 @@ module.exports = function (server, conf) {
 			handler: handlers.downloadFiles,
 			validate: {
 				query: false,
-				payload: true,
-				params: null
+				payload: false,
+				params: Joi.object({
+					file: Joi.string()
+				})
+				
 			},
 		description: 'download list of selected files'
 		},
@@ -162,7 +169,7 @@ module.exports = function (server, conf) {
 
 
 	server.route({
-		method: 'POST',
+		method: 'PUT',
 		path: '/dcbia/moveFiles',
 		config: {
 			auth: {
@@ -181,6 +188,32 @@ module.exports = function (server, conf) {
 		}
 	})
 
+	server.route({
+	    method: 'PUT',
+	    path: '/dcbia/rename',
+	    config: {
+			auth: {
+                strategy: 'token',
+                scope: ['dentist']
+            },
+	        handler: handlers.renameFile,
+		    validate : {
+		    	query: false,
+		    	params: null,
+		    	payload: Joi.object({
+		    		source: Joi.string(),
+		    		newname: Joi.string()
+		    	})
+		    },
+	        description: 'rename a file or folder'
+	    }
+	});
+
+	// moveFiles parameters :
+	// source
+	// target
+
+	// rename parameters :
 
 
 

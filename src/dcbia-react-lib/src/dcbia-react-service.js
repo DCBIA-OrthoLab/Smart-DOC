@@ -262,6 +262,14 @@ export default class DcbiaReactService {
     });
   }
 
+  renameFile(infos){
+    return this.http({
+      method: 'PUT',
+      url: '/dcbia/rename',
+      data: infos
+    })
+  }
+
   getDirectoryMap(username) {
     return this.http({
       method: 'GET',
@@ -284,20 +292,18 @@ export default class DcbiaReactService {
   })
  }
 
- createFolder(info) {
+ createFolder(newfolder) {
   return this.http({
     method: 'POST',
-    url: '/dcbia/createfolder',
-    data: info,
+    url: '/dcbia/createfolder/' + newfolder
   })
  }
 
- downloadFiles(filesList) {
+ downloadFiles(file) {
   return this.http({
-    method: 'POST',
-    url: '/dcbia/download',
-    data: filesList,
-    responseType: 'blob',
+    method: 'GET',
+    url: '/dcbia/download/' + file,
+    responseType: 'blob'
   })
  }
 
@@ -311,7 +317,7 @@ export default class DcbiaReactService {
 
  moveFiles(infos) {
   return this.http({
-    method: 'POST',
+    method: 'PUT',
     url: '/dcbia/moveFiles',
     data: infos
   });

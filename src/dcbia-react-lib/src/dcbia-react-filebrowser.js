@@ -1,20 +1,17 @@
 import React, {Component} from 'react'
 
 import { connect } from "react-redux";
-import {Container, Button, Table, Card, Col, Row, DropdownButton, Dropdown, Form, Modal, Alert, OverlayTrigger, Overlay, Tooltip, Popover, Badge, ButtonToolbar, ButtonGroup, InputGroup, FormControl, Spinner, Navbar, Nav, Breadcrumb} from 'react-bootstrap'
+import {Container, Button, Table, Card, Col, Row, DropdownButton, Dropdown, Form, Modal, Alert, OverlayTrigger, Overlay, Tooltip, Popover, Badge, ButtonToolbar, ButtonGroup, InputGroup, FormControl, Spinner, Navbar, Nav, Breadcrumb, ProgressBar} from 'react-bootstrap'
 
-import {Trash2, Folder, Plus, ArrowLeft, ArrowDown, ArrowRight, MinusSquare, PlusSquare, CheckSquare, XSquare, X, CornerDownLeft, FolderMinus, FolderPlus, MoreVertical, ChevronLeft, ChevronsLeft, Share2, Circle, Download, File, UploadCloud, Move} from 'react-feather'
+import {Trash2, Folder, Plus, ArrowLeft, ArrowDown, ArrowRight, MinusSquare, PlusSquare, CheckSquare, XSquare, X, CornerDownLeft, FolderMinus, FolderPlus, MoreVertical, ChevronLeft, ChevronsLeft, Share2, Circle, Download, File, UploadCloud, Move, Edit3} from 'react-feather'
 
 import Dropzone from 'react-dropzone'
 
 import DcbiaReactService from './dcbia-react-service'
 
 const _ = require('underscore');
-// import {JWTAuth, JWTAuthInterceptor, JWTAuthProfile, JWTAuthService, JWTAuthUsers} from 'react-hapi-jwt-auth';
-const Promise = require('bluebird')
-
-
-// 53 58 64
+const Promise = require('bluebird');
+var JSZip = require("jszip");
 
 
 class Filebrowser extends Component {
@@ -25,18 +22,22 @@ class Filebrowser extends Component {
 
 			fileToUpload: null,
 			uploadPath: null,
+			uploadValue: 0,
+
+
+
 			treeMap: null,	
 			filesList: {},
 			loadingUpload: false,
-			loadingDownload: false,
+
 			showUploadDragDrop: false,
 
 			searchFiles: false,
-			currentFolder: "./root",
+			currentFolder: ".",
 
 			// pop up
 			showCreateFolder: false,
-			showUpload: false,
+			// showUpload: false,
 			showImportProject: false,
 			showMove: false,
 			showErrorCreateFolder: false,
@@ -52,6 +53,8 @@ class Filebrowser extends Component {
 			dirToShare: null,
 			showPopUpShare: false,
 
+			showPopupRename: false,
+			
 			suggestions: []
 			}
 
@@ -60,10 +63,10 @@ class Filebrowser extends Component {
 	}
 
 	getTree() {
-	if (this.state.currentFolder == './root') { 
+	if (this.state.currentFolder == '.') { 
 			return(this.state.treeMap)
 		} else {
-			var objToFind = this.state.currentFolder.slice(7)
+			var objToFind = this.state.currentFolder.slice(2)
 			return this.findInMap(this.state.treeMap,objToFind)
 		}
 
@@ -102,7 +105,8 @@ class Filebrowser extends Component {
 		Object.keys(map).forEach(key => {
 		
 			if (found) {return found}
-			if ('./'+map[key].path == file) {found = true}
+			if ('./'+map[key].path == file) {
+				found = true}
 			else if (map[key].type == 'd') {
 				found = self.isInFolder(map[key].files,file)
 			}
@@ -112,20 +116,28 @@ class Filebrowser extends Component {
 
 	handleUpload(filelist) {
 		const self = this
-		const {currentFolder} = self.state;
-
-		var uploadPath
-		if (currentFolder=='./root') {uploadPath = './myFiles'} else {
-			uploadPath = currentFolder
-			uploadPath = uploadPath.replace('root/','')
-		}
+		const {currentFolder, uploadRate} = self.state;
+		
+		let uploadPath
+		var value = 100/filelist.length
 
 		return Promise.map(filelist, (file)=>{
-			if (self.isInFolder(self.state.treeMap, uploadPath+file.path))
+
+			if (file.path[0]!=='/') {
+				uploadPath = currentFolder+'/'+file.path
+			} else {
+				uploadPath = currentFolder+file.path
+			}
+
+			if (self.isInFolder(self.state.treeMap, uploadPath))
 			{
 				return Promise.resolve('File already uploaded')
 			} else {
-				return self.dcbiareactservice.uploadFile(uploadPath + file.path, file);
+				return self.dcbiareactservice.uploadFile(uploadPath, file)
+				.then(()=>{
+					self.setState({uploadValue: self.state.uploadValue+value})
+				})
+				
 			}
 
 
@@ -136,34 +148,32 @@ class Filebrowser extends Component {
 		})
 	}
 
+	// popUpUpload() {
+	// 	if (document.getElementById('inputUpload').value == '') {return} else {
+	// 	return (
+	// 		<Modal show={this.state.showUpload} onHide={() => this.setState({showUpload: false})}>
+	// 			<Modal.Header closeButton>
+	// 				<Modal.Title>Upload file</Modal.Title>  
+	// 			</Modal.Header>
 
+	// 			<Modal.Body>
+	// 				Confirm Uploading - <strong>{document.getElementById("inputUpload").value}</strong> in <strong>{this.state.currentFolder}</strong>
+	// 			</Modal.Body>
+	// 			<Modal.Footer>
+	// 				<Button variant="danger" onClick={() => this.setState({showUpload: false})} >
+	// 					Cancel
+	// 				</Button>
+	// 				{this.state.loadingUpload ? 
+	// 				<Button variant="info" disabled>
+	// 				<Spinner variant="dark" animation="border" size="sm" role="status"/>
+	// 				<span className="sr-only">Loading...</span>
+	// 				</Button> :
+	// 				<Button variant="info" onClick={() => this.handleUpload()}> Upload </Button>}
 
-	popUpUpload() {
-		if (document.getElementById('inputUpload').value == '') {return} else {
-		return (
-			<Modal show={this.state.showUpload} onHide={() => this.setState({showUpload: false})}>
-				<Modal.Header closeButton>
-					<Modal.Title>Upload file</Modal.Title>  
-				</Modal.Header>
-
-				<Modal.Body>
-					Confirm Uploading - <strong>{document.getElementById("inputUpload").value}</strong> in <strong>{this.state.currentFolder}</strong>
-				</Modal.Body>
-				<Modal.Footer>
-					<Button variant="danger" onClick={() => this.setState({showUpload: false})} >
-						Cancel
-					</Button>
-					{this.state.loadingUpload ? 
-					<Button variant="info" disabled>
-					<Spinner variant="dark" animation="border" size="sm" role="status"/>
-					<span className="sr-only">Loading...</span>
-					</Button> :
-					<Button variant="info" onClick={() => this.handleUpload()}> Upload </Button>}
-
-				</Modal.Footer>
-			</Modal>
-		)}
-	}
+	// 			</Modal.Footer>
+	// 		</Modal>
+	// 	)}
+	// }
 
 
 
@@ -209,39 +219,43 @@ class Filebrowser extends Component {
 
 
 
-	iterateMap(obj) {
-		
-		    Object.keys(obj).forEach(key => {
-		    	if (obj[key].type === "d") {
-			    	if (obj[key].path == "data/Archive") {
-
-			    	} else {
-			    		this.iterateMap(obj[key].files)
-			    	}
-	    		
-		    	}
-
-		    })
-		}	
+	
 
 	addSelectedFiles(f) {
-		var files = this.state.filesList
-		var bool = files[f.path].selected
-		files[f.path].selected = !bool
-		this.setState({filesList: files})
+		var {filesList} = this.state
+		var bool = filesList[f.path].selected
+		filesList[f.path].selected = !bool
 
+		// if (f.type=='d' && !bool==true) {
+		// 	Object.keys(filesList).forEach(file => {
+		// 		console.log(file)
+	 //    		if (file.includes(f.path)) {
+		// 			filesList[file].selected = true
+	 //    		}
+		// 	})
 
-		var somethingSelected = false
-    	Object.keys(files).forEach(key => {
-    		if (files[key].selected == true) {
-    			somethingSelected = true
-    		}
-    	})
-    	if (somethingSelected) {
-    		this.setState({selected: true})
-    	} else {
-    		this.setState({selected: false})
-    	}
+		// } else if (f.type=='d' && bool==true) {
+		// 	Object.keys(filesList).forEach(file => {
+		// 		console.log(file)
+	 //    		if (file.includes(f.path)) {
+		// 			filesList[file].selected = false
+	 //    		}
+		// 	})
+		// }
+
+		this.setState({filesList: filesList})
+
+		// var somethingSelected = false
+  //   	Object.keys(files).forEach(key => {
+  //   		if (files[key].selected == true) {
+  //   			somethingSelected = true
+  //   		}
+  //   	})
+  //   	if (somethingSelected) {
+  //   		this.setState({selected: true})
+  //   	} else {
+  //   		this.setState({selected: false})
+  //   	}
 	}
 
 
@@ -286,7 +300,6 @@ class Filebrowser extends Component {
 	deleteF() {
 		const self = this
 		var fileToDelete = self.state.fileToDelete.path
-		
 		// erase deleted file from file list
 		var pathname = self.state.fileToDelete.path
 		var files = self.state.filesList
@@ -295,7 +308,6 @@ class Filebrowser extends Component {
 		self.setState(
 			{showDelete: false, fileToDelete: "", filesList: files}
 		)
-
 		self.dcbiareactservice.deleteFile(fileToDelete)
 		.then(res => { 
 			self.updateDirectoryMap();
@@ -325,15 +337,16 @@ class Filebrowser extends Component {
 
 	displaySearchedFiles() {
 		if (this.state.suggestions.length==0) {
-			return <div>No file found</div>
+			return <div>Nothing found</div>
 		} else {
 			return (	
 				<Container>
 					{this.state.suggestions.map(f => 
-						<Row>
+						<Row style={f.isDir ? {color: "white"} : {color: "black"}}>
 							{/*<Plus onClick={() => this.addFileProject(f)}/>*/}
 							<CornerDownLeft style={{cursor:'pointer'}} onClick={() => this.goToFile(f.path)}/>
 							{f.filename} &nbsp;
+							{f.isDir ? <Folder/> : <File/>}&nbsp;
 							<i>{f.path}</i>
 						</Row>
 					)}
@@ -348,8 +361,8 @@ class Filebrowser extends Component {
 		
 	    e.preventDefault();
 	    e.stopPropagation();
-	
-	    if (f.type=="d" && !f.path.includes("sharedFiles")) {
+		console.log(e.dataTransfer.getData("filepath"))
+	    if (f.type=="d" && !f.path.includes("sharedFiles") && !e.dataTransfer.getData("filepath").includes("sharedPath")) {
 			self.handleMoveFiles(e.dataTransfer.getData("filepath"),f.path)
 		}
 
@@ -381,6 +394,78 @@ class Filebrowser extends Component {
 	    e.stopPropagation();
 	}
 
+// 	handleClick(e,f) {
+// 	  	e.preventDefault()
+// 	  	console.log(f)
+// 	  	this.setState({...this.state, showPopupRename: !this.state.showPopupRename, fileToRename: f})
+// }
+
+
+
+
+
+	popUpRename() {
+		const self = this
+		var {currentFolder, fileToRename} = self.state
+		return (
+			
+			<Modal show={this.state.showPopupRename} onHide={() => this.setState({showPopupRename: false})}>
+				<Modal.Header closeButton>
+					<Modal.Title>Rename {fileToRename.name}</Modal.Title>  
+				</Modal.Header>
+
+				<Modal.Body>
+				<Form>
+					<Form.Control id="formRename" type="text" placeholder="folder name" className="mr-sm-2" autoComplete="off"/>
+				</Form>
+				</Modal.Body>
+				<Modal.Footer>
+					<Button variant="danger" onClick={() => this.setState({showPopupRename: false})} >
+						Cancel
+					</Button>
+					<Button variant="success" onClick={() => this.handleRename(document.getElementById("formRename").value)}>
+						Create
+					</Button>
+				</Modal.Footer>
+			</Modal>
+		)
+	}
+
+
+
+	handleRename(newName) {
+		const self = this
+		const {fileToRename, filesList} = self.state
+		
+		Object.keys(filesList).forEach(file => {
+			if (file.includes(fileToRename.name)) {
+				delete filesList[file]
+			}
+		})
+
+		var f = fileToRename.path
+		filesList[f.replace(fileToRename.name, newName)] = {expand: false, selected: false}
+
+		// f = f.split('/').join('%2F')
+		// newName = newName.split('/').join('%2F')
+		
+		var infos = {}
+		infos["source"] = f 
+		infos["newname"] = newName
+
+		self.dcbiareactservice.renameFile(infos)
+			.then(res => {
+				self.updateDirectoryMap()
+				self.setState({filesList: filesList, showPopupRename: false, fileToRename: null})
+			})
+			.catch(err => {
+				console.log(err)
+			})	
+	}
+
+
+
+
 
 
 	displayFiles(param) {
@@ -400,13 +485,20 @@ class Filebrowser extends Component {
 
 
 				{/*Card DragNDrop*/}
-				<Card style={{backgroundColor: "#D7D8D9", borderColor: "#D7D8D9"}}
+				<Card 
+					id={f.name}
+					style={{backgroundColor: "#D7D8D9", borderColor: "#D7D8D9"}}
 					onDrop={(e) => this.handleDrop(e,f)}
 					onDragOver={(e) => this.handleDragOver(e)}
 					onDragLeave={(e) => this.handleDragLeave(e)}
 					onDragEnter={(e) => this.handleDragEnter(e)}
 					>
-					
+
+{/*onContextMenu={(e) => this.handleClick(e,f)}*/}
+
+
+
+				
 
 						<Row>
 						<Col>
@@ -417,24 +509,24 @@ class Filebrowser extends Component {
 */}
 						
 						
-
+				
 						{f.type=='d' ? 
 							filesList[f.path].expand==false ? 
 								<FolderPlus style={{color: "green", cursor:"pointer"}} onClick={() => this.testOnClickArrowDown(f)}/> 
 								: <FolderMinus style={{color: "red", cursor:"pointer"}} onClick={() => this.testOnClickArrowDown(f)}/> 
-							: null
+							: <File style={{height: 15, color: "SteelBlue"}}/>
 						} &nbsp;
 
 					
 
 						{f.type=='d' ? 
-							f.name=='myFiles'||f.name=='sharedFiles' ? 
+							f.name=='sharedFiles' ? 
 								<Badge size="11" 
-									   onClick={() => this.setState({currentFolder: './root/'+f.path})}
+									   onClick={() => this.setState({currentFolder: './'+f.path})}
 									   style={{backgroundColor: '#4f6185' ,cursor:'pointer'}}
 									><text style={{color: "white"}}>{f.name}</text></Badge> 
 								: <Badge pill
-										 onClick={() => this.setState({currentFolder: './root/'+f.path})}
+										 onClick={() => this.setState({currentFolder: './'+f.path})}
 										 style={{cursor:'pointer', backgroundColor: '#9796b4'}}
 										 draggable={!this.props.createtask}
 										 onDrag={(e) => this.handleDrag(e)}
@@ -446,7 +538,8 @@ class Filebrowser extends Component {
 										style={{color: 'SteelBlue'}}>{f.name}</i>
 						} 
 						
-						{f.type=='d' && f.name!=="myFiles" && !f.path.includes("sharedFiles") ? <Share2 style={{color: "#CC444B", height: 15, cursor:"pointer"}} onClick={() => this.setState({dirToShare: f.path, showPopUpShare: true})} /> : null}
+						{!f.path.includes("sharedFiles") ? <Edit3 style={{color: "black", height: 15, cursor:"pointer"}} onClick={() => this.setState({fileToRename: f, showPopupRename: true})} /> : null}
+						{f.type=='d' && !f.path.includes("sharedFiles") ? <Share2 style={{color: "red", height: 15, cursor:"pointer"}} onClick={() => this.setState({dirToShare: f.path, showPopUpShare: true})} /> : null}
 						&nbsp;
 
 
@@ -461,7 +554,7 @@ class Filebrowser extends Component {
 						: null}
 
 
-						{f.type=='f' && selectMode == true || this.props.createtask==true && f.type== 'f' ? 
+						{(selectMode == true || this.props.createtask==true) && f.name!=='sharedFiles' ? 
 						<input type="checkbox" checked={filesList[f.path].selected} onClick={() => this.addSelectedFiles(f)}/>						
 						: null} 
 
@@ -555,22 +648,29 @@ class Filebrowser extends Component {
     	})
 
     	if (filesToDownload.length !== 0) {
-			this.setState({loadingDownload: true})
 
-			self.dcbiareactservice.downloadFiles(filesToDownload)
-				.then(response => { 
-					const url = window.URL.createObjectURL(new Blob([response.data]));
-					const link = document.createElement('a');
-					link.href = url;
-					link.setAttribute('download', 'files.zip'); 
-					document.body.appendChild(link);
-					link.click();
+			var zip = new JSZip();
+			return Promise.map(filesToDownload, (file)=>{
 
-					self.setState({loadingDownload: false})
+
+				return self.dcbiareactservice.downloadFiles(file)
+				.then((res) => {
+
+
+					// zip.file(file, res.data)
+					// console.log(zip)
+
+					var data = window.URL.createObjectURL(new Blob([res.data]));
+
+				    var link = document.createElement("a");
+				    link.download = file;
+				    link.href = data;
+				    link.click();
+
 				})
-				.catch(error => {
-				    // console.log(error.response)
-				});
+				
+			})
+
 		}
 	}
 
@@ -623,19 +723,12 @@ class Filebrowser extends Component {
 
 		if (folderName){
 
-			var path
-			if (currentFolder=='./root') {path = './myFiles'} else {
-				path = currentFolder
-				path = path.replace('root/','')
-			}
-
 			document.getElementById("formFolderName").value = ""
 
-			var formData = new FormData()
-			formData.append("name", folderName)
-			formData.append("targetpath", path)
+			var newfolder = currentFolder + '%2F' + folderName
+			newfolder = newfolder.split('/').join('%2F')
 
-			this.dcbiareactservice.createFolder(formData)
+			this.dcbiareactservice.createFolder(newfolder)
 			.then(res => { 
 				
 				// error in creation
@@ -683,7 +776,10 @@ class Filebrowser extends Component {
 				</Modal.Header>
 
 				<Modal.Body>
-					Confirm creating folder - <strong>{document.getElementById("formFolderName").value}</strong>c
+				<Form>
+					<Form.Label> create at location <i>{currentFolder}</i></Form.Label>
+					<Form.Control id="formFolderName" type="text" placeholder="folder name" className="mr-sm-2" autoComplete="off"/>
+				</Form>
 				</Modal.Body>
 				<Modal.Footer>
 					<Button variant="danger" onClick={() => this.setState({showCreateFolder: false})} >
@@ -745,8 +841,9 @@ class Filebrowser extends Component {
 
     	infos["source"] = source 
 		infos["target"] = target
+
 		self.dcbiareactservice.moveFiles(infos)
-		.then(response => { 
+		 .then(response => { 
 			self.updateDirectoryMap()
 		})
 		.catch(err => {
@@ -824,7 +921,7 @@ class Filebrowser extends Component {
 				</Modal.Body>
 				<Modal.Footer>
 
-				<Button variant="outline-danger" onClick={() => this.handleShareFiles(this.state.dirToShare, selectedUsers)}> Share </Button>
+				<Button variant="outline-danger" onClick={() => this.handleShareFiles('./'+this.state.dirToShare, selectedUsers)}> Share </Button>
 				</Modal.Footer>
 			</Modal>
 		)
@@ -874,12 +971,11 @@ class Filebrowser extends Component {
 		const {currentFolder} = self.state;
 
 		const path = currentFolder.split('/')
-		path.shift()
 
 		return (		
 			<Breadcrumb color="red">
 					{path.map((f, index) => 
-						<Breadcrumb.Item active={index==path.length-1} onClick={() => self.goToFolder(f)}>{f}</Breadcrumb.Item>
+						<Breadcrumb.Item active={index==path.length-1} onClick={() => self.goToFolder(f)}>{f=='.' ? "..." : f}</Breadcrumb.Item>
 					)}				
 			</Breadcrumb>	
 
@@ -962,7 +1058,6 @@ class Filebrowser extends Component {
 							<Button variant="outline-primary" type="submit" onClick={() => self.setState({...self.state, showCreateFolder: true})}>
 								create folder
 							</Button>
-							<FormControl id="formFolderName" type="text" placeholder="Enter folder name" className="mr-sm-2" />
 						</Form>
 					</Nav>
 					<Row className="ml-3">
@@ -994,7 +1089,7 @@ class Filebrowser extends Component {
 					        		</Modal.Title>
 				        		</Modal.Header>
 				        		<Modal.Body>
-				        			<Dropzone onDrop={(acceptedFiles)=>{self.handleUpload(acceptedFiles).then(()=>{self.setState({...self.state, showUploadDragDrop: false})})}}>
+				        			<Dropzone onDrop={(acceptedFiles)=>{self.handleUpload(acceptedFiles).then(()=>{self.setState({...self.state, showUploadDragDrop: false, uploadValue: 0})})}}>
 				        				{({getRootProps, getInputProps}) => (
 						        			<Container fluid="true" style={{padding: 0, height: "50vh"}} {...getRootProps()}>
 						        				<Alert variant="primary" style={{height: "100%"}}>
@@ -1008,6 +1103,7 @@ class Filebrowser extends Component {
 								            </Container>
 							            )}
 									</Dropzone>
+									<ProgressBar animated now={self.state.uploadValue} />
 			        			</Modal.Body>
 							</Modal>
 						</Col>
@@ -1046,48 +1142,48 @@ class Filebrowser extends Component {
 	}
 
 
-	getUploadManager(){
-		const self = this;
-		const {loadingUpload, currentFolder} = self.state;
-		return (
-		<Container>
-			<Row>
-				<Col>
-					<Card className="mt-3 mb-3" style={{borderRadius: 10, borderColor: "#1b273e", borderWidth: 1}}> 
-						<Card.Header as="h5" className="info" style={{color: "#1b273e", backgroundColor: "#e0e4ec", borderRadius: 10}}>
-							Upload files
-						</Card.Header>
-						<Card.Body>
-							<Card.Title>
-								<input id="inputUpload" type="file" name="myZipFile"/>
-							</Card.Title>
-							<Card.Text>
-								{loadingUpload ? 
-									<Button variant="info" disabled>
-									<Spinner variant="dark" animation="border" size="sm" role="status"/>
-									<span className="sr-only">Loading...</span>
-									</Button> :
-									<Button variant="info" onClick={() => this.setState({showUpload: true})}> Upload </Button>}
-								&nbsp; <i>Upload in</i> <strong style={{color: "Navy"}}>{currentFolder}</strong>
-								</Card.Text>
-							</Card.Body>
-			  			</Card>
-	  			</Col>
-			</Row>
-			<Row>
-				<Col>
-					<Card className="mt-3 mb-3" style={{borderColor: "#1b273e", borderRadius: 10, borderWidth: 1}}>
-						<Card.Header as="h5" className="info" style={{color: "#1b273e", backgroundColor: "#e0e4ec", borderRadius: 10}}>
-							Selected files
-						</Card.Header>
-						<Card.Body>
-							{this.displaySelectedFiles()}
-						</Card.Body>
-					</Card>
-				</Col>
-			</Row>
-		</Container>)
-	}
+	// getUploadManager(){
+	// 	const self = this;
+	// 	const {loadingUpload, currentFolder} = self.state;
+	// 	return (
+	// 	<Container>
+	// 		<Row>
+	// 			<Col>
+	// 				<Card className="mt-3 mb-3" style={{borderRadius: 10, borderColor: "#1b273e", borderWidth: 1}}> 
+	// 					<Card.Header as="h5" className="info" style={{color: "#1b273e", backgroundColor: "#e0e4ec", borderRadius: 10}}>
+	// 						Upload files
+	// 					</Card.Header>
+	// 					<Card.Body>
+	// 						<Card.Title>
+	// 							<input id="inputUpload" type="file" name="myZipFile"/>
+	// 						</Card.Title>
+	// 						<Card.Text>
+	// 							{loadingUpload ? 
+	// 								<Button variant="info" disabled>
+	// 								<Spinner variant="dark" animation="border" size="sm" role="status"/>
+	// 								<span className="sr-only">Loading...</span>
+	// 								</Button> :
+	// 								<Button variant="info" onClick={() => this.setState({showUpload: true})}> Upload </Button>}
+	// 							&nbsp; <i>Upload in</i> <strong style={{color: "Navy"}}>{currentFolder}</strong>
+	// 							</Card.Text>
+	// 						</Card.Body>
+	// 		  			</Card>
+	//   			</Col>
+	// 		</Row>
+	// 		<Row>
+	// 			<Col>
+	// 				<Card className="mt-3 mb-3" style={{borderColor: "#1b273e", borderRadius: 10, borderWidth: 1}}>
+	// 					<Card.Header as="h5" className="info" style={{color: "#1b273e", backgroundColor: "#e0e4ec", borderRadius: 10}}>
+	// 						Selected files
+	// 					</Card.Header>
+	// 					<Card.Body>
+	// 						{this.displaySelectedFiles()}
+	// 					</Card.Body>
+	// 				</Card>
+	// 			</Col>
+	// 		</Row>
+	// 	</Container>)
+	// }
 
 ///////////////////////////////////////////////////////////////////////////////////////
 
@@ -1099,11 +1195,12 @@ class Filebrowser extends Component {
 
 				{this.state.showDelete ? this.popUpDelete() : null}
 				{this.state.showCreateFolder ? this.popUpCreateFolder() : null}
-				{this.state.showUpload ? this.popUpUpload() : null}
+{/*				{this.state.showUpload ? this.popUpUpload() : null}*/}
 				{this.state.showImportProject ? this.popUpImportProject() : null}
 				{this.state.showPopUpShare ? this.popUpShare() : null}
 				{this.state.showMove ? this.popUpMoveFiles() : null}
 				{this.state.showErrorCreateFolder ? this.popUpError() : null}
+				{this.state.showPopupRename ? this.popUpRename() : null}
 				<Row>
 					<Col>
 						{self.getFileManager()}
@@ -1111,6 +1208,7 @@ class Filebrowser extends Component {
 {/*					<Col xs={4} md={4}>
 						{self.getUploadManager()}
 					</Col>
+					<
 */}				</Row>
 			</Container>
 		)
