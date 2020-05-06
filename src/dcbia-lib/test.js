@@ -64,23 +64,22 @@ lab.experiment("Test dcbia lib", function(){
     var idWrongScope = "";
 
     lab.test('returns true when new user is login.', function(){
-
         return dcbia.userLogin(user)
         .then(function(res){
             Joi.assert(res.token, Joi.string().required());
-            console.log(res)
+            // console.log(res)
         });
         
     });
 
-    lab.test('returns true if the document is posted.', function(){
-        return dcbia.createClinicalData(clinicaldatapost)
-        .then(function(res){
-            console.log(res)
+    // lab.test('returns true if the document is posted.', function(){
+    //     return dcbia.createClinicalData(clinicaldatapost)
+    //     .then(function(res){
+    //         console.log(res)
             
-        });
+    //     });
         
-    });
+    // });
 
     // lab.test('returns true when return the surveys owners.', function(){
     //     return dcbia.getClinicalDataOwners()
@@ -134,140 +133,136 @@ lab.experiment("Test dcbia lib", function(){
     // });
 
 
+/////////////////////////////////////////////////
 
-
-
-
-/////////////
-
-    // lab.test('returns true when user folder map does not exists', function(){
-    //     return dcbia.getDirectoryMap()
-    //     .then(function(res){
-    //         console.log(res)
-    //         // expect(res[0].name == "myFiles").to.be.true()
-    //         // expect(1+1).to.be.equal(2)
-    //     }); 
-    // });
-    lab.test('returns true when user folder map is returned', function(){
+    lab.test('returns true when user folder map exist', function(){
         return dcbia.getDirectoryMap()
         .then(function(res){
+            res = JSON.parse(res)[0]
             console.log(res)
-
-            //Check that map is equal to test.zip
-            // Code.expect(JSON.parse(res)["ok"]).to.be.true();
+            expect(res).to.be.an.object()
         }); 
     });
 
 
 
-    lab.test('returns true when user search and find files', function(){
-        return dcbia.searchFiles()
+    lab.test('returns true when user upload a file', function(){
+        
+        var filename = 'filetest.txt';
+        var target = 'test/filetest.txt';
+
+        return dcbia.upload(target, filename)
         .then(function(res){
-            // console.log(res)
-            // expect(res[0].name == "myFiles").to.be.true()
-            // expect(1+1).to.be.equal(2)
+            expect(res).to.equal('File uploaded!')
+        }); 
+    });
+
+    lab.test('returns true when user upload a file that does not exist', function(){
+        
+        var filename = 'filetest_does_not_exists.txt';
+        var target = 'test/filetest_does_not_exists.txt';
+
+        return dcbia.upload(target, filename)
+        .catch(function(err){
+            expect(err).to.be.an.error(Error)
+        }); 
+    });
+
+
+
+    var newfolder = 'test%2Ffoldername'
+    lab.test('returns true when user creates a new folder', function(){
+        return dcbia.createFolder(newfolder)
+        .then(function(res){
+            expect(res).to.equal('true');
+        }); 
+    });
+
+    lab.test('returns false when user try to create an existing folder', function(){
+        return dcbia.createFolder(newfolder)
+        .then(function(res){
+            expect(res).to.equal('false');
+        }); 
+    });
+
+
+
+    var data = 'test'
+    lab.test('returns true when user search and find files', function(){
+        return dcbia.searchFiles(data)
+        .then(function(res){
+            expect(res).to.include({filename: 'filetest.txt', path: 'data/sbrosset@umich.edu/test/filetest.txt', isDir: false})
+        }); 
+    });    
+    var falsedata = 'fileNotExist'
+    lab.test('returns false when user search a file which doesnt exist', function(){
+        return dcbia.searchFiles(falsedata)
+        .then(function(res){
+            expect(res[0]).to.be.undefined()    
+        }); 
+    }); 
+
+
+
+    var fileToDelete = 'test/foldername'
+    lab.test('returns true when user delete a folder', function(){
+        return dcbia.deleteFile(fileToDelete)
+        .then(function(res){
+            expect(res).to.equal('File deleted!')
+
         }); 
     });
     
 
-    // var fileToDelete = 'data/sbrosset@umich.edu/myFiles/scanToDelete.nii'
 
-    // lab.test('returns true when user delete files', function(){
-    //     return dcbia.deleteFile(fileToDelete)
-    //     .then(function(res){
-    //         console.log(res)
-    //         // expect(res[0].name == "myFiles").to.be.true()
-    //         // expect(1+1).to.be.equal(2)
-    //     }); 
-    // });
-
-
-    // var zipfile = 
-    // lab.test('returns true when user upload a zipfile', function(){
-    //     return dcbia.uploadZipFile()
-    //     .then(function(res){
-    //         // console.log(res)
-    //         // expect(res[0].name == "myFiles").to.be.true()
-    //         // expect(1+1).to.be.equal(2)
-    //     }); 
-    // });
-
-
-
-    // var formData = new FormData()
-    // formData.append("name", "folderName")
-    // formData.append("path", 'data/sbrosset@umich.edu/myFiles')
-
-    // lab.test('returns true when user creates a folder', function(){
-    //     return dcbia.createFolder(formData)
-    //     .then(function(res){
-    //         console.log(res)
-    //         // expect(res[0].name == "myFiles").to.be.true()
-    //         // expect(1+1).to.be.equal(2)
-    //     }); 
-    // });
-
-
-
-
-
-
-
-
-
+    var infos = {
+        users: [
+            'sbrosset@umich.edu'
+        ],
+        directory: "./test/testfile.txt"
+    }
+    lab.test('returns true when user share a folder with another user', function(){
+        return dcbia.shareFiles(infos)
+        .then(function(res){
+            expect(res).to.be.true()
+        })
+    });
     // var infos = {
-    //     directory: '../data/dcbia-server/sbrosset@umich.edu/myFiles/scans_2',
-    //     files: [
-    //         '../dcbia-server/data/sbrosset@umich.edu/myFiles/scans/scan_1.nii',
-    //         '../data/sbrosset@umich.edu/myFiles/scans/scan_2.nii'
-    //     ]
+    //     users: [
+    //         'fakeuser@umich.edu'
+    //     ],
+    //     directory: "./test/testfile.txt"
     // }
+    // lab.test('returns false when user share a folder with an non existing user', function(){
+    //     return dcbia.shareFiles(infos)
+    //     .then(function(res){
+    //         console.log(res)
+    //     })
+    // });
 
+
+
+    // var files = ["filetest.txt"]
+    // lab.test('returns true when user download a file', function(){
+    //     return dcbia.downloadFiles(files)
+    //     .then(function(res){
+    //         console.log(res)
+    //     }); 
+    // });
+
+
+
+
+    
     // lab.test('returns true when user has moved files to the current folder', function(){
+    //     var infos = {
+    //         source: 'filetest.txt',
+    //         target: 'folderTest'
+    //     }
+
     //     return dcbia.moveFiles(infos)
     //     .then(function(res){
     //         console.log(res)
-    //         expect(res).to.be.true()
-    //     }); 
-    // });
-
-
-
-// var infos = {
-//     users: [
-//         'sbrosset@umich.edu'
-//     ],
-//     directory: '../dcbia-server/data/sbrosset@umich.edu/myFiles/dirToShare'
-// }
-
-//     lab.test('returns true when user share a folder with another user', function(){
-//         return dcbia.shareFiles(infos)
-//         .then(function(res){
-//             console.log(res)
-//             // expect(res[0].name == "myFiles").to.be.true()
-//             // expect(1+1).to.be.equal(2)
-//         }); 
-//     });
-
-
-    // lab.test('returns true when user download files ', function(){
-    //     return dcbia.downloadFiles()
-    //     .then(function(res){
-    //         // console.log(res)
-    //         // expect(res[0].name == "myFiles").to.be.true()
-    //         // expect(1+1).to.be.equal(2)
-    //     }); 
-    // });
-
-
-
-
-    // lab.test('returns false when user search and don\'t find files', function(){
-    //     return dcbia.searchFiles()
-    //     .then(function(res){
-    //         // console.log(res)
-    //         // expect(res[0].name == "myFiles").to.be.true()
-    //         // expect(1+1).to.be.equal(2)
     //     }); 
     // });
 
@@ -279,19 +274,22 @@ lab.experiment("Test dcbia lib", function(){
 
 
 
-    // lab.test('returns true when user uploads zip file', function(){
 
-    // lab.test('returns true when admin user gets folder of another user', function(){
 
-    // lab.test('returns true when user creates a directory', function(){
 
-    // lab.test('returns true when user uploads a single file', function(){
 
-    // lab.test('returns true when user downloads a single file', function(){
 
-    // lab.test('returns true when user downloads a folder', function(){
 
-    // lab.test('returns true when user deletes a file', function(){
+
+
+
+
+
+
+    
+
+
+
 
 
 });

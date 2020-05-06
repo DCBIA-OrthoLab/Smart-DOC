@@ -310,7 +310,7 @@ module.exports = class DCBIALib extends HapiJWTCouch{
 
 
 
-// get map with own account/admin account - nbr of folders ? etc
+
     getDirectoryMap(qs){
         var self = this;
         return new Promise(function(resolve, reject){
@@ -320,6 +320,7 @@ module.exports = class DCBIALib extends HapiJWTCouch{
                 qs: qs,
                 agentOptions: self.agentOptions,
                 auth: self.auth
+
             }
             request(options, function(err, res, body){
                 if(err){
@@ -332,32 +333,6 @@ module.exports = class DCBIALib extends HapiJWTCouch{
     }
 
 
-
-
-// move one/many files to a folder
-// move in own files
-    moveFiles(infos){
-        var self = this;
-        return new Promise(function(resolve, reject){
-            var options = {
-                url : self.getServer() + "/dcbia/moveFiles",
-                method: "POST",
-                payload: infos, 
-                agentOptions: self.agentOptions,
-                auth: self.auth
-            }
-            request(options, function(err, res, body){
-                if(err){
-                    reject(err);
-                }else{
-                    resolve(body);
-                }
-            })
-        });    
-    }
-
-// share with one person
-// share with many
     shareFiles(infos){
         var self = this;
         return new Promise(function(resolve, reject){
@@ -365,7 +340,13 @@ module.exports = class DCBIALib extends HapiJWTCouch{
                 url : self.getServer() + "/dcbia/shareFiles",
                 method: "POST",
                 agentOptions: self.agentOptions,
-                auth: self.auth
+                auth: self.auth,
+                payload: Joi.object({
+                    users: Joi.array(),
+                    directory: Joi.string(),
+                }),
+                json: infos
+
             }
             request(options, function(err, res, body){
                 if(err){
@@ -377,15 +358,16 @@ module.exports = class DCBIALib extends HapiJWTCouch{
         });    
     }
 
-// download one/many file - from - shared/personnal folders
     downloadFiles(files){
         var self = this;
         return new Promise(function(resolve, reject){
             var options = {
-                url : self.getServer() + "/dcbia/download/{filesList}",
-                method: "GET",
+                url : self.getServer() + "/dcbia/download",
+                method: "POST",
                 agentOptions: self.agentOptions,
-                auth: self.auth
+                auth: self.auth,
+                payload: true,
+                responseType: 'blob'
             }
             request(options, function(err, res, body){
                 if(err){
@@ -396,14 +378,13 @@ module.exports = class DCBIALib extends HapiJWTCouch{
             })
         });    
     }
+ 
 
-
-// create folder where ?
-    createFolder(name, path){
+    createFolder(newfolder){
         var self = this;
         return new Promise(function(resolve, reject){
             var options = {
-                url : self.getServer() + "/dcbia/createfolder",
+                url : self.getServer() + "/dcbia/createfolder/" + newfolder,
                 method: "POST",
                 agentOptions: self.agentOptions,
                 auth: self.auth
@@ -419,15 +400,15 @@ module.exports = class DCBIALib extends HapiJWTCouch{
     }
 
 
-// search in : personnal/shared - find one/many/zero
-    searchFiles(search){
+    searchFiles(data){
         var self = this;
         return new Promise(function(resolve, reject){
             var options = {
-                url : self.getServer() + "/dcbia/search/{data}",
+                url : self.getServer() + "/dcbia/search/" + data,
                 method: "GET",
                 agentOptions: self.agentOptions,
-                auth: self.auth
+                auth: self.auth,
+                json: data
             }
             request(options, function(err, res, body){
                 if(err){
@@ -440,12 +421,11 @@ module.exports = class DCBIALib extends HapiJWTCouch{
     }
 
 
-// delete one/many - files/folder
-    deleteFile(file){
+    deleteFile(deletepath){
         var self = this;
         return new Promise(function(resolve, reject){
             var options = {
-                url : self.getServer() + "/dcbia/"+file,
+                url : self.getServer() + "/dcbia/delete/" + deletepath,
                 method: "DELETE",
                 agentOptions: self.agentOptions,
                 auth: self.auth
@@ -460,15 +440,16 @@ module.exports = class DCBIALib extends HapiJWTCouch{
         });    
     }
 
-// upload zip with one/many files
-    uploadZipFile(zipfile){
+
+    moveFiles(data){
         var self = this;
         return new Promise(function(resolve, reject){
             var options = {
-                url : self.getServer() + "/dcbia/data",
-                method: "POST",
+                url : self.getServer() + "/dcbia/moveFiles",
+                method: "PUT",
                 agentOptions: self.agentOptions,
-                auth: self.auth
+                auth: self.auth,
+                json: data
             }
             request(options, function(err, res, body){
                 if(err){
@@ -481,6 +462,35 @@ module.exports = class DCBIALib extends HapiJWTCouch{
     }
 
 
-
+    upload(target_path, filename){
+        var self = this;
+        return new Promise(function(resolve, reject){
+            var options = {
+                url : self.getServer() + "/dcbia/upload/" + target_path,
+                method: "POST",
+                agentOptions: self.agentOptions,
+                headers: { 
+                    "Content-Type": "application/octet-stream"
+                },
+                auth: self.auth
+            }
+            var stat = fs.statSync(filename);
+            if(stat){
+                var stream = fs.createReadStream(filename);
+                stream.pipe(
+                    request(options, function(err, res, body){
+                        if(err){
+                            reject(err);
+                        }else{
+                            resolve(body);
+                        }
+                    })
+                );    
+            }else{
+                reject(stat);
+            }
+            
+        });    
+    }
     
 }
