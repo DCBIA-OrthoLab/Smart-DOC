@@ -467,21 +467,14 @@ lab.experiment("Test dcbia lib", function(){
         }); 
     });
 
-    // lab.test('returns true when user creates directory in sharedFiles', function(){
-    //     return dcbia.createFolder("sharedFiles/newDirectory")
-    //     .then(function(res){
-    //         expect(JSON.parse(res)).to.be.an.object().to.include({statusCode: 403});
-    //     });
-    // });
+    lab.test('returns true when user deletes deep_test', function(){
 
-    // lab.test('returns true when user deletes deep_test', function(){
+        return dcbia.deleteFile("test_next")
+        .then(function(res){
+            expect(res).to.equal('File deleted!')
+        }); 
 
-    //     return dcbia.deleteFile("test_next")
-    //     .then(function(res){
-    //         expect(res).to.equal('File deleted!')
-    //     }); 
-
-    // });
+    });
 
 
 });
