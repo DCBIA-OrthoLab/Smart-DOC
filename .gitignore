@@ -20,3 +20,5 @@ doc/sharingDataArticle/article.ps
 conf.my.dentalaws.json
 doc/sharingDataArticle/images/temp/*.png
 src/dcbia-server/data/
+filetest.txt
+my_deep_test
