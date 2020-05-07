@@ -4,7 +4,7 @@
   "description": "Utility to import data to the system",
   "main": "index.js",
   "scripts": {
-    "test": "lab -v test.js"
+    "test": "lab -v -m 120000 test.js"
   },
   "repository": {
     "type": "git",
@@ -28,6 +28,7 @@
   },
   "devDependencies": {
     "@hapi/code": "^8.0.1",
-    "@hapi/lab": "^22.0.4"
+    "@hapi/lab": "^22.0.4",
+    "md5-file": "^5.0.0"
   }
 }

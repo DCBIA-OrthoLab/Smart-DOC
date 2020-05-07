@@ -304,22 +304,15 @@ module.exports = class DCBIALib extends HapiJWTCouch{
     }
 
 
-
-
-
-
-
-
-
-    getDirectoryMap(qs){
+    getDirectoryMap(){
         var self = this;
         return new Promise(function(resolve, reject){
             var options = {
                 url : self.getServer() + "/dcbia/map",
                 method: "GET",
-                qs: qs,
                 agentOptions: self.agentOptions,
-                auth: self.auth
+                auth: self.auth,
+                json: true
 
             }
             request(options, function(err, res, body){
@@ -330,6 +323,17 @@ module.exports = class DCBIALib extends HapiJWTCouch{
                 }
             })
         });    
+    }
+
+    flattenDirectoryMap(dmap){
+        const self = this;
+        return _.flatten(_.map(dmap, (dm)=>{
+            if(dm.type == 'f'){
+                return dm.path;
+            }else{
+                return self.flattenDirectoryMap(dm.files);
+            }
+        }));
     }
 
 
@@ -358,15 +362,14 @@ module.exports = class DCBIALib extends HapiJWTCouch{
         });    
     }
 
-    downloadFiles(files){
+    downloadFile(filename){
         var self = this;
         return new Promise(function(resolve, reject){
             var options = {
-                url : self.getServer() + "/dcbia/download",
-                method: "POST",
+                url : self.getServer() + "/dcbia/download/" + filename,
+                method: "GET",
                 agentOptions: self.agentOptions,
                 auth: self.auth,
-                payload: true,
                 responseType: 'blob'
             }
             request(options, function(err, res, body){
@@ -377,6 +380,18 @@ module.exports = class DCBIALib extends HapiJWTCouch{
                 }
             })
         });    
+    }
+
+    downloadFileStream(filename){
+        var self = this;
+        
+        var options = {
+            url : self.getServer() + "/dcbia/download/" + filename,
+            method: "GET",
+            agentOptions: self.agentOptions,
+            auth: self.auth
+        }
+        return request(options);
     }
  
 
@@ -399,28 +414,6 @@ module.exports = class DCBIALib extends HapiJWTCouch{
         });    
     }
 
-
-    searchFiles(data){
-        var self = this;
-        return new Promise(function(resolve, reject){
-            var options = {
-                url : self.getServer() + "/dcbia/search/" + data,
-                method: "GET",
-                agentOptions: self.agentOptions,
-                auth: self.auth,
-                json: data
-            }
-            request(options, function(err, res, body){
-                if(err){
-                    reject(err);
-                }else{
-                    resolve(body);
-                }
-            })
-        });    
-    }
-
-
     deleteFile(deletepath){
         var self = this;
         return new Promise(function(resolve, reject){
@@ -428,7 +421,8 @@ module.exports = class DCBIALib extends HapiJWTCouch{
                 url : self.getServer() + "/dcbia/delete/" + deletepath,
                 method: "DELETE",
                 agentOptions: self.agentOptions,
-                auth: self.auth
+                auth: self.auth,
+                json: true
             }
             request(options, function(err, res, body){
                 if(err){
@@ -446,6 +440,26 @@ module.exports = class DCBIALib extends HapiJWTCouch{
         return new Promise(function(resolve, reject){
             var options = {
                 url : self.getServer() + "/dcbia/moveFiles",
+                method: "PUT",
+                agentOptions: self.agentOptions,
+                auth: self.auth,
+                json: data
+            }
+            request(options, function(err, res, body){
+                if(err){
+                    reject(err);
+                }else{
+                    resolve(body);
+                }
+            })
+        });    
+    }
+
+    copyFiles(data){
+        var self = this;
+        return new Promise(function(resolve, reject){
+            var options = {
+                url : self.getServer() + "/dcbia/copyFiles",
                 method: "PUT",
                 agentOptions: self.agentOptions,
                 auth: self.auth,
@@ -491,6 +505,25 @@ module.exports = class DCBIALib extends HapiJWTCouch{
             }
             
         });    
+    }
+
+    getDirectoryFiles(dirname){
+        const self = this;
+        return _.flatten(_.map(fs.readdirSync(dirname), (filename)=>{
+            var fullpath = path.join(dirname, filename);
+            if(fs.statSync(fullpath).isDirectory()){
+                return self.getDirectoryFiles(fullpath);
+            }else{
+                return fullpath;
+            }
+        }));
+    }
+
+    uploadDirectory(target_path, dirname){
+        var self = this;
+        return Promise.map(self.getDirectoryFiles(dirname), (filename)=>{
+            return self.upload(path.join(target_path, filename.replace(dirname, '')), filename);
+        }, {concurrency: 1})
     }
     
 }
