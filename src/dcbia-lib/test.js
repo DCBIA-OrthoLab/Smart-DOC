@@ -339,6 +339,19 @@ lab.experiment("Test dcbia lib", function(){
 
     });
 
+    lab.test('returns true when user copy a file into existing directory', function(){
+        var copy_obj = {
+            source: 'test/my_deep_test/d22/d d29/d d36/f41',
+            target: 'test/my_deep_test/'
+        }
+
+        return dcbia.copyFiles(copy_obj)
+        .then(function(res){
+            expect(res).to.be.true();
+        }); 
+
+    });
+
     lab.test('returns true when user copy a file relative path', function(){
         var copy_obj = {
             source: 'test/my_deep_test/d22/d d29/d d36/f41',
@@ -461,14 +474,14 @@ lab.experiment("Test dcbia lib", function(){
     //     });
     // });
 
-    lab.test('returns true when user deletes deep_test', function(){
+    // lab.test('returns true when user deletes deep_test', function(){
 
-        return dcbia.deleteFile("test_next")
-        .then(function(res){
-            expect(res).to.equal('File deleted!')
-        }); 
+    //     return dcbia.deleteFile("test_next")
+    //     .then(function(res){
+    //         expect(res).to.equal('File deleted!')
+    //     }); 
 
-    });
+    // });
 
 
 });
