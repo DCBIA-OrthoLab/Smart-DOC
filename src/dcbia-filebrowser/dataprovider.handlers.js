@@ -6,7 +6,7 @@ const spawn = require('child_process').spawn;
 const path = require('path');
 const qs = require('querystring');
 const fs = require('fs');
-const admZip = require('adm-zip');
+const archiver = require('archiver');
 
 module.exports = function (server, conf) {
 	
@@ -34,7 +34,7 @@ module.exports = function (server, conf) {
 	/*
 	*/
 
-	handler.uploadFile = async (req, h) => {
+	handler.uploadFile = (req, h) => {
 		const {auth, params, payload} = req;
 		const {credentials} = auth;
 		const {target_path} = params;
@@ -43,8 +43,8 @@ module.exports = function (server, conf) {
 			
 			var filename = path.join(conf.datapath, credentials.email, target_path);
 			var dirname = path.dirname(filename);
-
-			if(!fs.existsSync(path)){
+			
+			if(!fs.existsSync(dirname)){
 				fs.mkdirSync(dirname, { recursive: true }, (err) => {if (err) reject(err)});
 			}
 
@@ -57,11 +57,11 @@ module.exports = function (server, conf) {
 	}
 
 
-	handler.deleteFile = async (req, h) => {
+	handler.deleteFile = (req, h) => {
 		const {auth, params, payload} = req;
 		const {credentials} = auth;
 		const {target_path} = params;
-		console.log(target_path)
+		
 		return new Promise((resolve, reject)=>{
 			var filename = path.join(conf.datapath, credentials.email, target_path);
 
@@ -73,141 +73,104 @@ module.exports = function (server, conf) {
 		});
 	}
 
-
-	handler.getDirectoryMap = async (req, h) => {
-		const {query, auth} = req;
-		var credentials = auth.credentials;
-		var user = query.email ? query.email : credentials.email;
-
-	    var getMap = function(directory, root_folder){
-	    	var directoryMap = []
-	    	_.each(fs.readdirSync(directory), function(filename){
-	    		var fullPath = path.join(directory, filename)
-
-	    		//  delete dead symlinks from shared folders
-	    		fs.lstat(fullPath, function(err,stats) {
-	    			if (stats.isSymbolicLink()) {
-	    				fs.exists(fullPath, function(link) {
-	    					if (!link) { 
-								fs.unlink(fullPath, (err) => {
-									if (err) throw err;
-								})
-
-	    						return directoryMap
-	    					}
-	    				})
-	    			}
-	    		})
-
-	    		if (filename==".DS_Store") {fs.unlinkSync(fullPath)}
-
-	    		var stats = fs.statSync(fullPath)
-	    		if (stats.isDirectory()){
-	    			directoryMap.push({type:'d', name: filename, path: path.relative(root_folder, fullPath), files: getMap(fullPath, root_folder)})
-	    		} else {
-	    			directoryMap.push({type:'f', name: filename, path: path.relative(root_folder, fullPath)})
-	    		}
-	    	})
-	    	return directoryMap
-	    }
-
-	    var personnalPath = path.join(conf.datapath, user)
-
-	    if (!fs.existsSync(personnalPath)) {
-			fs.mkdirSync(path.join(personnalPath,'sharedFiles'), { recursive: true }, (err) => {if (err) throw err})
-	    }
-	    
-		return getMap(personnalPath, personnalPath);
-	}
-
-			 
-	
-
-
- 
-
-	handler.searchFiles = async (req, h) => {
-		const {auth, params, payload} = req;
-		const {credentials} = auth;
-		const {data} = params
-
-		var result = []
-		var dir = path.join(conf.datapath, credentials.email)
-		
-		console.log(dir)
-		console.log(data)
-		
-		if (data == ''){return result}
-
-		var searchRecurs = function(data,directory){
+	const getDirectoryMap = (directory, root_folder)=>{
+		return _.map(fs.readdirSync(directory), (filename)=>{
+			var fullPath = path.join(directory, filename);
 			
-			_.each(fs.readdirSync(directory), function(file){	
-				var fullPath = path.join(directory,file)
-				var stats = fs.statSync(fullPath)
-				if(stats.isDirectory()){
-					if (file.toUpperCase().includes(data.toUpperCase())){
-						result.push({ filename: file, path: fullPath, isDir: true})
-					}
-					searchRecurs(data,fullPath)
-				}else{
-					if (file.toUpperCase().includes(data.toUpperCase())){
-						result.push({ filename: file, path: fullPath, isDir: false})
-					}
-				}
-			})
-			return result
-		}
-
-		return searchRecurs(data,dir)
+			if(fs.lstatSync(fullPath).isSymbolicLink() && !fs.existsSync(fullPath)){
+				fs.unlinkSync(fullPath);
+				return null;
+			}
+			
+			if (fs.statSync(fullPath).isDirectory()){
+    			return {type:'d', name: filename, path: path.relative(root_folder, fullPath), files: _.compact(getDirectoryMap(fullPath, root_folder))}
+    		} else {
+    			return {type:'f', name: filename, path: path.relative(root_folder, fullPath)};
+    		}
+		});
 	}
 
 
+	handler.getDirectoryMap = (req, h) => {
 
-	handler.createFolder = async (req, h) => {
-	const {auth, params, payload} = req;
-	const {credentials} = auth;
-	const {newfolder} = params
+		return new Promise((resolve, reject)=>{
+			const {query, auth} = req;
+			var credentials = auth.credentials;
+			var user = credentials.email;
 
-	var directorypath = path.join(conf.datapath, credentials.email, newfolder)
-	var name = path.basename(directorypath)
+			if(query.email && credentials.scope.indexOf('admin') == -1){
+				reject(Boom.unauthorized('You are not an admin!'));
+			}else{
+			    var personnalPath = path.join(conf.datapath, user);
+			    if (!fs.existsSync(personnalPath)) {
+					fs.mkdirSync(path.join(personnalPath,'sharedFiles'), { recursive: true }, (err) => {if (err) reject(err)});
+			    }
+				resolve(_.compact(getDirectoryMap(personnalPath, personnalPath)));
+			}
+		})
+	}
 
-	if (directorypath.includes('sharedFiles') 
-			|| fs.existsSync(directorypath) 
-			|| name.match("^[0-9a-zA-Z-_+ ]+$") == null)
-		{
-			return false
 
-		} else {
-			fs.mkdir(directorypath, (err) => {
-				if (err) throw err
-			})	
-		}
-		return true
+	handler.createFolder = (req, h) => {
+
+		return new Promise((resolve, reject)=>{
+			const {auth, params, payload} = req;
+			const {credentials} = auth;
+			const {newfolder} = params;
+
+			var directorypath = path.join(conf.datapath, credentials.email, newfolder)
+
+			if (directorypath.includes('sharedFiles')){
+				reject(Boom.forbidden("Cannot create directory in sharedFiles!"));
+			}else if(fs.existsSync(directorypath)){
+				resolve(false);
+			} else {
+				fs.mkdirSync(directorypath, { recursive: true });
+				resolve(true)
+			}
+		})
 	}	
 		
 
-	handler.downloadFiles = async (req, h) => {
+	handler.downloadFile = (req, h) => {
 		const {auth, params} = req;
 		const {credentials} = auth;
-		const {file} = params
-		// list = Object.values(payload)
-
-		var zip = new admZip()
-
-		// list.forEach((file) => {
- 	// 		zip.addLocalFile(path.join(conf.datapath, credentials.email, file));
- 	// 	})
-
- 		var filepath = path.join(conf.datapath, credentials.email, file)
- 		console.log(filepath)
- 	// // 	zip.addLocalFile(path.join(conf.datapath, credentials.email, payload))
- 		data = fs.readFileSync(filepath)
-		// // var sendThis = zip.toBuffer();
+		const {file} = params;
 		
-		// // return sendThis
-		// console.log(file)
-		console.log(data)
-		return data
+		var fullPath = path.join(conf.datapath, credentials.email, file);
+
+		if(fs.existsSync(fullPath)){
+			if(fs.statSync(fullPath).isDirectory()){
+				return new Promise((resolve, reject)=>{
+					// create a file to stream archive data to.
+					var output_zip = path.resolve(fullPath) + ".zip";
+					var output = fs.createWriteStream(output_zip);
+
+					var archive = archiver('zip', {
+					  zlib: { level: 0 }
+					});
+					//When the output stream is closed we can resolve the promise
+					output.on('close', ()=>{
+						var outstream = fs.createReadStream(output_zip);
+						outstream.on('close', ()=>{
+					  		//When the outstream finishes we nuke the archive
+					  		fs.unlinkSync(output_zip);
+					  	})
+					  	resolve(outstream);
+					});
+
+					archive.pipe(output);
+
+					archive.directory(fullPath, path.basename(fullPath));
+
+					archive.finalize();
+				});
+			}else{
+				return fs.createReadStream(fullPath);
+			}
+		}else{
+			return Boom.notFound(file);
+		}
 	}
 
 
@@ -220,13 +183,15 @@ module.exports = function (server, conf) {
 	var relativePath = path.relative(__dirname,sourcePath)
 	var fullPath = path.join(__dirname, relativePath)
 
-
-
 	users.forEach((user) => {
-		var targetPath = path.join(conf.datapath, user, 'sharedFiles', path.basename(directory))
-	  	
-	  	console.log(fullPath)
-	  	console.log(targetPath)
+
+		var sharedFolder = path.join(conf.datapath, user, 'sharedFiles');
+
+		if(!fs.existsSync(sharedFolder)){
+			fs.mkdirSync(sharedFolder);
+		}
+
+		var targetPath = path.join(sharedFolder, path.basename(directory))
 
 	  	if (!fs.existsSync(targetPath)) {
 			fs.symlinkSync(fullPath, targetPath, (err) => {
@@ -239,29 +204,79 @@ module.exports = function (server, conf) {
   	return true
   }
 
+	const copyFiles = (source, target)=>{
+		const self = this;
 
+		if(fs.existsSync(target) && fs.statSync(target).isFile()){
+			//If both file exist then don't copy. It's a conflict
+			return Promise.reject(Boom.conflict("File Exists!"));
+		}
 
+		if(fs.existsSync(target) && fs.statSync(target).isDirectory()){
+			//If the target is a directory, it means the source needs to be copy inside the directory
+			//Apend the name of the source
+			target = path.join(target, path.basename(source));
+		}
 
+		if(fs.existsSync(source) && fs.statSync(source).isDirectory()){
+			//Copy recursively everthing in source if it is a directory
+			return Promise.map(fs.readdirSync(source), (filename)=>{
+				var source_path = path.join(source, filename);
+				var target_path = path.join(target, filename);
+				return copyFiles(source_path, target_path);
+			})
+		}else{
+			//If source is anything but a directory
+			//Copy the whole thing
+			return new Promise((resolve, reject)=>{
 
-  handler.moveFiles = async (req, h) => {  
+				var target_dir = path.dirname(target);
+
+				if(!fs.existsSync(target_dir)){
+					fs.mkdirSync(target_dir, {recursive: true});
+				}
+
+				var reader = fs.createReadStream(source);
+				var writer = fs.createWriteStream(target);
+				reader.pipe(writer);
+
+				writer.on('finish', ()=>{
+					resolve();
+				});
+
+				writer.on('error', (err)=>{
+					reject(Boom.badRequest(err));
+				});
+			});
+		}
+  }
+
+  handler.copyFiles = (req, h) => {  
   	const {credentials} = req.auth;
   	const {source, target} = req.payload;
 
   	const sourcePath = path.join(conf.datapath, credentials.email, source);
   	var targetPath = path.join(conf.datapath, credentials.email, target);
 
-  	var stat = fs.statSync(targetPath);
+  	return copyFiles(sourcePath, targetPath)
+  	.then(()=>{
+  		return true;
+  	});
+  }
 
-  	if(stat.isDirectory()){
-  		targetPath = path.join(targetPath, path.basename(sourcePath));
-  	}
 
-  	fs.renameSync(sourcePath, targetPath, (err) =>{
-  		if (err) {throw err}
 
-  	})
+  handler.moveFiles = (req, h) => {  
+  	const {credentials} = req.auth;
+  	const {source, target} = req.payload;
 
-  	return true;
+  	const sourcePath = path.join(conf.datapath, credentials.email, source);
+  	var targetPath = path.join(conf.datapath, credentials.email, target);
+
+  	return copyFiles(sourcePath, targetPath)
+  	.then(()=>{
+  		return deleteRecursive(sourcePath);
+  	});
   }
 
 

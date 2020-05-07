@@ -17,7 +17,7 @@ module.exports = function (server, conf) {
 		    validate : {
 		    	query: false,
 		    	params: Joi.object({
-					target_path: Joi.string().required()
+					target_path: Joi.string().required().pattern(/(\.\.)/, { invert: true })
 		    	}),
 		    	payload: true
 		    },
@@ -68,7 +68,7 @@ module.exports = function (server, conf) {
 			validate: {
 				query: false,
 				params: Joi.object({
-					target_path: Joi.string().required()
+					target_path: Joi.string().required().pattern(/(\.\.)/, { invert: true })
 		    	}),
 				payload: false
 			},
@@ -80,35 +80,9 @@ module.exports = function (server, conf) {
 	})
 
 
-
-
-
-
-	server.route({
-		method: 'GET',
-		path: '/dcbia/search/{data}',
-		config: {
-			auth: {
-                strategy: 'token',
-                scope: ['dentist']
-            },
-			handler: handlers.searchFiles,
-			validate: {
-				query: false,
-				params: Joi.object({
-					data: Joi.string().required()
-				}),
-				payload: false
-			},
-			description: 'search for a file in the user personnal space'
-		}
-	})
-
-
-
 	server.route({
 		method: 'POST',
-		path: '/dcbia/createfolder/{newfolder}',
+		path: '/dcbia/createfolder/{newfolder*}',
 	    config: {
 			auth: {
                 strategy: 'token',
@@ -118,32 +92,32 @@ module.exports = function (server, conf) {
 	        validate: {
 	        	query: false,
 	        	params: Joi.object({
-	        		newfolder: Joi.string().required()
+	        		newfolder: Joi.string().required().pattern(/(\.\.)/, { invert: true })
 	        	}),
 	        	payload: false
 	        },
-	    description: 'create a folder at the path in the user personnal space'
+	    	description: 'create a folder at the path in the user personnal space'
 	    }
 	})
 
 	server.route({
 		method: 'GET',
-		path: '/dcbia/download/{file}',
+		path: '/dcbia/download/{file*}',
 		config: {
 			auth: {
                 strategy: 'token',
                 scope: ['dentist']
             },
-			handler: handlers.downloadFiles,
+			handler: handlers.downloadFile,
 			validate: {
 				query: false,
 				payload: false,
 				params: Joi.object({
-					file: Joi.string()
+					file: Joi.string().pattern(/(\.\.)/, { invert: true })
 				})
 				
 			},
-		description: 'download list of selected files'
+			description: 'download file/directory. If directory, the stream will be a zipped file'
 		},
 	})
 
@@ -160,8 +134,28 @@ module.exports = function (server, conf) {
 				query: false,
 			    payload: Joi.object({
 					users: Joi.array(),
-					directory: Joi.string(),
+					directory: Joi.string().pattern(/(\.\.)/, { invert: true }),
 				}),
+			    params: null		    
+			},
+		}
+	});
+
+	server.route({
+		method: 'PUT',
+		path: '/dcbia/copyFiles',
+		config: {
+			auth: {
+				strategy: 'token',
+				scope: ['dentist']
+			},
+			handler: handlers.copyFiles,
+			validate: {
+				query: false,
+			    payload: Joi.object({
+			    	source: Joi.string().pattern(/(\.\.)/, { invert: true }),
+			    	target: Joi.string().pattern(/(\.\.)/, { invert: true }),
+			    }),
 			    params: null		    
 			},
 		}
@@ -180,8 +174,8 @@ module.exports = function (server, conf) {
 			validate: {
 				query: false,
 			    payload: Joi.object({
-			    	source: Joi.string(),
-			    	target: Joi.string(),
+			    	source: Joi.string().pattern(/(\.\.)/, { invert: true }),
+			    	target: Joi.string().pattern(/(\.\.)/, { invert: true }),
 			    }),
 			    params: null		    
 			},
@@ -201,8 +195,8 @@ module.exports = function (server, conf) {
 		    	query: false,
 		    	params: null,
 		    	payload: Joi.object({
-		    		source: Joi.string(),
-		    		newname: Joi.string()
+		    		source: Joi.string().pattern(/(\.\.)/, { invert: true }),
+		    		newname: Joi.string().pattern(/(\.\.)/, { invert: true })
 		    	})
 		    },
 	        description: 'rename a file or folder'

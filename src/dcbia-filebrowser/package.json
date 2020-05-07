@@ -11,7 +11,7 @@
   "dependencies": {
     "@hapi/boom": "^9.1.0",
     "@hapi/joi": "^17.1.1",
-    "adm-zip": "^0.4.14",
+    "archiver": "^4.0.1",
     "bluebird": "^3.7.2",
     "request": "^2.88.2",
     "underscore": "^1.10.2"
