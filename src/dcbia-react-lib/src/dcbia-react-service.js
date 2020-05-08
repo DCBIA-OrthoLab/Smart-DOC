@@ -323,6 +323,14 @@ export default class DcbiaReactService {
   });
  }
 
+ copyFiles(infos) {
+  return this.http({
+    method: 'PUT',
+    url: '/dcbia/copyFiles',
+    data: infos
+  });
+ }
+
 
 
 }

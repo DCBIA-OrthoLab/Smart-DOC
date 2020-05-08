@@ -65,11 +65,16 @@ module.exports = function (server, conf) {
 		return new Promise((resolve, reject)=>{
 			var filename = path.join(conf.datapath, credentials.email, target_path);
 
-			if(deleteRecursive(filename)){
-				resolve("File deleted!");
-			}else{
-				reject("Cannot delete:", target_path);
-			}
+			fs.lstat(filename, function(err,stats){
+				if(stats.isSymbolicLink()){
+					fs.unlinkSync(filename)
+					resolve('Shared folder deleted!')
+				} else if(deleteRecursive(filename)){
+					resolve("File deleted!");
+				}else{
+					reject("Cannot delete:", target_path);
+				}
+			});
 		});
 	}
 
@@ -289,7 +294,7 @@ module.exports = function (server, conf) {
 
 	stats = fs.statSync(oldPath);
 	if(!stats.isDirectory()){
-		targetPath = targetPath+path.extname(source)
+		targetPath = targetPath
 	}
 
 	fs.rename(oldPath, targetPath, err => {

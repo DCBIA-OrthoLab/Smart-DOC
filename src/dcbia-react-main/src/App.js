@@ -21,7 +21,7 @@ import store from "./redux/store";
 
 import {DcbiaReactProjects, DcbiaReactMorphologicalData, DcbiaReactClinicalData, DcbiaReactFilebrowser} from 'dcbia-react-lib'
 import {ClusterpostJobs, ClusterpostTokens, ClusterpostDashboard} from 'clusterpost-list-react'
-// import {MedImgSurf} from 'react-med-img-viewer';
+import {MedImgSurf} from 'react-med-img-viewer';
 
 
 class App extends Component {
