@@ -7,7 +7,7 @@
     "@hapi/boom": "^8.0.1",
     "@hapi/joi": "^16.1.8",
     "bluebird": "^3.3.0",
-    "couch-provider": "^1.0.0",
+    "couch-provider": "^3.0.1",
     "couch-update-views": "^1.0.9",
     "request": "^2.69.0",
     "underscore": "^1.8.3"
