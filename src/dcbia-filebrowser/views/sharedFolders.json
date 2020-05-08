@@ -1,0 +1,9 @@
+{
+    "_id": "_design/sharedFolders",
+    "views": {
+        "shared": {
+            "map": "function (doc) {\n  if(doc.type == \"shared\"){\n    emit([doc.owner, doc.directory], doc.users);\n  }\n}"
+        }
+    },
+    "language": "javascript"
+}
