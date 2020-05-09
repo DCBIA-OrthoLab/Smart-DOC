@@ -3,11 +3,13 @@ import React, {Component} from 'react'
 import { connect } from "react-redux";
 import {Container, Button, Table, Card, Col, Row, DropdownButton, Dropdown, Form, Modal, Alert, OverlayTrigger, Overlay, Tooltip, Popover, Badge, ButtonToolbar, ButtonGroup, InputGroup, FormControl, Spinner, Navbar, Nav, Breadcrumb, ProgressBar} from 'react-bootstrap'
 
-import {Trash2, Folder, Plus, ArrowLeft, ArrowDown, ArrowRight, MinusSquare, PlusSquare, CheckSquare, XSquare, X, CornerDownLeft, FolderMinus, FolderPlus, MoreVertical, ChevronLeft, ChevronsLeft, Share2, Circle, Download, File, UploadCloud, Move, Edit3} from 'react-feather'
+import {Trash2, Folder, Plus, ArrowLeft, ArrowDown, ArrowRight, MinusSquare, PlusSquare, CheckSquare, XSquare, X, CornerDownLeft, FolderMinus, FolderPlus, MoreVertical, ChevronLeft, ChevronsLeft, Share2, Circle, Download, File, UploadCloud, Move, Edit3, Edit2, Copy} from 'react-feather'
 
 import Dropzone from 'react-dropzone'
 
+
 import DcbiaReactService from './dcbia-react-service'
+
 
 const _ = require('underscore');
 const Promise = require('bluebird');
@@ -22,8 +24,15 @@ class Filebrowser extends Component {
 
 			fileToUpload: null,
 			uploadPath: null,
+			
 			uploadValue: 0,
+			showUploadBar: false,
 
+			downloadValue: 0,
+			showDownloadBar: false,
+
+
+			projectFilesList: [],
 
 
 			treeMap: null,	
@@ -62,14 +71,22 @@ class Filebrowser extends Component {
 
 	}
 
-	getTree() {
-	if (this.state.currentFolder == '.') { 
-			return(this.state.treeMap)
-		} else {
-			var objToFind = this.state.currentFolder.slice(2)
-			return this.findInMap(this.state.treeMap,objToFind)
-		}
+	getTree(optionnalSearch=null) {
+		const {treeMap, currentFolder} = this.state
 
+		if (optionnalSearch!==null) {
+			var objToFind = optionnalSearch
+			return this.findInMap(treeMap, objToFind)
+		
+		} else {
+
+			if (currentFolder == '.') { 
+					return(treeMap)
+			} else {
+				var objToFind = currentFolder.slice(2)
+				return this.findInMap(treeMap,objToFind)
+			}
+		}
 	}	
 
 	findInMap(map,objToFind) {
@@ -118,8 +135,16 @@ class Filebrowser extends Component {
 		const self = this
 		const {currentFolder, uploadRate} = self.state;
 		
+		self.setState({...self.state, showUploadDragDrop: false, showUploadBar: true})
+
 		let uploadPath
-		var value = 100/filelist.length
+
+		if (filelist.length==1) {
+			var value = 50
+			self.setState({...self.state, uploadValue: value})
+		} else {
+			var value = 100/filelist.length
+		}
 
 		return Promise.map(filelist, (file)=>{
 
@@ -222,40 +247,26 @@ class Filebrowser extends Component {
 	
 
 	addSelectedFiles(f) {
+		
 		var {filesList} = this.state
 		var bool = filesList[f.path].selected
 		filesList[f.path].selected = !bool
-
-		// if (f.type=='d' && !bool==true) {
-		// 	Object.keys(filesList).forEach(file => {
-		// 		console.log(file)
-	 //    		if (file.includes(f.path)) {
-		// 			filesList[file].selected = true
-	 //    		}
-		// 	})
-
-		// } else if (f.type=='d' && bool==true) {
-		// 	Object.keys(filesList).forEach(file => {
-		// 		console.log(file)
-	 //    		if (file.includes(f.path)) {
-		// 			filesList[file].selected = false
-	 //    		}
-		// 	})
-		// }
-
 		this.setState({filesList: filesList})
+		
+		if (this.props.createtask) {
+			const {projectFilesList} = this.state
+				
+			if (projectFilesList.length==0){
+				var data = {name: f.path} 
+			} else {
+				var data = Object.assign({}, projectFilesList[0])
+				data.name = f.path
+			}
 
-		// var somethingSelected = false
-  //   	Object.keys(files).forEach(key => {
-  //   		if (files[key].selected == true) {
-  //   			somethingSelected = true
-  //   		}
-  //   	})
-  //   	if (somethingSelected) {
-  //   		this.setState({selected: true})
-  //   	} else {
-  //   		this.setState({selected: false})
-  //   	}
+			projectFilesList.push(data)
+			this.setState({projectFilesList: projectFilesList})	
+
+		}
 	}
 
 
@@ -318,22 +329,37 @@ class Filebrowser extends Component {
 
 
 
-// faire la reconnaissance debut du mot + reconnaissance sans majuscule
 	handleSearchFile(e) {
 		const self = this
 		var search = e.target.value
+		// var bool = this.state.searchFiles
+		const {treeMap} = self.state
 
-		var bool = this.state.searchFiles
-		if (search !== '') {this.setState({searchFiles: true})} 
-			else {this.setState({searchFiles: false})}
+		if (search == '') {this.setState({searchFiles: false})} 
+			else {this.setState({searchFiles: true})}
 
-		self.dcbiareactservice.searchFiles(search)
-			.then(res => { 
-				// console.log(res)
-				self.setState({suggestions: res.data})
+		var result = []
+		var searchRecurs = function(data, directory){
+			Object.values(directory).forEach(element => {
+				if (element.type=='d'){
+					if (element.name.toUpperCase().includes(data.toUpperCase())){
+						result.push({type: element.type, name: element.name, path: element.path})
+					}
+					searchRecurs(search, element.files)	
+				}else{
+					if (element.name.toUpperCase().includes(data.toUpperCase())){
+						result.push({type: element.type, name: element.name, path: element.path})
+					}
+				}
 			})
+			return result
+		}
+		
+
+		var found = searchRecurs(search, treeMap)
+		self.setState({suggestions: found})
 	}
-	
+
 
 	displaySearchedFiles() {
 		if (this.state.suggestions.length==0) {
@@ -342,11 +368,11 @@ class Filebrowser extends Component {
 			return (	
 				<Container>
 					{this.state.suggestions.map(f => 
-						<Row style={f.isDir ? {color: "white"} : {color: "black"}}>
+						<Row style={f.type=='d' ? {color: "white"} : {color: "black"}}>
 							{/*<Plus onClick={() => this.addFileProject(f)}/>*/}
 							<CornerDownLeft style={{cursor:'pointer'}} onClick={() => this.goToFile(f.path)}/>
-							{f.filename} &nbsp;
-							{f.isDir ? <Folder/> : <File/>}&nbsp;
+							{f.name} &nbsp;
+							{f.type=='d' ? <Folder/> : <File/>}&nbsp;
 							<i>{f.path}</i>
 						</Row>
 					)}
@@ -361,11 +387,13 @@ class Filebrowser extends Component {
 		
 	    e.preventDefault();
 	    e.stopPropagation();
-		console.log(e.dataTransfer.getData("filepath"))
-	    if (f.type=="d" && !f.path.includes("sharedFiles") && !e.dataTransfer.getData("filepath").includes("sharedPath")) {
+
+		var sourcePath = e.dataTransfer.getData("filepath")
+		var sourceType = e.dataTransfer.getData("type")
+
+	    if (f.type=="d" && !f.path.includes("sharedFiles") && !sourcePath.includes("sharedFiles")) {
 			self.handleMoveFiles(e.dataTransfer.getData("filepath"),f.path)
 		}
-
 
 	}
 	
@@ -391,6 +419,7 @@ class Filebrowser extends Component {
 
 	handleDragStart(e,f) {
 		e.dataTransfer.setData("filepath",f.path);
+		e.dataTransfer.setData("type",f.type);
 	    e.stopPropagation();
 	}
 
@@ -416,7 +445,7 @@ class Filebrowser extends Component {
 
 				<Modal.Body>
 				<Form>
-					<Form.Control id="formRename" type="text" placeholder="folder name" className="mr-sm-2" autoComplete="off"/>
+					<Form.Control id="formRename" type="text" placeholder={fileToRename.name} className="mr-sm-2" autoComplete="off"/>
 				</Form>
 				</Modal.Body>
 				<Modal.Footer>
@@ -424,7 +453,7 @@ class Filebrowser extends Component {
 						Cancel
 					</Button>
 					<Button variant="success" onClick={() => this.handleRename(document.getElementById("formRename").value)}>
-						Create
+						Rename
 					</Button>
 				</Modal.Footer>
 			</Modal>
@@ -445,9 +474,6 @@ class Filebrowser extends Component {
 
 		var f = fileToRename.path
 		filesList[f.replace(fileToRename.name, newName)] = {expand: false, selected: false}
-
-		// f = f.split('/').join('%2F')
-		// newName = newName.split('/').join('%2F')
 		
 		var infos = {}
 		infos["source"] = f 
@@ -539,7 +565,8 @@ class Filebrowser extends Component {
 						} 
 						
 						{!f.path.includes("sharedFiles") ? <Edit3 style={{color: "black", height: 15, cursor:"pointer"}} onClick={() => this.setState({fileToRename: f, showPopupRename: true})} /> : null}
-						{f.type=='d' && !f.path.includes("sharedFiles") ? <Share2 style={{color: "red", height: 15, cursor:"pointer"}} onClick={() => this.setState({dirToShare: f.path, showPopUpShare: true})} /> : null}
+						{f.type=='d' && !f.path.includes("sharedFiles") && !this.props.createtask ? <Share2 style={{color: "red", height: 15, cursor:"pointer"}} onClick={() => this.setState({dirToShare: f.path, showPopUpShare: true})} /> : null}
+						{f.type=='d' && f.name!=="sharedFiles" && !this.props.createtask ? <Copy style={{color: "black", height: 15, cursor:"pointer"}} onClick={() => this.copyFiles(f.path)} /> : null}
 						&nbsp;
 
 
@@ -586,52 +613,88 @@ class Filebrowser extends Component {
 		this.expandFolder(f)
 	}
 
-	
+//   Object.values(users).forEach(value => {
+	// // items.push(<Dropdown.Item eventKey={value["name"]}>{value["name"]}</Dropdown.Item>)
+//  		items.push(
+//  			<li>
+//  				{value["email"]}
+//  				&nbsp;
+//  				<input type="checkbox" onChange={() => selectedUsers[value["email"]] = !selectedUsers[value["email"]]}/>
+//  			</li>)
+//  		selectedUsers[value["email"]] = false
+//  	})
 
-	displaySelectedFiles() {
-		var projectFiles = []
-		var files = this.state.filesList
-		for (var elem in files) {
-			if (files[elem].selected == true) {
-				projectFiles.push({name: elem})
-			}
-		}
-		return (
-			<Container>
-					{projectFiles.map(f => 
-						<Row>
-							 {/*<CornerDownLeft style={{cursor:'pointer'}} onClick={() => this.goToFile(f.name)}/>*/}
-							&nbsp; <X style={{color: "red", cursor: "pointer"}} onClick={() => this.addSelectedFiles({path: f.name})}/>
-							&nbsp; <i style={{"word-break": "break-all"}}>{f.name}</i>
-						</Row>
-					)}			
+
+
+
+
+
+	// 		<Container>
+	// 				{projectFiles.map(f => 
+
+	// 					<Row>
+	// 						&nbsp; <X style={{color: "red", cursor: "pointer"}} onClick={() => this.addSelectedFiles({path: f.name})}/>
+	// 						&nbsp; <i style={{"word-break": "break-all"}}>{f.name}</i>
+	// 					</Row>
+	// 				)}			
 	
-			</Container>	
-		)
-	}							
+	// 		</Container>	
+			
+	// 	)
+	// }							
+
 
 
 	goToFile(param) {
-		var files = this.state.filesList
-		var path = param.split("/")
-		var l = path.length
-		var Rpath = path.reverse()
+		var {filesList} = this.state
+		var arrayPath = param.split("/")
+		var l = arrayPath.length
+		var Rarraypath = arrayPath.reverse()
 
-		for (var ind in path) {
-
+		for (var ind in arrayPath) {
 			this.updateFilesList({path: param})
 
-			if (ind == l-1) {
-				this.setState({filesList: files})
-			} else {
-				files[param].expand = true
-				param = param.slice(0,param.indexOf("/"+Rpath[ind]))
-			}
+			filesList[param].expand = true
+			param = param.slice(0,param.indexOf("/"+Rarraypath[ind]))
+
 		}
+		this.setState({filesList: filesList})
+
 	}
 
 
 
+
+
+ 
+
+  	copyFiles(target) {
+  		const self = this
+  		const {filesList} = self.state
+  		var filesToCopy = []
+
+  		Object.keys(filesList).forEach(key => {
+  			if (filesList[key].selected == true) {
+  				filesToCopy.push(key)
+  			}
+  		})
+
+  		if (filesToCopy.length !== 0) {
+  			var infos = {}
+  			return Promise.map(filesToCopy, (file)=>{
+  				infos["source"] = file
+  				infos["target"] = target
+  				return self.dcbiareactservice.copyFiles(infos)
+  				.then(res => {
+  					self.updateDirectoryMap()
+  				})
+  			}, {concurrency:1}
+			)
+			// .then((response) => {
+			// 	self.updateDirectoryMap()
+			// })
+  		}
+  	}
 
 
 	downloadFiles() {
@@ -647,31 +710,66 @@ class Filebrowser extends Component {
     		}
     	})
 
+		if (filesToDownload.length==1) {
+			var value = 50
+			self.setState({...self.state, downloadValue: value, showDownloadBar: true})
+		} else {
+			var value = 100/filesToDownload.length
+			self.setState({showDownloadBar: true})
+		}
+
+
+
     	if (filesToDownload.length !== 0) {
 
-			var zip = new JSZip();
+			var name;
 			return Promise.map(filesToDownload, (file)=>{
 
-
 				return self.dcbiareactservice.downloadFiles(file)
-				.then((res) => {
+				.then((response) => {
 
+					name = file.split('/').pop()
+					if (name.split('.').length <= 1) {
+						name = name + ".zip"
+					}
 
-					// zip.file(file, res.data)
-					// console.log(zip)
+			        var pom = document.createElement('a');
+			        pom.setAttribute('href', window.URL.createObjectURL(new Blob([response.data])));
+			        pom.setAttribute('download', name);
 
-					var data = window.URL.createObjectURL(new Blob([res.data]));
+			        pom.dataset.downloadurl = ['application/octet-stream', pom.download, pom.href].join(':');
 
-				    var link = document.createElement("a");
-				    link.download = file;
-				    link.href = data;
-				    link.click();
+			        document.body.appendChild(pom);
+			        pom.click();
+			    })
+			    .then(()=>{
+						self.setState({downloadValue: self.state.downloadValue+value})
+				})	
 
-				})
-				
+			})
+			.then(()=>{
+				self.setState({downloadValue: 0, showDownloadBar: false})
 			})
 
 		}
+
+				// console.log(file.split('.').pop())
+				// return self.dcbiareactservice.downloadFiles(file)
+				// .then((res) => {
+
+
+				// 	// zip.file(file, res.data)
+				// 	// console.log(zip)
+
+				// 	var data = window.URL.createObjectURL(new Blob([res.data]));
+
+				//     var link = document.createElement("a");
+				//     link.download = file;
+				//     link.href = data;
+				//     link.click();
+
+				// })
+			
 	}
 
 
@@ -931,26 +1029,18 @@ class Filebrowser extends Component {
 
 
 	popUpImportProject() {
+		const {projectFilesList} = this.state
+
 		return (
-			<Modal show={this.state.showImportProject} onHide={() => this.setState({showImportProject: false})}>
+			<Modal show={this.state.showImportProject} size="xl" onHide={() => this.setState({showImportProject: false})}>
 				<Modal.Header closeButton>
-					<Modal.Title> 					
-						<Dropdown>
-						  <Dropdown.Toggle>
-						    Choose Project
-						  </Dropdown.Toggle>
-						  <Dropdown.Menu>
-						    <Dropdown.Item>Project name</Dropdown.Item>
-						    <Dropdown.Item>Another project name</Dropdown.Item>
-						    <Dropdown.Item>Again project</Dropdown.Item>
-						  </Dropdown.Menu>
-						</Dropdown>
+					<Modal.Title> 
+						Task					
 					</Modal.Title>  
 				</Modal.Header>
 
 				<Modal.Body>
-					<strong>Files list</strong>
-					{this.displaySelectedFiles()}
+					{projectFilesList.length!==0 ? this.displaySelectedFiles() : null}
 				</Modal.Body>
 				<Modal.Footer>
 					<Button variant="danger" onClick={() => this.setState({showImportProject: false})} >
@@ -963,6 +1053,172 @@ class Filebrowser extends Component {
 			</Modal>
 		)
 	}
+
+
+
+	editrow(e){
+		const self = this
+		const {projectFilesList} = self.state
+
+		const id = e.target.id
+		const row = id.split('_')[1]
+		console.log(self.state.projectFilesList[row])
+	}
+
+	editParamName(header){
+		console.log("change value for : ", header)
+	}	
+
+	editparam(e){
+		const self = this
+		const {projectFilesList} = self.state
+		const id = e.target.id
+		const row = id.split('_')[0]
+		const col = id.split('_')[1]
+
+		const h = Object.keys(projectFilesList[0])[col]
+
+		projectFilesList[row][h] = e.target.value
+		self.setState({projectFilesList: projectFilesList})
+	}
+
+
+	addParam(){
+		const self = this
+		const {projectFilesList} = self.state
+
+		Object.keys(projectFilesList).forEach(id => {
+			console.log(id)
+			projectFilesList[id][document.getElementById('entryname').value] = document.getElementById('defaultvalue').value
+		})
+		document.getElementById('defaultvalue').value = ''
+		document.getElementById('entryname').value = ''
+		self.setState({projectFilesList: projectFilesList})
+	} 
+
+	searchExp() {
+		const self = this
+		const {projectFilesList} = self.state
+		const search = new RegExp(document.getElementById('searchPattern').value)
+		const newParam = document.getElementById('newParam').value
+		const newParamValue = document.getElementById('newParamValue').value
+		console.log(search)
+
+		if (document.getElementById('searchPattern').value) {
+			
+			var filesAlreadyIn = []
+			Object.keys(projectFilesList).forEach(key => {
+				filesAlreadyIn.push(projectFilesList[key].name)
+			})
+
+			var patients = self.getTree(projectFilesList[0].name)
+			patients.forEach(patient => {
+				patient.files.forEach(file => {
+					
+					if (filesAlreadyIn.includes(file.name)) {
+						Object.keys(projectFilesList).forEach(key => {
+							if (projectFilesList[key].name == file.name) {
+								if (search.test(file.name)) {
+									projectFilesList[key][newParam] = newParamValue
+								} else {
+									projectFilesList[key][newParam] = ""
+								}
+							}
+						})
+					} else {
+						
+						var data = Object.assign({}, projectFilesList[0])
+						data.name = file.name
+
+						if (search.test(file.name)) {	
+							data[newParam] = newParamValue
+						} else {
+							data[newParam] = ""
+						}
+						projectFilesList.push(data) 
+
+					}			
+				})
+			})
+			projectFilesList[0][newParam] = ""
+			self.setState({projectFilesList: projectFilesList})
+		}
+	}
+
+	displaySelectedFiles() {		
+		const self = this
+		var {projectFilesList} = self.state
+
+		var headers = []
+		Object.keys(projectFilesList[0]).forEach(header => {
+			headers.push(
+				<th>
+					<Edit2 id={header} style={{height: 15, cursor: 'pointer'}} onClick={() => this.editParamName(header)}/>
+					{header}
+				</th>
+			)
+		})
+
+		var projectList = []
+		var line = []
+		var i = 0
+		var j = 0
+		Object.values(projectFilesList).forEach(fileline => { 
+			line = []
+			j = 0
+			Object.values(fileline).forEach(param => {
+				line.push(
+					<td> 
+					<Col>
+						{Object.keys(projectFilesList[0])[j]=='name' ? <Row>{param}</Row> :
+						<Row><input id={i+"_"+j} type="text" placeholder={param} onChange={(e) => this.editparam(e)}/></Row>}
+					</Col>
+					</td>
+				)
+				j = j + 1
+			})
+			projectList.push(
+			<tr id={"row"+i} onClick={(e) => this.editrow(e)}>
+				{line}
+			</tr>
+			)
+			i = i + 1
+		})
+
+		return (
+			<React.Fragment>
+			<Container>
+			<Row>
+			<Col>
+					<Button size="sm" variant="outline-primary" onClick={() => this.addParam()}> add for all</Button>
+					<FormControl size="sm" id="entryname" placeholder="parameter" type="text" autoComplete="off"/>
+					<FormControl size="sm" id="defaultvalue" placeholder="default value" type="text" autoComplete="off"/>
+			</Col>
+			<Col>
+					<Button size="sm" variant="outline-primary" onClick={() => this.searchExp()}> add </Button>
+					<FormControl size="sm" id="searchPattern" placeholder="pattern" type="text" autoComplete="off"/>
+					<FormControl size="sm" id="newParam" placeholder="parameter" type="text" autoComplete="off"/>
+					<FormControl size="sm" id="newParamValue" placeholder="default value" type="text" autoComplete="off"/>
+			</Col>
+			</Row>
+			</Container>
+{/*		<FormControl id="newparamvalue" autoComplete="off"/>
+*/}			<Table responsive striped bordered hover>
+				<thead>
+					<tr>
+					{headers}
+					</tr>
+				</thead>
+
+				<tbody>
+					{projectList}
+				</tbody>	
+			</Table>
+{/*			<Button onClick={()=> console.log(self.state.projectFilesList)}/>
+*/}			</React.Fragment>
+		)
+	}
+
 
 
 
@@ -1032,9 +1288,12 @@ class Filebrowser extends Component {
 					{self.props.createtask ? <text>Select files to create new task</text> : <text>Manage Files</text>}
 				</Card.Header>
 				<Navbar bg="dark" hidden={!self.props.createtask}>
+				<Form inline>	
 					<Button className="mr-3" variant="secondary" onClick={() => self.setState({showImportProject: true})}> Create task </Button>
 					<Button className="mr-3" variant="secondary" onClick={() => self.cleanSelecteFiles()}> Clear all </Button>
-				</Navbar>
+{/*					<FormControl id="searchFilesForm" onChange={(e)=>{self.handleSearchFile(e)}} type="text" placeholder="file name" className="mr-sm-2" autoComplete="off"/>
+*/}				</Form></Navbar>
+
 				<Navbar bg="light" hidden={self.props.createtask}>
 					<Nav className="mr-auto">
 						<Form inline>
@@ -1060,8 +1319,11 @@ class Filebrowser extends Component {
 							</Button>
 						</Form>
 					</Nav>
+
+
+
 					<Row className="ml-3">
-							
+
 							<Button style={{backgroundColor: '#66B2FF', borderColor: "#66B2FF"}} type='radio' className="mr-sm-2" onClick={() => self.setState({...self.state, selectMode: !self.state.selectMode})}>Select files</Button>
 					
 						<Col>
@@ -1089,7 +1351,7 @@ class Filebrowser extends Component {
 					        		</Modal.Title>
 				        		</Modal.Header>
 				        		<Modal.Body>
-				        			<Dropzone onDrop={(acceptedFiles)=>{self.handleUpload(acceptedFiles).then(()=>{self.setState({...self.state, showUploadDragDrop: false, uploadValue: 0})})}}>
+				        			<Dropzone onDrop={(acceptedFiles)=>{self.handleUpload(acceptedFiles).then(()=>{self.setState({...self.state, uploadValue: 0, showUploadBar: false})})}}>
 				        				{({getRootProps, getInputProps}) => (
 						        			<Container fluid="true" style={{padding: 0, height: "50vh"}} {...getRootProps()}>
 						        				<Alert variant="primary" style={{height: "100%"}}>
@@ -1103,15 +1365,17 @@ class Filebrowser extends Component {
 								            </Container>
 							            )}
 									</Dropzone>
-									<ProgressBar animated now={self.state.uploadValue} />
 			        			</Modal.Body>
 							</Modal>
 						</Col>
-						<Col>
+						<Col xs={10} md={10}>
+							{self.state.showUploadBar ? <ProgressBar className={"mt-2"}  animated now={self.state.uploadValue}/> : null}
+							{self.state.showDownloadBar ? <ProgressBar className={"mt-2"}  animated now={self.state.downloadValue}/> : null}
 						</Col>
 					</Row>
-
 				</Navbar>
+
+
 				<Card.Body >
 					<Container>
 						<Row>
