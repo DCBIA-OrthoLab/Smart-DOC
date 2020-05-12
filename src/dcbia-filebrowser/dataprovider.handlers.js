@@ -194,17 +194,22 @@ module.exports = function (server, conf) {
 		if(fs.existsSync(sourcePath)){
 			return Promise.map(users, (user)=>{
 				try{
-					var sharedFolder = path.resolve(path.join(conf.datapath, user, 'sharedFiles'));
-					if(!fs.existsSync(sharedFolder)){
-						fs.mkdirSync(sharedFolder, {recursive: true});
-					}
 
-					var targetPath = path.join(sharedFolder, path.basename(sourcePath))
+					if(user != owner){
+						var sharedFolder = path.resolve(path.join(conf.datapath, user, 'sharedFiles'));
+						if(!fs.existsSync(sharedFolder)){
+							fs.mkdirSync(sharedFolder);
+						}
 
-				  	if (!fs.existsSync(targetPath)) {
-						fs.symlinkSync(sharedFolder, targetPath);
+						var targetPath = path.join(sharedFolder, path.basename(sourcePath))
+
+					  	if (!fs.existsSync(targetPath)) {
+							fs.symlinkSync(sharedFolder, targetPath);
+						}
+						return user;		
+					}else{
+						return Promise.reject(Boom.badRequest("Cannot share with self!"));
 					}
-					return user;	
 				}catch(e){
 					console.error(e);
 					return null;
@@ -216,10 +221,9 @@ module.exports = function (server, conf) {
 
 				var view = '_design/sharedFolders/_view/shared';
 				var query = {
-					key: [owner, directory],
+					key: JSON.stringify([owner, directory]),
 					include_docs: true
 				}
-		
 				return server.methods.dcbia.getViewQs(view, query)
 				.then(function(rows){
 					var doc = _.pluck(rows, 'doc')[0];
@@ -247,8 +251,9 @@ module.exports = function (server, conf) {
 		const {target_path} = params;
 
 		var view = '_design/sharedFolders/_view/shared';
+
 		var query = {
-			key: [credentials.email, target_path],
+			key: JSON.stringify([credentials.email, target_path]),
 			include_docs: true
 		}
 		
@@ -280,7 +285,7 @@ module.exports = function (server, conf) {
 					var sharedFolder = path.resolve(path.join(conf.datapath, user, 'sharedFiles'));
 					var targetPath = path.join(sharedFolder, path.basename(sourcePath))
 
-				  	if(fs.lstatSync(targetPath).isSymbolicLink()){
+				  	if(fs.existsSync(targetPath) && fs.lstatSync(targetPath).isSymbolicLink()){
 						fs.unlinkSync(targetPath);
 						return user;
 					}
@@ -296,7 +301,7 @@ module.exports = function (server, conf) {
 
 				var view = '_design/sharedFolders/_view/shared';
 				var query = {
-					key: [owner, directory],
+					key: JSON.stringify([owner, directory]),
 					include_docs: true
 				}
 		
