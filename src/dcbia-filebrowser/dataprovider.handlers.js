@@ -194,17 +194,21 @@ module.exports = function (server, conf) {
 		if(fs.existsSync(sourcePath)){
 			return Promise.map(users, (user)=>{
 				try{
-					var sharedFolder = path.resolve(path.join(conf.datapath, user, 'sharedFiles'));
-					if(!fs.existsSync(sharedFolder)){
-						fs.mkdirSync(sharedFolder);
-					}
+					if(user != owner){
+						var sharedFolder = path.resolve(path.join(conf.datapath, user, 'sharedFiles'));
+						if(!fs.existsSync(sharedFolder)){
+							fs.mkdirSync(sharedFolder);
+						}
 
-					var targetPath = path.join(sharedFolder, path.basename(sourcePath))
+						var targetPath = path.join(sharedFolder, path.basename(sourcePath))
 
-				  	if (!fs.existsSync(targetPath)) {
-						fs.symlinkSync(sharedFolder, targetPath);
+					  	if (!fs.existsSync(targetPath)) {
+							fs.symlinkSync(sharedFolder, targetPath);
+						}
+						return user;		
+					}else{
+						return Promise.reject(Boom.badRequest("Cannot share with self!"));
 					}
-					return user;	
 				}catch(e){
 					console.error(e);
 					return null;
@@ -216,10 +220,9 @@ module.exports = function (server, conf) {
 
 				var view = '_design/sharedFolders/_view/shared';
 				var query = {
-					key: [owner, directory],
+					key: JSON.stringify([owner, directory]),
 					include_docs: true
 				}
-		
 				return server.methods.dcbia.getViewQs(view, query)
 				.then(function(rows){
 					var doc = _.pluck(rows, 'doc')[0];
@@ -249,12 +252,18 @@ module.exports = function (server, conf) {
 		var view = '_design/sharedFolders/_view/shared';
 
 		var query = {
-			key: [credentials.email, target_path],
+			key: JSON.stringify([credentials.email, target_path]),
 			include_docs: true
 		}
 		
 		return server.methods.dcbia.getViewQs(view, query)
-		.then((res)=>{return _.pluck(res, 'doc')[0]});
+		.then((res)=>{
+			res = _.pluck(res, 'doc')[0];
+			return res? res: Boom.notFound(e);
+		})
+		.catch((e)=>{
+			return Boom.notFound(e);
+		});
 	}
 
 	handler.unshareFiles = async (req, h) => {
@@ -271,7 +280,7 @@ module.exports = function (server, conf) {
 					var sharedFolder = path.resolve(path.join(conf.datapath, user, 'sharedFiles'));
 					var targetPath = path.join(sharedFolder, path.basename(sourcePath))
 
-				  	if(fs.lstatSync(targetPath).isSymbolicLink()){
+				  	if(fs.existsSync(targetPath) && fs.lstatSync(targetPath).isSymbolicLink()){
 						fs.unlinkSync(targetPath);
 						return user;
 					}
@@ -287,7 +296,7 @@ module.exports = function (server, conf) {
 
 				var view = '_design/sharedFolders/_view/shared';
 				var query = {
-					key: [owner, directory],
+					key: JSON.stringify([owner, directory]),
 					include_docs: true
 				}
 		
