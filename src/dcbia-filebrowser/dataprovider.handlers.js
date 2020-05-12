@@ -7,9 +7,12 @@ const path = require('path');
 const qs = require('querystring');
 const fs = require('fs');
 const archiver = require('archiver');
+const couchUpdateViews = require('couch-update-views');
 
 module.exports = function (server, conf) {
 	
+
+	couchUpdateViews.migrateUp(server.methods.dcbia.getCouchDBServer(), path.join(__dirname, "views"));
 	
 	const deleteRecursive = (filepath)=>{
 		try{
@@ -179,35 +182,140 @@ module.exports = function (server, conf) {
 	}
 
 
-  handler.shareFiles = async (req, h) => {
-  	const {query, auth, payload} = req;
-  	const {directory, users} = payload;
-  	const {credentials} = auth;
+	handler.shareFiles = async (req, h) => {
+		const {query, auth, payload} = req;
+		const {directory, users} = payload;
+		const {credentials} = auth;
 
-  	const sourcePath = path.join(conf.datapath,credentials.email,directory)
-	var relativePath = path.relative(__dirname,sourcePath)
-	var fullPath = path.join(__dirname, relativePath)
+		var owner = credentials.email;
+		var rootPath = path.join(conf.datapath, owner);
+		var sourcePath = path.resolve(path.join(rootPath, directory));
 
-	users.forEach((user) => {
+		if(fs.existsSync(sourcePath)){
+			return Promise.map(users, (user)=>{
+				try{
+					var sharedFolder = path.resolve(path.join(conf.datapath, user, 'sharedFiles'));
+					if(!fs.existsSync(sharedFolder)){
+						fs.mkdirSync(sharedFolder, {recursive: true});
+					}
 
-		var sharedFolder = path.join(conf.datapath, user, 'sharedFiles');
+					var targetPath = path.join(sharedFolder, path.basename(sourcePath))
 
-		if(!fs.existsSync(sharedFolder)){
-			fs.mkdirSync(sharedFolder);
-		}
-
-		var targetPath = path.join(sharedFolder, path.basename(directory))
-
-	  	if (!fs.existsSync(targetPath)) {
-			fs.symlinkSync(fullPath, targetPath, (err) => {
-				if (err) throw err
+				  	if (!fs.existsSync(targetPath)) {
+						fs.symlinkSync(sharedFolder, targetPath);
+					}
+					return user;	
+				}catch(e){
+					console.error(e);
+					return null;
+				}
+				
 			})
+			.then((users)=>{ return _.compact(users); })
+			.then((users)=>{
+
+				var view = '_design/sharedFolders/_view/shared';
+				var query = {
+					key: [owner, directory],
+					include_docs: true
+				}
+		
+				return server.methods.dcbia.getViewQs(view, query)
+				.then(function(rows){
+					var doc = _.pluck(rows, 'doc')[0];
+					doc.users = _.union(doc.users, users);
+					return server.methods.dcbia.uploadDocuments(doc);
+				})
+				.catch(function(e){
+					var shared_users = {
+						owner,
+						directory,
+						users,
+						type: "shared"
+					}
+					return server.methods.dcbia.uploadDocuments(shared_users);
+				});
+			})
+		}else{
+			return Promise.reject(Boom.notFound("You don't own this folder"));
 		}
-	})	
+	}
 
+	handler.mySharedFiles = (req, h)=>{
+		const {auth, params} = req;
+		const {credentials} = auth;
+		const {target_path} = params;
 
-  	return true
-  }
+		var view = '_design/sharedFolders/_view/shared';
+		var query = {
+			key: [credentials.email, target_path],
+			include_docs: true
+		}
+		
+		return server.methods.dcbia.getViewQs(view, query)
+		.then((res)=>{
+			var docs = _.pluck(res, 'doc');
+			if(docs.length > 0){
+				return docs[0];
+			}else{
+				return [];
+			}
+		})
+		.catch((e)=>{
+			return Boom.notFound(e);
+		});
+	}
+
+	handler.unshareFiles = async (req, h) => {
+		const {query, auth, payload} = req;
+		const {directory, users} = payload;
+		const {credentials} = auth;
+		const owner = credentials.email;
+
+		const sourcePath = path.resolve(path.join(conf.datapath, credentials.email, directory));
+
+		if(fs.existsSync(sourcePath)){
+			return Promise.map(users, (user)=>{
+				try{
+					var sharedFolder = path.resolve(path.join(conf.datapath, user, 'sharedFiles'));
+					var targetPath = path.join(sharedFolder, path.basename(sourcePath))
+
+				  	if(fs.lstatSync(targetPath).isSymbolicLink()){
+						fs.unlinkSync(targetPath);
+						return user;
+					}
+					return null;
+				}catch(e){
+					console.error(e);
+					return null;
+				}
+				
+			})
+			.then((users)=>{ return _.compact(users); })
+			.then((users)=>{
+
+				var view = '_design/sharedFolders/_view/shared';
+				var query = {
+					key: [owner, directory],
+					include_docs: true
+				}
+		
+				return server.methods.dcbia.getViewQs(view, query)
+				.then(function(rows){
+					var doc = _.pluck(rows, 'doc')[0];
+					doc.users = _.difference(doc.users, _.intersection(doc.users, users));
+					return server.methods.dcbia.uploadDocuments(doc);
+				})
+				.catch(function(e){
+					return Promise.reject(Boom.notFound("You own the folder but never shared it before!"));
+				});
+			})
+		}else{
+			return Promise.reject(Boom.notFound("You don't own this folder"));
+		}
+
+		return true
+	}
 
 	const copyFiles = (source, target)=>{
 		const self = this;

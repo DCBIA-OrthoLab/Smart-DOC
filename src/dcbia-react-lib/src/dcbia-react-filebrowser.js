@@ -13,7 +13,6 @@ import DcbiaReactService from './dcbia-react-service'
 
 const _ = require('underscore');
 const Promise = require('bluebird');
-var JSZip = require("jszip");
 
 
 class Filebrowser extends Component {
@@ -21,6 +20,8 @@ class Filebrowser extends Component {
 		super(props)
 
 		this.state = {
+
+			taskParams: {},
 
 			fileToUpload: null,
 			uploadPath: null,
@@ -34,7 +35,7 @@ class Filebrowser extends Component {
 
 			projectFilesList: [],
 
-
+			sharedDoc: {},
 			treeMap: null,	
 			filesList: {},
 			loadingUpload: false,
@@ -565,7 +566,7 @@ class Filebrowser extends Component {
 						} 
 						
 						{!f.path.includes("sharedFiles") ? <Edit3 style={{color: "black", height: 15, cursor:"pointer"}} onClick={() => this.setState({fileToRename: f, showPopupRename: true})} /> : null}
-						{f.type=='d' && !f.path.includes("sharedFiles") && !this.props.createtask ? <Share2 style={{color: "red", height: 15, cursor:"pointer"}} onClick={() => this.setState({dirToShare: f.path, showPopUpShare: true})} /> : null}
+						{f.type=='d' && !f.path.includes("sharedFiles") && !this.props.createtask ? <Share2 style={{color: "red", height: 15, cursor:"pointer"}} onClick={() => this.dcbiareactservice.mySharedFiles(f.path).then((sharedDoc)=> {this.setState({dirToShare: f.path, showPopUpShare: true, sharedDoc})})} /> : null}
 						{f.type=='d' && f.name!=="sharedFiles" && !this.props.createtask ? <Copy style={{color: "black", height: 15, cursor:"pointer"}} onClick={() => this.copyFiles(f.path)} /> : null}
 						&nbsp;
 
@@ -893,44 +894,45 @@ class Filebrowser extends Component {
 
 
 
-	// shareFilesGroup() {
-	// 	var users = this.props.users
-	// 	var items = []
 
- //    	Object.values(users).forEach(value => {
-	// 		items.push(<Dropdown.Item eventKey={value["name"]}>{value["name"]}</Dropdown.Item>)
- //    	})
-		
-	// 	return (
-	// 		<ButtonGroup>
-	// 		<Button size="sm" variant="outline-danger" onClick={() => this.handleShareFiles()}>share files to {this.state.usersToShare}</Button>
-	// 		<DropdownButton id="dropdownShare" size="sm" variant="danger" value onSelect={(e) => this.setState({usersToShare: e})} title="Users">
-	// 			{items}
-	// 		</DropdownButton>
-	// 		</ButtonGroup>
-	// 	)
-	// }
-
-	handleShareFiles(f, users) {
+	handleShareFiles(usersList) {
 		const self = this
+		const {sharedDoc, dirToShare} = self.state
+		const alreadyShared = sharedDoc.data.users
 
-		var infos = {}
-    	Object.keys(users).forEach(key => {
-    		if (users[key]==false) {
-    			delete users[key]
-    		}
-    	})
+		var share = []
+		var unshare = []
 
-		infos["users"] = Object.keys(users)
-		infos["directory"] = f
-
-		self.dcbiareactservice.shareFiles(infos)
-		.then(response => { 
-			this.setState({showPopUpShare: false, dirToShare: null})			
+		Object.keys(usersList).forEach(key => {
+			if (usersList[key]==true){
+				if (!alreadyShared.includes(key)){
+					share.push(key)
+				}
+			} else {
+				if (alreadyShared.includes(key)){
+					unshare.push(key)
+				}
+			}
 		})
 
 
+
+		if (share.length!==0) {
+			var infosShare = {}
+			infosShare["users"] = share
+			infosShare["directory"] = dirToShare
+			self.dcbiareactservice.shareFiles(infosShare)
+		}
+
+		if (unshare.length!==0) {
+			var infosUnshare = {}
+			infosUnshare["users"] = unshare
+			infosUnshare["directory"] = dirToShare
+			self.dcbiareactservice.unshareFiles(infosUnshare)
+		}
 	}
+
+
 
 	handleMoveFiles(source, target) {
 		const self = this
@@ -987,39 +989,52 @@ class Filebrowser extends Component {
 
 
 	popUpShare() {
-		var string = this.state.dirToShare.split("").reverse().join("")
-		var ind = string.indexOf('/')
-		var dir = string.slice(0,ind).split("").reverse().join("")
+		const self = this
+		const {users} = self.props
+		const {sharedDoc, dirToShare} = self.state
+		const alreadyShared = sharedDoc.data.users
+		console.log("Share infos !")
+		console.log(dirToShare)
+		console.log(alreadyShared)
 
-		var users = this.props.users
+		var usersList = {}
+		users.forEach(user => {
+
+			if (alreadyShared.includes(user.email)) {
+				usersList[user.email] = true
+			} else {
+				usersList[user.email] = false
+			}
+
+		})
+
+
 		var items = []
-    	var selectedUsers = {}
-
-    	Object.values(users).forEach(value => {
-			// items.push(<Dropdown.Item eventKey={value["name"]}>{value["name"]}</Dropdown.Item>)
+    	Object.keys(usersList).forEach(key => {
     		items.push(
     			<li>
-    				{value["email"]}
+    				{key}
     				&nbsp;
-    				<input type="checkbox" onChange={() => selectedUsers[value["email"]] = !selectedUsers[value["email"]]}/>
+    				<input type="checkbox" defaultChecked={usersList[key]} onChange={() => usersList[key] = !usersList[key]}/>
     			</li>)
-    		selectedUsers[value["email"]] = false
     	})
 
-
 		return (
-			<Modal show={this.state.showPopUpShare} onHide={() => this.setState({showPopUpShare: false})}>
+			<Modal show={self.state.showPopUpShare} onHide={() => self.setState({showPopUpShare: false})}>
 				<Modal.Header closeButton>
 					<Modal.Title> 					
-						Share folder <i style={{color: 'SteelBlue'}}>{dir}</i>
+						Share folder <i style={{color: 'SteelBlue'}}>{dirToShare}</i>
 					</Modal.Title>  
 				</Modal.Header>
 				<Modal.Body>
+				{/*<FormControl size="sm" id="user" placeholder="search user" type="text" autoComplete="off" onChange={(e)=> console.log("search fct todo")}/>*/}
+				<div style={{overflow: "auto", display: "block",  height: "500px"}}>
 				{items}
+				</div>
 				</Modal.Body>
 				<Modal.Footer>
 
-				<Button variant="outline-danger" onClick={() => this.handleShareFiles('./'+this.state.dirToShare, selectedUsers)}> Share </Button>
+				<Button variant="outline-danger" onClick={() => self.handleShareFiles(usersList)}> Share </Button>
 				</Modal.Footer>
 			</Modal>
 		)
@@ -1056,98 +1071,23 @@ class Filebrowser extends Component {
 
 
 
-	editrow(e){
-		const self = this
-		const {projectFilesList} = self.state
 
-		const id = e.target.id
-		const row = id.split('_')[1]
-		console.log(self.state.projectFilesList[row])
-	}
-
-	editParamName(header){
-		console.log("change value for : ", header)
-	}	
-
-	editparam(e){
-		const self = this
-		const {projectFilesList} = self.state
-		const id = e.target.id
-		const row = id.split('_')[0]
-		const col = id.split('_')[1]
-
-		const h = Object.keys(projectFilesList[0])[col]
-
-		projectFilesList[row][h] = e.target.value
-		self.setState({projectFilesList: projectFilesList})
-	}
+	flattenDirectoryMap(dmap){
+        const self = this;
+        return _.flatten(_.map(dmap, (dm)=>{
+            if(dm.type == 'f'){
+                return dm.path;
+            }else{
+                return self.flattenDirectoryMap(dm.files);
+            }
+        }));
+    }
 
 
-	addParam(){
-		const self = this
-		const {projectFilesList} = self.state
-
-		Object.keys(projectFilesList).forEach(id => {
-			console.log(id)
-			projectFilesList[id][document.getElementById('entryname').value] = document.getElementById('defaultvalue').value
-		})
-		document.getElementById('defaultvalue').value = ''
-		document.getElementById('entryname').value = ''
-		self.setState({projectFilesList: projectFilesList})
-	} 
-
-	searchExp() {
-		const self = this
-		const {projectFilesList} = self.state
-		const search = new RegExp(document.getElementById('searchPattern').value)
-		const newParam = document.getElementById('newParam').value
-		const newParamValue = document.getElementById('newParamValue').value
-		console.log(search)
-
-		if (document.getElementById('searchPattern').value) {
-			
-			var filesAlreadyIn = []
-			Object.keys(projectFilesList).forEach(key => {
-				filesAlreadyIn.push(projectFilesList[key].name)
-			})
-
-			var patients = self.getTree(projectFilesList[0].name)
-			patients.forEach(patient => {
-				patient.files.forEach(file => {
-					
-					if (filesAlreadyIn.includes(file.name)) {
-						Object.keys(projectFilesList).forEach(key => {
-							if (projectFilesList[key].name == file.name) {
-								if (search.test(file.name)) {
-									projectFilesList[key][newParam] = newParamValue
-								} else {
-									projectFilesList[key][newParam] = ""
-								}
-							}
-						})
-					} else {
-						
-						var data = Object.assign({}, projectFilesList[0])
-						data.name = file.name
-
-						if (search.test(file.name)) {	
-							data[newParam] = newParamValue
-						} else {
-							data[newParam] = ""
-						}
-						projectFilesList.push(data) 
-
-					}			
-				})
-			})
-			projectFilesList[0][newParam] = ""
-			self.setState({projectFilesList: projectFilesList})
-		}
-	}
 
 	displaySelectedFiles() {		
 		const self = this
-		var {projectFilesList} = self.state
+		var {projectFilesList, taskParams} = self.state
 
 		var headers = []
 		Object.keys(projectFilesList[0]).forEach(header => {
@@ -1191,8 +1131,8 @@ class Filebrowser extends Component {
 			<Row>
 			<Col>
 					<Button size="sm" variant="outline-primary" onClick={() => this.addParam()}> add for all</Button>
-					<FormControl size="sm" id="entryname" placeholder="parameter" type="text" autoComplete="off"/>
-					<FormControl size="sm" id="defaultvalue" placeholder="default value" type="text" autoComplete="off"/>
+					<FormControl size="sm" id="entryname" placeholder="parameter" type="text" autoComplete="off" value={taskParams.paramAll} onChange={(e)=>{taskParams.paramAll = e.target.value; self.setState({...self.state, taskParams})}}/>
+	 				<FormControl size="sm" id="defaultvalue" placeholder="default value" type="text" autoComplete="off"/>
 			</Col>
 			<Col>
 					<Button size="sm" variant="outline-primary" onClick={() => this.searchExp()}> add </Button>

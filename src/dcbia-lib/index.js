@@ -362,6 +362,52 @@ module.exports = class DCBIALib extends HapiJWTCouch{
         });    
     }
 
+    myShareFiles(target_path){
+        var self = this;
+        return new Promise(function(resolve, reject){
+            var options = {
+                url : self.getServer() + "/dcbia/mySharedFiles/" + target_path,
+                method: "GET",
+                agentOptions: self.agentOptions,
+                auth: self.auth,
+                json: true
+
+            }
+            request(options, function(err, res, body){
+                if(err){
+                    reject(err);
+                }else{
+                    resolve(body);
+                }
+            })
+        });    
+    }
+
+    unshareFiles(infos){
+        var self = this;
+        return new Promise(function(resolve, reject){
+            var options = {
+                url : self.getServer() + "/dcbia/unshareFiles",
+                method: "POST",
+                agentOptions: self.agentOptions,
+                auth: self.auth,
+                payload: Joi.object({
+                    users: Joi.array(),
+                    directory: Joi.string(),
+                }),
+                json: infos
+
+            }
+            request(options, function(err, res, body){
+                if(err){
+                    reject(err);
+                }else{
+                    resolve(body);
+                }
+            })
+        });    
+    }
+
     downloadFile(filename){
         var self = this;
         return new Promise(function(resolve, reject){

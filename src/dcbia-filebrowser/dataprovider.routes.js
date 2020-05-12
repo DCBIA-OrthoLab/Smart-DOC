@@ -142,6 +142,45 @@ module.exports = function (server, conf) {
 	});
 
 	server.route({
+		method: 'GET',
+		path: '/dcbia/mySharedFiles/{target_path*}',
+		config: {
+			auth: {
+				strategy: 'token',
+				scope: ['dentist']
+			},
+			handler: handlers.mySharedFiles,
+			validate: {
+				query: false,
+			    payload: null,
+			    params: Joi.object({
+					target_path: Joi.string(),
+				})		    
+			},
+		}
+	});
+
+	server.route({
+		method: 'POST',
+		path: '/dcbia/unshareFiles',
+		config: {
+			auth: {
+				strategy: 'token',
+				scope: ['dentist']
+			},
+			handler: handlers.unshareFiles,
+			validate: {
+				query: false,
+			    payload: Joi.object({
+					users: Joi.array(),
+					directory: Joi.string().pattern(/(\.\.)/, { invert: true }),
+				}),
+			    params: null		    
+			},
+		}
+	});
+
+	server.route({
 		method: 'PUT',
 		path: '/dcbia/copyFiles',
 		config: {

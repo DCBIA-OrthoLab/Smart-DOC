@@ -432,18 +432,47 @@ lab.experiment("Test dcbia lib", function(){
         }
         return dcbia.shareFiles(infos)
         .then(function(res){
-            expect(res).to.be.true();
+            expect(res).to.part.include({ ok: true });
         });
     });
 
-    lab.test('returns false when user share a folder with self', function(){
+    lab.test('returns true when user gets the shared doc', function(){
+        return dcbia.myShareFiles("test_next")
+        .then(function(res){
+            expect(res).to.satisfy((r)=>{
+                return r.type == "shared" && expect(r.users).to.include("juanprietob@gmail.com");
+            });
+        });
+    });
+
+    lab.test('returns false when user unshare folder with a user', function(){
+        var infos = {
+            users: ['juanprietob@gmail.com'],
+            directory: "test_next"
+        }
+        return dcbia.unshareFiles(infos)
+        .then(function(res){
+            expect(res).to.part.include({ ok: true });
+        });
+    });
+
+    lab.test('returns true when user gets the shared doc and user is not there', function(){
+        return dcbia.myShareFiles("test_next")
+        .then(function(res){
+            expect(res).to.satisfy((r)=>{
+                return r.type == "shared" && expect(r.users).to.not.include("juanprietob@gmail.com");
+            });
+        });
+    });
+
+    lab.test('returns true when user share a folder with self', function(){
         var infos = {
             users: ['sbrosset@umich.edu'],
             directory: "test_next"
         }
         return dcbia.shareFiles(infos)
         .then(function(res){
-            expect(res).to.be.true();
+            expect(res).to.part.include({ ok: true });
         });
     });
 
