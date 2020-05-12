@@ -331,6 +331,21 @@ export default class DcbiaReactService {
   });
  }
 
+ unshareFiles(infos) {
+  return this.http({
+    method: 'POST',
+    url: '/dcbia/unshareFiles',
+    data: infos
+  });
+ }
+
+ mySharedFiles(target_path) {
+  return this.http({
+    method: 'GET',
+    url: '/dcbia/mySharedFiles/' + target_path,
+  });
+ }
+
 
 
 }

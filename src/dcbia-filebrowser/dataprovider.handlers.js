@@ -194,6 +194,7 @@ module.exports = function (server, conf) {
 		if(fs.existsSync(sourcePath)){
 			return Promise.map(users, (user)=>{
 				try{
+
 					if(user != owner){
 						var sharedFolder = path.resolve(path.join(conf.datapath, user, 'sharedFiles'));
 						if(!fs.existsSync(sharedFolder)){
@@ -258,8 +259,12 @@ module.exports = function (server, conf) {
 		
 		return server.methods.dcbia.getViewQs(view, query)
 		.then((res)=>{
-			res = _.pluck(res, 'doc')[0];
-			return res? res: Boom.notFound(e);
+			var docs = _.pluck(res, 'doc');
+			if(docs.length > 0){
+				return docs[0];
+			}else{
+				return [];
+			}
 		})
 		.catch((e)=>{
 			return Boom.notFound(e);

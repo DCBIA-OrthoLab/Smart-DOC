@@ -19,9 +19,9 @@ import { connect } from "react-redux";
 import axios from 'axios';
 import store from "./redux/store";
 
-import {DcbiaReactProjects, DcbiaReactMorphologicalData, DcbiaReactClinicalData, DcbiaReactFilebrowser} from 'dcbia-react-lib'
+import {DcbiaReactProjects, DcbiaReactMorphologicalData, DcbiaReactClinicalData, DcbiaReactFilebrowser, DcbiaReactCreateTask} from 'dcbia-react-lib'
 import {ClusterpostJobs, ClusterpostTokens, ClusterpostDashboard} from 'clusterpost-list-react'
-import {MedImgSurf} from 'react-med-img-viewer';
+// import {MedImgSurf} from 'react-med-img-viewer';
 
 
 class App extends Component {
@@ -100,7 +100,7 @@ class App extends Component {
             </Card>
           </Col>
           <Col sm={6}>
-            <MedImgSurf data={[{data: landingVtk, color: [0,255,255]}]}/>
+{/*            <MedImgSurf data={[{data: landingVtk, color: [0,255,255]}]}/>*/}
           </Col>
         </Row>
       </Container>);
@@ -122,13 +122,13 @@ class App extends Component {
 
   showFilebrowser(){
     return (
-      <DcbiaReactFilebrowser users={this.state.users} createtask={false}/>
+      <DcbiaReactFilebrowser users={this.state.users} />
     )
   }
 
   showCreatetask(){
     return (
-      <DcbiaReactFilebrowser createtask={true}/>
+      <DcbiaReactCreateTask/>
     )
   }
 
