@@ -198,13 +198,13 @@ module.exports = function (server, conf) {
 					if(user != owner){
 						var sharedFolder = path.resolve(path.join(conf.datapath, user, 'sharedFiles'));
 						if(!fs.existsSync(sharedFolder)){
-							fs.mkdirSync(sharedFolder);
+							fs.mkdirSync(sharedFolder, {recursive: true});
 						}
 
 						var targetPath = path.join(sharedFolder, path.basename(sourcePath))
 
 					  	if (!fs.existsSync(targetPath)) {
-							fs.symlinkSync(sharedFolder, targetPath);
+							fs.symlinkSync(sourcePath, targetPath);
 						}
 						return user;		
 					}else{

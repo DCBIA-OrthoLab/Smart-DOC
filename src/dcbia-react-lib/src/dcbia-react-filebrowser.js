@@ -11,6 +11,7 @@ import Dropzone from 'react-dropzone'
 import DcbiaReactService from './dcbia-react-service'
 
 
+
 const _ = require('underscore');
 const Promise = require('bluebird');
 
@@ -21,33 +22,37 @@ class Filebrowser extends Component {
 
 		this.state = {
 
-			taskParams: {},
 
 			fileToUpload: null,
 			uploadPath: null,
 			
 			uploadValue: 0,
 			showUploadBar: false,
-
+			
 			downloadValue: 0,
 			showDownloadBar: false,
+
+			treeMap: null,	
+			filesList: {},
+
+
+			searchShareUser: "",
+
+			taskParams: {},
+
+			
 
 
 			projectFilesList: [],
 
 			sharedDoc: {},
-			treeMap: null,	
-			filesList: {},
-			loadingUpload: false,
 
 			showUploadDragDrop: false,
 
 			searchFiles: false,
 			currentFolder: ".",
 
-			// pop up
 			showCreateFolder: false,
-			// showUpload: false,
 			showImportProject: false,
 			showMove: false,
 			showErrorCreateFolder: false,
@@ -174,32 +179,7 @@ class Filebrowser extends Component {
 		})
 	}
 
-	// popUpUpload() {
-	// 	if (document.getElementById('inputUpload').value == '') {return} else {
-	// 	return (
-	// 		<Modal show={this.state.showUpload} onHide={() => this.setState({showUpload: false})}>
-	// 			<Modal.Header closeButton>
-	// 				<Modal.Title>Upload file</Modal.Title>  
-	// 			</Modal.Header>
 
-	// 			<Modal.Body>
-	// 				Confirm Uploading - <strong>{document.getElementById("inputUpload").value}</strong> in <strong>{this.state.currentFolder}</strong>
-	// 			</Modal.Body>
-	// 			<Modal.Footer>
-	// 				<Button variant="danger" onClick={() => this.setState({showUpload: false})} >
-	// 					Cancel
-	// 				</Button>
-	// 				{this.state.loadingUpload ? 
-	// 				<Button variant="info" disabled>
-	// 				<Spinner variant="dark" animation="border" size="sm" role="status"/>
-	// 				<span className="sr-only">Loading...</span>
-	// 				</Button> :
-	// 				<Button variant="info" onClick={() => this.handleUpload()}> Upload </Button>}
-
-	// 			</Modal.Footer>
-	// 		</Modal>
-	// 	)}
-	// }
 
 
 
@@ -211,7 +191,7 @@ class Filebrowser extends Component {
 
 	updateDirectoryMap(){
 		const self = this;
-		var user = this.props.user
+		const user = this.props.user
 
 		if (user !== undefined) {
 
@@ -244,29 +224,74 @@ class Filebrowser extends Component {
 	}
 
 
+	flattenDirectoryMap(dmap){
+        const self = this;
+        return _.flatten(_.map(dmap, (dm)=>{
+            if(dm.type == 'f'){
+                return dm.path;
+            }else{
+                return self.flattenDirectoryMap(dm.files);
+            }
+        }));
+    }
 
 	
 
 	addSelectedFiles(f) {
+		const self = this
 		
-		var {filesList} = this.state
+		var {filesList} = self.state
 		var bool = filesList[f.path].selected
 		filesList[f.path].selected = !bool
-		this.setState({filesList: filesList})
+		self.setState({filesList: filesList})
 		
-		if (this.props.createtask) {
-			const {projectFilesList} = this.state
+		if (self.props.createtask) {
+
+			// var tree = self.getTree(f.path)
+			// var flattenTree = self.flattenDirectoryMap(tree)
+
+			// console.log("SALUT FLATTEN")
+			// console.log(flattenTree)
+			// self.props.getFiles(f.path);
+
+
+			// const {projectFilesList} = self.state
 				
-			if (projectFilesList.length==0){
-				var data = {name: f.path} 
-			} else {
-				var data = Object.assign({}, projectFilesList[0])
-				data.name = f.path
+			// if (projectFilesList.length==0){
+			// 	var data = {name: f.path} 
+			// } else {
+			// 	var data = Object.assign({}, projectFilesList[0])
+			// 	data.name = f.path
+			// }
+
+			// projectFilesList.push(data)
+			// self.setState({projectFilesList: projectFilesList})	
+
+		}
+	}
+
+	manageCreateTask() {
+		const self = this
+		const {filesList} = self.state
+		var fullFlatMap = []
+		var filesTask = []
+
+		Object.keys(filesList).forEach(key => {
+			if (filesList[key].selected) {
+				filesTask.push(key)
 			}
+		})
 
-			projectFilesList.push(data)
-			this.setState({projectFilesList: projectFilesList})	
+		if (filesTask.length !== 0) {
 
+			filesTask.forEach(file => {
+				var tree = self.getTree(file)
+				var flatTree = self.flattenDirectoryMap(tree)
+				fullFlatMap = [].concat(fullFlatMap, flatTree)
+			})
+			if (fullFlatMap.length !== 0) {
+				self.props.startCreatetask(fullFlatMap)
+			}
 		}
 	}
 
@@ -311,11 +336,12 @@ class Filebrowser extends Component {
 
 	deleteF() {
 		const self = this
-		var fileToDelete = self.state.fileToDelete.path
+		const fileToDelete = self.state.fileToDelete.path
+
 		// erase deleted file from file list
-		var pathname = self.state.fileToDelete.path
+		console.log(fileToDelete)
 		var files = self.state.filesList
-		delete files[pathname]
+		delete files[fileToDelete]
 
 		self.setState(
 			{showDelete: false, fileToDelete: "", filesList: files}
@@ -437,6 +463,8 @@ class Filebrowser extends Component {
 	popUpRename() {
 		const self = this
 		var {currentFolder, fileToRename} = self.state
+		var newName
+
 		return (
 			
 			<Modal show={this.state.showPopupRename} onHide={() => this.setState({showPopupRename: false})}>
@@ -446,14 +474,14 @@ class Filebrowser extends Component {
 
 				<Modal.Body>
 				<Form>
-					<Form.Control id="formRename" type="text" placeholder={fileToRename.name} className="mr-sm-2" autoComplete="off"/>
+					<Form.Control id="formRename" type="text" placeholder={fileToRename.name} className="mr-sm-2" autoComplete="off" onChange={(e) => newName = e.target.value}/>
 				</Form>
 				</Modal.Body>
 				<Modal.Footer>
 					<Button variant="danger" onClick={() => this.setState({showPopupRename: false})} >
 						Cancel
 					</Button>
-					<Button variant="success" onClick={() => this.handleRename(document.getElementById("formRename").value)}>
+					<Button variant="success" onClick={() => this.handleRename(newName)}>
 						Rename
 					</Button>
 				</Modal.Footer>
@@ -496,8 +524,9 @@ class Filebrowser extends Component {
 
 
 	displayFiles(param) {
+		const self = this
 		var _ = require('underscore')
-		const {filesList, selectMode} = this.state
+		const {filesList, selectMode} = self.state
 
 		if(param !== null){
 
@@ -511,36 +540,27 @@ class Filebrowser extends Component {
 					<React.Fragment>
 
 
-				{/*Card DragNDrop*/}
 				<Card 
 					id={f.name}
 					style={{backgroundColor: "#D7D8D9", borderColor: "#D7D8D9"}}
-					onDrop={(e) => this.handleDrop(e,f)}
-					onDragOver={(e) => this.handleDragOver(e)}
-					onDragLeave={(e) => this.handleDragLeave(e)}
-					onDragEnter={(e) => this.handleDragEnter(e)}
+					onDrop={(e) => self.handleDrop(e,f)}
+					onDragOver={(e) => self.handleDragOver(e)}
+					onDragLeave={(e) => self.handleDragLeave(e)}
+					onDragEnter={(e) => self.handleDragEnter(e)}
 					>
 
-{/*onContextMenu={(e) => this.handleClick(e,f)}*/}
 
-
-
-				
 
 						<Row>
 						<Col>
-				{/*add files now as we display them so we do operation on it: expand, inproject, etc*/}
-					{this.updateFilesList(f)}
-						
-{/*						{f.type=='f' && this.state.projectMode && this.state.filesList[f.path].inProject ? <CheckSquare color='#FF0000' size="20" /> : null}
-*/}
+					{self.updateFilesList(f)}
 						
 						
 				
 						{f.type=='d' ? 
 							filesList[f.path].expand==false ? 
-								<FolderPlus style={{color: "green", cursor:"pointer"}} onClick={() => this.testOnClickArrowDown(f)}/> 
-								: <FolderMinus style={{color: "red", cursor:"pointer"}} onClick={() => this.testOnClickArrowDown(f)}/> 
+								<FolderPlus style={{color: "green", cursor:"pointer"}} onClick={() => self.testOnClickArrowDown(f)}/> 
+								: <FolderMinus style={{color: "red", cursor:"pointer"}} onClick={() => self.testOnClickArrowDown(f)}/> 
 							: <File style={{height: 15, color: "SteelBlue"}}/>
 						} &nbsp;
 
@@ -549,41 +569,41 @@ class Filebrowser extends Component {
 						{f.type=='d' ? 
 							f.name=='sharedFiles' ? 
 								<Badge size="11" 
-									   onClick={() => this.setState({currentFolder: './'+f.path})}
+									   onClick={() => self.setState({currentFolder: './'+f.path})}
 									   style={{backgroundColor: '#4f6185' ,cursor:'pointer'}}
 									><text style={{color: "white"}}>{f.name}</text></Badge> 
 								: <Badge pill
-										 onClick={() => this.setState({currentFolder: './'+f.path})}
+										 onClick={() => self.setState({currentFolder: './'+f.path})}
 										 style={{cursor:'pointer', backgroundColor: '#9796b4'}}
-										 draggable={!this.props.createtask}
-										 onDrag={(e) => this.handleDrag(e)}
-										 onDragStart={(e) => this.handleDragStart(e,f)}
+										 draggable={!self.props.createtask}
+										 onDrag={(e) => self.handleDrag(e)}
+										 onDragStart={(e) => self.handleDragStart(e,f)}
 									><text value={f} style={{color: "white"}}>{f.name}</text></Badge> 
-							:  <i 		draggable={!this.props.createtask}
-										 onDrag={(e) => this.handleDrag(e)}
-										 onDragStart={(e) => this.handleDragStart(e,f)}
+							:  <i 		draggable={!self.props.createtask}
+										 onDrag={(e) => self.handleDrag(e)}
+										 onDragStart={(e) => self.handleDragStart(e,f)}
 										style={{color: 'SteelBlue'}}>{f.name}</i>
 						} 
+
+
+
+						{!f.path.includes("sharedFiles") && !self.props.createtask ? <Edit3 style={{color: "black", height: 15, cursor:"pointer"}} onClick={() => self.setState({fileToRename: f, showPopupRename: true})}/> : null}
+						{f.type=='d' && !f.path.includes("sharedFiles") && !self.props.createtask ? <Share2 style={{color: "red", height: 15, cursor:"pointer"}} onClick={() => self.dcbiareactservice.mySharedFiles(f.path).then((sharedDoc)=> {self.setState({dirToShare: f.path, showPopUpShare: true, sharedDoc})})}/> : null}
+						{f.type=='d' && f.name!=="sharedFiles" && !self.props.createtask ? <Copy style={{color: "black", height: 15, cursor:"pointer"}} onClick={() => self.copyFiles(f.path)} /> : null}
 						
-						{!f.path.includes("sharedFiles") ? <Edit3 style={{color: "black", height: 15, cursor:"pointer"}} onClick={() => this.setState({fileToRename: f, showPopupRename: true})} /> : null}
-						{f.type=='d' && !f.path.includes("sharedFiles") && !this.props.createtask ? <Share2 style={{color: "red", height: 15, cursor:"pointer"}} onClick={() => this.dcbiareactservice.mySharedFiles(f.path).then((sharedDoc)=> {this.setState({dirToShare: f.path, showPopUpShare: true, sharedDoc})})} /> : null}
-						{f.type=='d' && f.name!=="sharedFiles" && !this.props.createtask ? <Copy style={{color: "black", height: 15, cursor:"pointer"}} onClick={() => this.copyFiles(f.path)} /> : null}
-						&nbsp;
-
-
 
 
 						</Col>
 						<Col md="auto">
 
 
-						{f.name!=="myFiles" && f.name!=="sharedFiles" && !(f.path.includes("sharedFiles")&&f.type=='f') && selectMode==false
-						? <Trash2 hidden={this.props.createtask} style={{color: "black", height: 15, cursor:"pointer"}} onClick={()=>this.setState({showDelete: true, fileToDelete: f})}/>
+						{f.name!=="sharedFiles" && !f.path.includes("sharedFiles") && !selectMode && !self.props.createtask
+						? <Trash2 style={{color: "black", height: 15, cursor:"pointer"}} onClick={()=>self.setState({showDelete: true, fileToDelete: f})}/>
 						: null}
 
 
-						{(selectMode == true || this.props.createtask==true) && f.name!=='sharedFiles' ? 
-						<input type="checkbox" checked={filesList[f.path].selected} onClick={() => this.addSelectedFiles(f)}/>						
+						{(selectMode == true || self.props.createtask) && f.name!=='sharedFiles'  ? 
+						<input type="checkbox" checked={filesList[f.path].selected} onClick={() => self.addSelectedFiles(f)}/>						
 						: null} 
 
 						</Col>
@@ -591,7 +611,7 @@ class Filebrowser extends Component {
 				</Card>
 						<Row>
 						<Col md={{offset:"1"}}>
-					{f.type=='d' && filesList[f.path].expand == true ? this.displayFiles(f.files):null}
+					{f.type=='d' && filesList[f.path].expand == true ? self.displayFiles(f.files):null}
 						</Col>
 						</Row>
 					</React.Fragment>
@@ -867,7 +887,9 @@ class Filebrowser extends Component {
 
 	popUpCreateFolder() {
 		const self = this
-		var {currentFolder} = self.state
+		const {currentFolder} = self.state
+		var folderName
+
 		return (
 			<Modal show={this.state.showCreateFolder} onHide={() => this.setState({showCreateFolder: false})}>
 				<Modal.Header closeButton>
@@ -877,14 +899,14 @@ class Filebrowser extends Component {
 				<Modal.Body>
 				<Form>
 					<Form.Label> create at location <i>{currentFolder}</i></Form.Label>
-					<Form.Control id="formFolderName" type="text" placeholder="folder name" className="mr-sm-2" autoComplete="off"/>
+					<Form.Control id="formFolderName" type="text" placeholder="folder name" className="mr-sm-2" autoComplete="off" onChange={(e) => folderName = e.target.value}/>
 				</Form>
 				</Modal.Body>
 				<Modal.Footer>
 					<Button variant="danger" onClick={() => this.setState({showCreateFolder: false})} >
 						Cancel
 					</Button>
-					<Button variant="success" onClick={() => this.handleCreateFolder(document.getElementById("formFolderName").value)}>
+					<Button variant="success" onClick={() => this.handleCreateFolder(folderName)}>
 						Create
 					</Button>
 				</Modal.Footer>
@@ -898,7 +920,8 @@ class Filebrowser extends Component {
 	handleShareFiles(usersList) {
 		const self = this
 		const {sharedDoc, dirToShare} = self.state
-		const alreadyShared = sharedDoc.data.users
+		var alreadyShared = sharedDoc.data.users
+		if (!alreadyShared) {alreadyShared = []}
 
 		var share = []
 		var unshare = []
@@ -915,7 +938,7 @@ class Filebrowser extends Component {
 			}
 		})
 
-
+		self.setState({showPopUpShare: false})
 
 		if (share.length!==0) {
 			var infosShare = {}
@@ -991,15 +1014,13 @@ class Filebrowser extends Component {
 	popUpShare() {
 		const self = this
 		const {users} = self.props
-		const {sharedDoc, dirToShare} = self.state
-		const alreadyShared = sharedDoc.data.users
-		console.log("Share infos !")
-		console.log(dirToShare)
-		console.log(alreadyShared)
+		const {sharedDoc, dirToShare, searchShareUser} = self.state
+		var alreadyShared = sharedDoc.data.users
 
+		if (!alreadyShared) {alreadyShared = []}
+		
 		var usersList = {}
 		users.forEach(user => {
-
 			if (alreadyShared.includes(user.email)) {
 				usersList[user.email] = true
 			} else {
@@ -1008,33 +1029,35 @@ class Filebrowser extends Component {
 
 		})
 
-
 		var items = []
     	Object.keys(usersList).forEach(key => {
+    		{key.includes(self.state.searchShareUser) ?
     		items.push(
     			<li>
     				{key}
     				&nbsp;
     				<input type="checkbox" defaultChecked={usersList[key]} onChange={() => usersList[key] = !usersList[key]}/>
     			</li>)
+    		: null}
     	})
 
 		return (
 			<Modal show={self.state.showPopUpShare} onHide={() => self.setState({showPopUpShare: false})}>
 				<Modal.Header closeButton>
 					<Modal.Title> 					
-						Share folder <i style={{color: 'SteelBlue'}}>{dirToShare}</i>
+						Share : <i style={{color: 'SteelBlue'}}>{dirToShare}</i>
 					</Modal.Title>  
 				</Modal.Header>
 				<Modal.Body>
-				{/*<FormControl size="sm" id="user" placeholder="search user" type="text" autoComplete="off" onChange={(e)=> console.log("search fct todo")}/>*/}
+				<FormControl size="sm" placeholder="search user" type="text" autoComplete="off" onChange={(e)=> self.setState({...self.state, searchShareUser: e.target.value})}/>
 				<div style={{overflow: "auto", display: "block",  height: "500px"}}>
 				{items}
 				</div>
 				</Modal.Body>
 				<Modal.Footer>
 
-				<Button variant="outline-danger" onClick={() => self.handleShareFiles(usersList)}> Share </Button>
+				<Button variant="outline-danger" onClick={() => self.handleShareFiles(usersList)}> Share / Unshare
+				 </Button>
 				</Modal.Footer>
 			</Modal>
 		)
@@ -1073,6 +1096,7 @@ class Filebrowser extends Component {
 
 
 	flattenDirectoryMap(dmap){
+
         const self = this;
         return _.flatten(_.map(dmap, (dm)=>{
             if(dm.type == 'f'){
@@ -1224,21 +1248,20 @@ class Filebrowser extends Component {
 
 		return (
 			<Card className="mt-3" style={{borderColor: "#1b273e", borderWidth: 3, borderRadius: 10}}>
-				<Card.Header as="h5" className="info" style={{color: "#1b273e", backgroundColor: "#e0e4ec", borderRadius: 10}}>
-					{self.props.createtask ? <text>Select files to create new task</text> : <text>Manage Files</text>}
+				<Card.Header as="h5" className="info" style={self.props.createtask ? {color: "white", backgroundColor: "black"} : {color: "#1b273e", backgroundColor: "#e0e4ec", borderRadius: 10}}>
+					<text>Select files to create new task</text>
 				</Card.Header>
-				<Navbar bg="dark" hidden={!self.props.createtask}>
+{/*				<Navbar bg="dark" hidden={!self.props.createtask}>
 				<Form inline>	
 					<Button className="mr-3" variant="secondary" onClick={() => self.setState({showImportProject: true})}> Create task </Button>
 					<Button className="mr-3" variant="secondary" onClick={() => self.cleanSelecteFiles()}> Clear all </Button>
-{/*					<FormControl id="searchFilesForm" onChange={(e)=>{self.handleSearchFile(e)}} type="text" placeholder="file name" className="mr-sm-2" autoComplete="off"/>
-*/}				</Form></Navbar>
-
-				<Navbar bg="light" hidden={self.props.createtask}>
+					<FormControl id="searchFilesForm" onChange={(e)=>{self.handleSearchFile(e)}} type="text" placeholder="file name" className="mr-sm-2" autoComplete="off"/>
+				</Form></Navbar>
+*/}
+				<Navbar bg="light">
 					<Nav className="mr-auto">
 						<Form inline>
-							<Button variant="outline-primary">Search files</Button>
-							<FormControl id="searchFilesForm" onChange={(e)=>{self.handleSearchFile(e)}} type="text" placeholder="file name" className="mr-sm-2" autoComplete="off"/>
+							<FormControl id="searchFilesForm" onChange={(e)=>{self.handleSearchFile(e)}} type="text" placeholder="search file/folder" className="mr-sm-2" autoComplete="off"/>
 
 							<Overlay target={document.getElementById("searchFilesForm")} show={searchFiles} placement="right">
 								{({placement,...props}) => (
@@ -1254,9 +1277,11 @@ class Filebrowser extends Component {
 								)}
 							</Overlay>
 
-							<Button variant="outline-primary" type="submit" onClick={() => self.setState({...self.state, showCreateFolder: true})}>
+							<Button hidden={self.props.createtask} variant="outline-primary" onClick={() => self.setState({...self.state, showCreateFolder: true})}>
 								create folder
 							</Button>
+
+
 						</Form>
 					</Nav>
 
@@ -1264,18 +1289,19 @@ class Filebrowser extends Component {
 
 					<Row className="ml-3">
 
-							<Button style={{backgroundColor: '#66B2FF', borderColor: "#66B2FF"}} type='radio' className="mr-sm-2" onClick={() => self.setState({...self.state, selectMode: !self.state.selectMode})}>Select files</Button>
+						<Button className="mr-sm-2" variant="outline-primary" hidden={!self.props.createtask} onClick={() => self.manageCreateTask()}> Create Task </Button>
+						<Button hidden={self.props.createtask} style={{backgroundColor: '#66B2FF', borderColor: "#66B2FF"}} type='radio' className="mr-sm-2" onClick={() => self.setState({...self.state, selectMode: !self.state.selectMode})}>Select files</Button>
 					
 						<Col>
 							<OverlayTrigger overlay={<Tooltip>Download files</Tooltip>} placement={'top'}>
-								<Button variant="success" onClick={() => self.downloadFiles()}>
+								<Button hidden={self.props.createtask} variant="success" onClick={() => self.downloadFiles()}>
 									<Download style={{"color": "white"}}> </Download>
 								</Button>
 							</OverlayTrigger>
 						</Col>
 						<Col>
 							<OverlayTrigger overlay={<Tooltip>Upload files</Tooltip>} placement={'top'}>
-								<Button variant="primary" onClick={()=>{self.setState({...self.state, showUploadDragDrop: true})}}>
+								<Button hidden={self.props.createtask} variant="primary" onClick={()=>{self.setState({...self.state, showUploadDragDrop: true})}}>
 									<UploadCloud/>
 								</Button>
 							</OverlayTrigger>
@@ -1412,7 +1438,7 @@ class Filebrowser extends Component {
 {/*					<Col xs={4} md={4}>
 						{self.getUploadManager()}
 					</Col>
-					<
+					<					
 */}				</Row>
 			</Container>
 		)
@@ -1432,5 +1458,15 @@ const mapStateToProps = (state, ownProps) => {
     http: state.jwtAuthReducer.http,
   }
 }
+
+// const mapDispatchToProps = (dispatch) => {
+//   return {
+//     thisprop: (StateSendCreateTaskTEST) => {
+//       dispatch({
+//         StateSendCreateTaskTEST: StateSendCreateTaskTEST
+//       });
+//     }
+//   }
+// }
 
 export default connect(mapStateToProps)(Filebrowser);
