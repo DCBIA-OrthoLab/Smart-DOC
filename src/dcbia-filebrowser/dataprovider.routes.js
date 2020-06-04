@@ -242,12 +242,46 @@ module.exports = function (server, conf) {
 	    }
 	});
 
-	// moveFiles parameters :
-	// source
-	// target
 
-	// rename parameters :
 
+
+	server.route({
+		method: 'POST',
+		path: '/dcbia/uploadscript',
+		config: {
+			auth: {
+				strategy: 'token',
+				scope: ['dentist']
+			},
+			handler: handlers.uploadscript,
+			validate: {
+				query: false,
+			    payload: Joi.object({
+					taskname: Joi.string(),
+					desc: Joi.string(),
+					pattern: Joi.object(),
+				}),
+			    params: null		    
+			},
+		}
+	});
+
+	server.route({
+		method: 'GET',
+		path: '/dcbia/getscript',
+		config: {
+			auth: {
+				strategy: 'token',
+				scope: ['dentist']
+			},
+			handler: handlers.getscript,
+			validate: {
+				query: false,
+			    payload: null,
+			    params: null		    
+			},
+		}
+	});
 
 
 }
