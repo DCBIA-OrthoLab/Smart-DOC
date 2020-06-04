@@ -1289,7 +1289,7 @@ class Filebrowser extends Component {
 
 					<Row className="ml-3">
 
-						<Button className="mr-sm-2" variant="outline-primary" hidden={!self.props.createtask} onClick={() => self.manageCreateTask()}> Create Task </Button>
+						<Button className="mr-sm-2" variant="outline-success" hidden={!self.props.createtask} onClick={() => self.manageCreateTask()}> Validate Files Selection </Button>
 						<Button hidden={self.props.createtask} style={{backgroundColor: '#66B2FF', borderColor: "#66B2FF"}} type='radio' className="mr-sm-2" onClick={() => self.setState({...self.state, selectMode: !self.state.selectMode})}>Select files</Button>
 					
 						<Col>

@@ -37,7 +37,7 @@ class CreateTask extends Component {
 			checkedFolder: [],
 			files: [],
 			folderList: [],
-			createTask: false,
+			createTask: true,
 
 			filesOrder: true, // true = all, false = bypatient
 
@@ -70,7 +70,9 @@ class CreateTask extends Component {
 				description: ""
 			},
 
-			scriptsInfos: "",
+			currentPattern: "",
+
+			scriptsInfos: [],
 
 			showAdvancedOptions: false,
 
@@ -90,8 +92,23 @@ class CreateTask extends Component {
 		self.getScriptInfos()
 	}
 
+	// createTask(files, checkedFolder) {
+	// 	const self = this
+	// 	var folderList = []
+
+	// 	files.forEach(file => {
+	// 		var folder_path = file.substring(0, file.lastIndexOf('/'))
+	// 		if (!folderList.includes(folder_path)) {
+	// 			folderList.push(folder_path)
+	// 		}
+	// 	})
+
+	// 	self.setState({...self.state, files: files, checkedFolder: checkedFolder,folderList: folderList , createTask: !self.state.createTask})
+	// }
+
 	createTask(files, checkedFolder) {
 		const self = this
+		const {currentPattern} = self.state
 		var folderList = []
 
 		files.forEach(file => {
@@ -101,7 +118,14 @@ class CreateTask extends Component {
 			}
 		})
 
-		self.setState({...self.state, files: files, checkedFolder: checkedFolder,folderList: folderList , createTask: !self.state.createTask})
+		self.setState({
+			...self.state, 
+			commandList: {},
+			files: files, 
+			checkedFolder: checkedFolder,
+			folderList: folderList},
+			() => self.useExistingPattern(currentPattern) 
+		)
 	}
 
 
@@ -127,20 +151,31 @@ class CreateTask extends Component {
 			if (script.taskname==scriptClicked) {
 				self.setState({
 					filesOrder: filesOrder,
-					saveEntries: [],
 					selectedScript: scriptClicked,
 					commandScript: script.command,
-					commandList: {}}, 
-					() => self.useExistingPattern(script.patterns[0])
-				)
+					currentPattern: script.patterns[0]
+				})
 			}
-		})	
+		})
+
+		// scriptsInfos.forEach(script => {
+		// 	if (script.taskname==scriptClicked) {
+		// 		self.setState({
+		// 			filesOrder: filesOrder,
+		// 			saveEntries: [],
+		// 			selectedScript: scriptClicked,
+		// 			commandScript: script.command,
+		// 			commandList: {}}, 
+		// 			() => self.useExistingPattern(script.patterns[0])
+		// 		)
+		// 	}
+		// })	
 
 	}
 
 	manageTaskFiles() {
 		const self = this
-		const {files, newParam, newFlag, commandScript, commandList, selectedScript, checkedFolder, showFiles, saveEntries, filesSearch, scriptsInfos, manageScript, newPatternName, showInfosScript, showAdvancedOptions} = self.state
+		const {createTask, files, newParam, newFlag, commandScript, commandList, selectedScript, checkedFolder, showFiles, saveEntries, filesSearch, scriptsInfos, manageScript, newPatternName, showInfosScript, showAdvancedOptions} = self.state
 		
 		var selectedFiles = []
 		checkedFolder.forEach(elem => {
@@ -189,10 +224,10 @@ class CreateTask extends Component {
 		})
 
 
-		var displaycmd = []
-		self.state.commandLineList.forEach(cmd => {
-			displaycmd.push(<li>{cmd}</li>)
-		})
+		// var displaycmd = []
+		// self.state.commandLineList.forEach(cmd => {
+		// 	displaycmd.push(<li>{cmd}</li>)
+		// })
 
 
 		var patterns = []
@@ -212,43 +247,28 @@ class CreateTask extends Component {
 		return (
 			<React.Fragment>
 
-	<Button size="sm" onClick={()=>this.testFctUploadScript()}></Button>
+{/*	<Button size="sm" onClick={()=>this.testFctUploadScript()}></Button>
 	<Button size="sm" onClick={()=>console.log(self.state.files)}></Button>
 	<Button size="sm" onClick={()=>console.log(self.state.checkedFolder)}></Button>
-	<Button size="sm" onClick={()=>console.log(self.state.folderList)}></Button>
+	<Button size="sm" onClick={()=>console.log(self.state.folderList)}></Button>*/}
 
 			<Card>
 			<Card.Header > 
 				Manage task creation
 					<Button style={{float: "right"}} variant="outline-success" size="sm" className="ml-2 mr-2" onClick={() => self.createCommandLine()}> Run ! </Button>
+					
 					<Form.Check style={{float: "right"}} type="checkbox" label="Advanced options" onChange={() => self.setState({showAdvancedOptions: !self.state.showAdvancedOptions})}/>
-					<Button style={{float: "right"}} variant="outline-danger" size="sm" className="ml-2 mr-2" onClick={() => self.setState({...self.state, createTask: false, files: [], commandList: {}, commandLineList: [], saveEntries: [], folderList: [], selectedScript: ""})}> Back to file selection </Button>
+{/*					<Button style={{float: "right"}} variant="outline-danger" size="sm" className="ml-2 mr-2" onClick={() => self.setState({...self.state, createTask: false, files: [], commandList: {}, commandLineList: [], saveEntries: [], folderList: [], selectedScript: ""})}> Back to file selection </Button>
+*/}			
+
 			</Card.Header>
 			<Card.Body>
 			<Row>
-				<Col>
-					<Alert variant="primary" id="alertFiles"> 
-					<Alert.Heading> selected files : {selectedFiles}</Alert.Heading>
-						<FormControl size="sm" id="searchFilesForm" onChange={(e)=>{this.searchFiles(e.target.value)}} type="text" placeholder="search file/folder" className="mr-sm-2" autoComplete="off"/>
-					</Alert>
-					<Overlay target={document.getElementById("alertFiles")} show={showFiles} placement="bottom">
-						{({placement,...props}) => (
-							<div {...props}
-								style={{
-								backgroundColor: 'gray',
-								color: 'white',
-								borderRadius: 5,
-								padding: '10px 10px',
-								...props.style,}}>
-								{filesSearch}
-							</div>
-						)}
-					</Overlay>
-				</Col>				
 
 				<Col sm="7">	
 				<Card variant="success">	
 				<Card.Header>
+
 					<Nav variant="tabs" defaultActiveKey="useScript">
 					<Nav.Item>
 							<Nav.Link onClick={() => self.setState({manageScript: true})} eventKey="useScript">Software</Nav.Link>
@@ -257,6 +277,7 @@ class CreateTask extends Component {
 							<Nav.Link hidden={!showAdvancedOptions} onClick={() => self.setState({manageScript: false})} eventKey="createPattern">create pattern</Nav.Link>
 						</Nav.Item>
 					</Nav>
+
 				</Card.Header>
 
 				{manageScript ? 
@@ -275,6 +296,9 @@ class CreateTask extends Component {
 				  	)}
 					  </Dropdown.Menu>
 					</Dropdown>
+				</Col>
+				<Col>
+					<Button style={{float: "right"}} disabled={selectedScript=="none"} variant="outline-info" size="sm" className="ml-2 mr-2" onClick={() =>  self.setState({createTask: false}) }> Start File Selection </Button>
 				</Col>
 				<Col>
 					<Dropdown className="mt-1 mb-1 ml-2 mr-2">
@@ -314,11 +338,32 @@ class CreateTask extends Component {
 				}
 				</Card>	
 				</Col>
+
+				<Col>
+					<Alert variant="primary" id="alertFiles"> 
+					<Alert.Heading> selected files : {selectedFiles}</Alert.Heading>
+						<FormControl size="sm" id="searchFilesForm" onChange={(e)=>{this.searchFiles(e.target.value)}} type="text" placeholder="search file/folder" className="mr-sm-2" autoComplete="off"/>
+					</Alert>
+					<Overlay target={document.getElementById("alertFiles")} show={showFiles} placement="bottom">
+						{({placement,...props}) => (
+							<div {...props}
+								style={{
+								backgroundColor: 'gray',
+								color: 'white',
+								borderRadius: 5,
+								padding: '10px 10px',
+								...props.style,}}>
+								{filesSearch}
+							</div>
+						)}
+					</Overlay>
+				</Col>				
+
 			</Row>
 			</Card.Body>
 			</Card>
 
-			<Table className="mt-2 mb-2" responsive striped bordered hover size="sm" variant="dark">
+			<Table className="mt-2 mb-2" hidden={!showAdvancedOptions} responsive striped bordered hover size="sm" variant="dark">
 				<thead>
 					<tr>
 					{headers}
@@ -332,7 +377,7 @@ class CreateTask extends Component {
 			
 
 
-			{displaycmd}
+			{/*{displaycmd}*/}
 			</React.Fragment>
 		)
 	}
@@ -526,8 +571,8 @@ class CreateTask extends Component {
 	useExistingPattern(pattern) {
 		const self = this
 		const {scriptsInfos, selectedScript, filesOrder} = self.state
-		
-		console.log(self.state.commandList)
+
+		console.log("Creating a task for : ", selectedScript)
 		
 		var scriptPattern = pattern.infos
 
@@ -624,6 +669,7 @@ class CreateTask extends Component {
 			commandLineList.push(cmd)
 		})
 		self.setState({commandLineList: commandLineList})
+		console.log(commandLineList)
 	}
 
 
@@ -709,7 +755,7 @@ class CreateTask extends Component {
 
 
 	getFileManager(){
-		return <DcbiaReactFilebrowser createtask={true} startCreatetask={this.createTask}/>
+		return <DcbiaReactFilebrowser createtask={true} startCreatetask={this.createTask} />
 	}
 
 	render() {
@@ -723,8 +769,10 @@ class CreateTask extends Component {
 
 				<Row>
 					<Col>
-						{createTask ? <div>{self.manageTaskFiles()}</div> : <div>{self.getFileManager()}</div>}
-					</Col>
+						<div>{self.manageTaskFiles()}</div>
+						{createTask ? null : <div>{self.getFileManager()}</div>}
+{/*						{createTask ? <div>{self.manageTaskFiles()}</div> : <div>{self.getFileManager()}</div>}
+*/}					</Col>
 				</Row>	
 			</Container>
 		)
