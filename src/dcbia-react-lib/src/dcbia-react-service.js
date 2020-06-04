@@ -346,6 +346,22 @@ export default class DcbiaReactService {
   });
  }
 
+ uploadscript(infos) {
+  return this.http({
+    method: 'POST',
+    url: '/dcbia/uploadscript',
+    data: infos
+  });
+ }
+
+ getscript() {
+  return this.http({
+    method: 'GET',
+    url: '/dcbia/getscript',
+  });
+ }
+
+
 
 
 }

@@ -290,7 +290,7 @@ class Filebrowser extends Component {
 				fullFlatMap = [].concat(fullFlatMap, flatTree)
 			})
 			if (fullFlatMap.length !== 0) {
-				self.props.startCreatetask(fullFlatMap)
+				self.props.startCreatetask(fullFlatMap, filesTask)
 			}
 		}
 	}
