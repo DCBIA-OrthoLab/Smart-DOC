@@ -419,5 +419,41 @@ module.exports = function (server, conf) {
   }
 
 
+
+  handler.getscript = async(req, h) => {
+	var view = '_design/tasksInfos/_view/tasksInfos';
+	var query = {
+		key: JSON.stringify(),
+		include_docs: true
+	}
+	
+	return server.methods.dcbia.getViewQs(view, query)
+	.then((res)=>{
+		var docs = _.pluck(res, 'doc');
+		return docs
+	})
+
+  	return true
+  }
+
+
+  handler.uploadscript = async(req, h) => {
+  	const {desc, taskname, pattern} = req.payload;
+
+	var view = '_design/tasksInfos/_view/tasksInfos';
+	var query = {
+		key: JSON.stringify(taskname),
+		include_docs: true
+	}
+	
+	return server.methods.dcbia.getViewQs(view, query)
+	.then(function(res){
+		var doc = res[0].doc
+		doc.patterns.push(pattern)
+		return server.methods.dcbia.uploadDocuments(doc)
+	})
+}
+
+
 	return handler;
 }
