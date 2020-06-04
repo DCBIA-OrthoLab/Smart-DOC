@@ -6,6 +6,7 @@ import {Edit2, X, ChevronDown, HelpCircle} from 'react-feather'
 import DcbiaReactFilebrowser from './dcbia-react-filebrowser'
 import DcbiaReactService from './dcbia-react-service'
 
+import {ClusterpostService} from 'clusterpost-list-react'
 
 const _ = require('underscore');
 const Promise = require('bluebird');
@@ -89,6 +90,9 @@ class CreateTask extends Component {
 
 		self.dcbiareactservice = new DcbiaReactService();
 		self.dcbiareactservice.setHttp(self.props.http);
+
+		self.clusterpostservice = new ClusterpostService();
+
 		self.getScriptInfos()
 	}
 
@@ -573,7 +577,7 @@ class CreateTask extends Component {
 		const {scriptsInfos, selectedScript, filesOrder} = self.state
 
 		console.log("Creating a task for : ", selectedScript)
-		
+
 		var scriptPattern = pattern.infos
 
 		Object.keys(scriptPattern).forEach(key => {
@@ -670,6 +674,42 @@ class CreateTask extends Component {
 		})
 		self.setState({commandLineList: commandLineList})
 		console.log(commandLineList)
+
+		// Promise.map(commandLineList, (cli) => {
+		// 	return self.clusterpostservice.parseCLIFromString(cli)
+		// 	.then((job) => {
+		// 		console.log(job);
+		// 		job.inputs = [];
+		// 		job.name = "some name"; // name/id for each job
+
+		// 		if(organizedBySubject){
+		// 			//2 options : by patient / for all
+		// 			job.cwd = {		// current dir : for output,etc need to be entered by user
+		// 				key: "file-browser",
+		// 				path: userEmail + outputFolderFromTask + currentSubjectId
+		// 			}	
+		// 		}else{
+		// 			job.cwd = {
+		// 				key: "file-browser",
+		// 				path: userEmail + outputFolderFromTask
+		// 			}
+		// 		}
+				
+
+		// 		_.map(getthefileinputs, (file_obj)=>{ // enter full_path locally of all files needed
+		// 			job.inputs.append({
+		// 				name: file_obj.name,
+		// 				local: {
+		// 					key: "file-browser",
+		// 					path: file_obj.complete_path //userEmail/fullPath
+		// 				}
+		// 			})
+		// 		})
+		// 		return true;
+		// 		// return self.clusterpostservice.createAndSubmitJob(job)
+		// 	})
+		// }, {concurrency: 1})
+
 	}
 
 
