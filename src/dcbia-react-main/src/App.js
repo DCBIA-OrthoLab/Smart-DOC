@@ -21,7 +21,7 @@ import store from "./redux/store";
 
 import {DcbiaReactProjects, DcbiaReactMorphologicalData, DcbiaReactClinicalData, DcbiaReactFilebrowser, DcbiaReactCreateTask} from 'dcbia-react-lib'
 import {ClusterpostJobs, ClusterpostTokens, ClusterpostDashboard} from 'clusterpost-list-react'
-// import {MedImgSurf} from 'react-med-img-viewer';
+import {MedImgSurf} from 'react-med-img-viewer';
 
 
 class App extends Component {
@@ -100,7 +100,7 @@ class App extends Component {
             </Card>
           </Col>
           <Col sm={6}>
-{/*            <MedImgSurf data={[{data: landingVtk, color: [0,255,255]}]}/>*/}
+            <MedImgSurf data={[{data: landingVtk, color: [0,255,255]}]}/>
           </Col>
         </Row>
       </Container>);
