@@ -522,8 +522,8 @@ class Filebrowser extends Component {
 
 
 
-
 	displayFiles(param) {
+
 		const self = this
 		var _ = require('underscore')
 		const {filesList, selectMode} = self.state
@@ -548,7 +548,6 @@ class Filebrowser extends Component {
 					onDragLeave={(e) => self.handleDragLeave(e)}
 					onDragEnter={(e) => self.handleDragEnter(e)}
 					>
-
 
 
 						<Row>
@@ -1192,7 +1191,7 @@ class Filebrowser extends Component {
 
 		const path = currentFolder.split('/')
 
-		return (		
+		return (
 			<Breadcrumb color="red">
 					{path.map((f, index) => 
 						<Breadcrumb.Item active={index==path.length-1} onClick={() => self.goToFolder(f)}>{f=='.' ? "..." : f}</Breadcrumb.Item>
@@ -1350,7 +1349,7 @@ class Filebrowser extends Component {
 							</Col>
 						</Row>
 						<Alert variant="dark">
-						{this.displayFiles(this.getTree())}
+							{this.displayFiles(this.getTree())}
 						</Alert>
 					</Container>
 {/*					<Row>

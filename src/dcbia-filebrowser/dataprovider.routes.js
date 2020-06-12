@@ -257,9 +257,10 @@ module.exports = function (server, conf) {
 			validate: {
 				query: false,
 			    payload: Joi.object({
-					taskname: Joi.string(),
-					desc: Joi.string(),
-					pattern: Joi.object(),
+					scriptname: Joi.string(),
+					description: Joi.string(),
+					command: Joi.string(),
+					patterns: Joi.array(),
 				}),
 			    params: null		    
 			},
