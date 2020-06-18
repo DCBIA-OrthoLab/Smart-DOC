@@ -22,7 +22,7 @@
     "url": "https://github.com/DCBIA-OrthoLab/shiny-tooth/issues"
   },
   "dependencies": {
-    "angular": "1.7.9",
+    "angular": "1.8.0",
     "angular-chart.js": "^1.0.3",
     "angular-route": "1.5.8",
     "angular-smart-table": "^2.1.8",
