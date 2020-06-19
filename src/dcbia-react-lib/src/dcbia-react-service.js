@@ -361,6 +361,14 @@ export default class DcbiaReactService {
   });
  }
 
+ deleteSoftware(scriptname) {
+  return this.http({
+    method: 'DELETE',
+    url: '/dcbia/deletesoftware',
+    data: scriptname
+  });
+ }
+
 
 
 

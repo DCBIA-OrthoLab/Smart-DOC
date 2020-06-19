@@ -2,7 +2,7 @@ import React, {Component} from 'react'
 
 import { connect } from "react-redux";
 import {Container, Button, Table, Card, Col, Row, DropdownButton, Dropdown, Form, Modal, Alert, OverlayTrigger, Overlay, Tooltip, Popover, Badge, ButtonToolbar, ButtonGroup, InputGroup, FormControl, Spinner, Navbar, Nav, Breadcrumb, ProgressBar, Collapse} from 'react-bootstrap'
-import {Edit2, X, ChevronDown, HelpCircle} from 'react-feather'
+import {Edit2, X, ChevronDown, ChevronUp, HelpCircle, XCircle} from 'react-feather'
 import DcbiaReactFilebrowser from './dcbia-react-filebrowser'
 import DcbiaReactService from './dcbia-react-service'
 
@@ -90,6 +90,8 @@ class CreateTask extends Component {
 			objectCMD: null,
 
 			newExecutable: {},
+
+			showTemplate: false,
 
 			newSoftware: {
 				scriptname: "",
@@ -184,25 +186,25 @@ class CreateTask extends Component {
 
 
 
-	// getTableTemplate() {
-	// 	const self = this
-	// 	const {selectedCMD} = self.state
+	getTableTemplate() {
+		const self = this
+		const {selectedCMD} = self.state
 
-	// 	var trows = _.map(selectedCMD.patterns, (pattern)=>{
-	// 		return (
-	// 			<td> 
-	// 				{pattern.value ? pattern.value : pattern.pattern}
-	// 			</td>
-	// 		)
-	// 	})
+		var trows = _.map(selectedCMD.patterns, (pattern)=>{
+			return (
+				<td> 
+					{pattern.value ? pattern.value : pattern.pattern}
+				</td>
+			)
+		})
 
-	// 	return (
-	// 		<tr>
-	// 			<td>{selectedCMD.command}</td>
-	// 			{trows}
-	// 		</tr>
-	// 	)
-	// }
+		return (
+				<tr class="bg-light">
+					<td>{selectedCMD.command}</td>
+					{trows}
+				</tr>
+		)
+	}
 	getTableHeader(){
 		const self = this;
 		const {selectedCMD} = self.state;
@@ -223,7 +225,10 @@ class CreateTask extends Component {
 		return (
 			<thead className="thead-dark">
 				<th>
-					<ChevronDown style={{color: "green"}} onClick={() => {self.tablebody.className.indexOf("collapse show") > -1 ? self.tablebody.className="collapse" : self.tablebody.className="collapse show"}}/>
+					<ChevronDown style={{color: "red", height: "20", cursor: "pointer"}} onClick={() => self.setState({showTemplate: !self.state.showTemplate})}/>
+					<Button variant="success" className="mr-1 ml-1"size="sm" onClick={() => {self.tablebody.className.indexOf("collapse show") > -1 ? self.tablebody.className="collapse" : self.tablebody.className="collapse show"}}>
+					<ChevronDown style={{color: "white"}}/>
+					</Button>
 					{"Command"}
 				</th>
 				{trows}
@@ -287,26 +292,26 @@ class CreateTask extends Component {
 	getTableBody(){
 		const self = this;
 		const {selectedCMD, objectCMD} = self.state;
-
+		
 		// {
 		// 	executable: "python",
 		// 	patterns: [{pattern1: ".*blbl.*", flag: "somename"}, position: 1]
 		// }
 		// if flag empty => put position / if flag no empty => put real value
 
-		var trows = _.map(objectCMD, (match)=>{
+		var trows = _.map(objectCMD, (match, index)=>{
 
 			var tcols = _.map(selectedCMD.patterns, (pattern)=>{
-				// if(pattern.flag){
-				return (<td>{match[pattern.position]}</td>)
-				// }else{
-				// 	return (<td></td>)
-				// }
+				// return (<td>{match[pattern.position]}</td>)
+
+				return (<td>
+					<FormControl type="text" value={match[pattern.position]} className="mr-sm-2" autoComplete="off" onChange={(e) => {objectCMD[index][pattern.position] = e.target.value, self.setState({...self.state, objectCMD: objectCMD})}}/>
+						</td>)
 			})
 			return (
 				<tr>	
 					<td>
-					<X style={{color: "red", height: 15, cursor: 'pointer'}} onClick={() => this.deleteRow(match)}/>
+					<X style={{color: "red", height: 15, cursor: 'pointer'}} onClick={() => this.deleteRow(index)}/>
 						{selectedCMD.command}
 					</td>
 					{tcols}
@@ -322,14 +327,13 @@ class CreateTask extends Component {
 	}
 
 
-	deleteRow(param) {
+	deleteRow(index) {
 		const self = this
 		var {objectCMD} = self.state
 
-		var newObj = _.omit(objectCMD, obj => { 
-				return _.isEqual(Object.values(obj), Object.values(param)) 
-			})
-		self.setState({objectCMD: newObj})
+		objectCMD.splice(index, 1)
+
+		self.setState({objectCMD: objectCMD})
 	}
 
 
@@ -354,6 +358,16 @@ class CreateTask extends Component {
 
 		self.setState({filesSearch: filesSearch, showFiles: showFiles})
 	}
+
+
+
+// dcbia-filebrowser/view -> shared.token & tasks.token
+// handlers/routes updated with better syntax
+
+// change script to software in all code
+
+
+
 
 
 
@@ -489,11 +503,14 @@ class CreateTask extends Component {
 				</Modal.Header>
 				<Modal.Body>
 					{scriptInfo}
+
 				</Modal.Body>
 				<Modal.Footer>
-					<Button variant="danger" onClick={() => this.setState({showInfosScript: false})} >
-						Close
-					</Button>
+						{selectedScript !== "none" ? 
+						<Button variant="danger" onClick={() => {self.dcbiareactservice.deleteSoftware(selectedScript); self.setState({showInfosScript: false, selectedScript: "none"})}}>
+							<XCircle/> Delete software
+						</Button>	
+						: null}
 				</Modal.Footer>
 			</Modal>
 		)
@@ -576,6 +593,9 @@ class CreateTask extends Component {
 			return false
 		} else {
 			self.dcbiareactservice.uploadscript(newSoftware)
+
+			newSoftware.type = "tasksInfos"
+
 			self.setState({newSoftware: {scriptname: "", patterns: [], command: "", description: ""}, showSavePattern: false})
 		}
 	}
@@ -585,7 +605,6 @@ class CreateTask extends Component {
 		const {selectedCMD, objectCMD, outputDirectory, jobName} = self.state
 		const {user} = self.props
 		const {email} = user
-
  	
 		var job_nbr = 0
 		Promise.map(objectCMD, (cli) => {
@@ -605,8 +624,13 @@ class CreateTask extends Component {
 					: cmd = cmd + " " + param}
 			})
 
+
 			return self.clusterpostservice.parseCLIFromString(cmd)	
 			.then((job) => {
+
+
+				console.log(job)
+				console.log(cmd)
 				job.name = jobName+"_"+job_nbr
 				job.parameters = _.compact(job.parameters)
 				job.userEmail = email
@@ -633,6 +657,7 @@ class CreateTask extends Component {
 						useDefault: true
 					}
 				})
+
 				console.log(job)
 				return self.clusterpostservice.createAndSubmitJob(job)
 				.catch((e)=>{
@@ -641,7 +666,6 @@ class CreateTask extends Component {
 			})	
 		}, {concurrency: 1})
 	}
-
 
 
 
@@ -743,7 +767,6 @@ class CreateTask extends Component {
 		return (
 			<React.Fragment>
 
-
 			<Card className="mt-2 mb-2" ref={(e) => {this.cardTask = e}}>
 			<Card.Header > 
 				Manage task creation
@@ -763,7 +786,7 @@ class CreateTask extends Component {
 							<Nav.Link onClick={() => self.setState({manageScript: true})} eventKey="useScript">Software</Nav.Link>
 						</Nav.Item>
 						<Nav.Item>
-							<Nav.Link onClick={() => self.setState({manageScript: false})} eventKey="createPattern">Create new executable</Nav.Link>
+							<Nav.Link onClick={() => self.setState({manageScript: false})} eventKey="createPattern">Create new software</Nav.Link>
 						</Nav.Item>
 					</Nav>
 				</Card.Header>
@@ -825,6 +848,7 @@ class CreateTask extends Component {
 				  <Dropdown.Menu>
 			  	{scriptsInfos.map(f => 
 				    	<Dropdown.Item onClick={(e) => self.updateScript(e.target.innerHTML)}>{f.scriptname}</Dropdown.Item>	
+			  			
 			  	)}
 				  </Dropdown.Menu>
 				</Dropdown>
@@ -908,12 +932,13 @@ class CreateTask extends Component {
 
 	getTableCommand() {
 		const self = this
-		const {showAdvancedOptions, selectedScript} = self.state
+		const {showAdvancedOptions, selectedScript, showTemplate} = self.state
 
 		return(
-			<Table className="mt-3 mb-3" hidden={selectedScript=="none"} expanded={false} responsive striped bordered hover size="sm">
+			<Table className="mt-3 mb-3" hidden={selectedScript=="none"} expanded={false} responsive bordered hover size="sm">
+				{showTemplate ? self.getTableTemplate() : null}
+				
 				{self.getTableHeader()}
-				{/*{self.getTableTemplate()}*/}
 
 				{self.getTableBody()}
 			</Table>

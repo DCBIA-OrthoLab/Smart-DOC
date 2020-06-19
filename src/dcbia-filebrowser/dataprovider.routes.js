@@ -261,6 +261,7 @@ module.exports = function (server, conf) {
 					description: Joi.string(),
 					command: Joi.string(),
 					patterns: Joi.array(),
+					type: Joi.string().allow("tasksInfos")
 				}),
 			    params: null		    
 			},
@@ -284,5 +285,25 @@ module.exports = function (server, conf) {
 		}
 	});
 
+
+	server.route({
+		method: 'DELETE',
+		path: '/dcbia/deletesoftware/{scriptname*}',
+		config: {
+			auth: {
+                strategy: 'token',
+                scope: ['dentist']
+            },
+			handler: handlers.deleteSoftware,
+			validate: {
+				query: false,
+				params: null,
+				payload: Joi.string()
+			},
+			description: "delete a softwate from the database"
+		}
+	})
+
+	
 
 }

@@ -422,7 +422,6 @@ module.exports = function (server, conf) {
   handler.getscript = async(req, h) => {
 	var view = '_design/tasksInfos/_view/tasksInfos';
 	var query = {
-		key: JSON.stringify(),
 		include_docs: true
 	}
 	
@@ -439,11 +438,39 @@ module.exports = function (server, conf) {
   handler.uploadscript = async(req, h) => {
   	var {payload} = req
 
-  	payload.type = "tasksInfos"
-
 	return server.methods.dcbia.uploadDocuments(payload);
+  }
 
-}
+
+  handler.deleteSoftware = async(req, h) => {
+  	const {payload} = req
+	var view = '_design/tasksInfos/_view/tasksInfos';
+	var query = {
+		include_docs: true
+	}
+
+	return server.methods.dcbia.getViewQs(view, query)
+	.then((res)=>{
+		var docs = _.pluck(res, 'doc');
+
+		var software = _.filter(docs, (doc) => {
+			return doc.scriptname == payload
+		})
+
+		return server.methods.dcbia.deleteDocument(software[0])
+		.then((res) => {
+			return true
+		})
+
+	})
+
+
+
+
+  	return true
+  }
+
+
 
 
 	return handler;
