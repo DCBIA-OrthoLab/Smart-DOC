@@ -520,12 +520,12 @@ class Filebrowser extends Component {
 
 
 
-
+	// onMouseEnter={(e) => {console.log("Entering :", f.name);e.target.style.borderColor = "black"}}
+	// onMouseLeave={(e) => {console.log("Leaving :", f.name);e.target.style.borderColor = "#D7D8D9"}}
 
 	displayFiles(param) {
 
 		const self = this
-		var _ = require('underscore')
 		const {filesList, selectMode} = self.state
 
 		if(param !== null){
