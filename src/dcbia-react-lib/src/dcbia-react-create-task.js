@@ -41,7 +41,7 @@ class CreateTask extends Component {
 			createTask: true,
 
 
-			outputDirectory:"",
+			suffix: "",
 
 			organizedBySubject: false, // true = all, false = bypatient
 
@@ -240,6 +240,7 @@ class CreateTask extends Component {
 	getMatchFiles(pattern) {
 		const self = this
 		const {selectedCMD, files} = self.state
+		var {suffix} = self.state
 		const search = new RegExp(".*"+pattern.pattern+".*")
 
 		if (pattern.pattern) {
@@ -247,6 +248,19 @@ class CreateTask extends Component {
 			var matchesFiles = _.filter(files, (file) => {
 				return search.test(file)
 			})
+
+			if (pattern.flag == "--out") {
+				matchesFiles = _.map(matchesFiles, file => {
+					var pathSplit = file.split('/')
+					var filename = pathSplit[pathSplit.length - 1] 
+					var ind = filename.indexOf('.')
+					filename = filename.slice(0, ind) + suffix + filename.slice(ind);
+ 					pathSplit[pathSplit.length - 1] = filename
+					var fullname = pathSplit.join('/')
+					return fullname
+				})
+			}
+
 			return matchesFiles
 		} else {
 			return [pattern.value]
@@ -255,17 +269,12 @@ class CreateTask extends Component {
 	getMatchDir(){
 		const self = this;
 		const {selectedCMD} = self.state;
-		// {
-		// 	1: [m11, ..., m1n],
-		// 	2: [m21, ...., m2n]
-		// }
 
-		// [{1: m11, 2: m21}, {1: m12, 2: m22}, ...., {}]
 		var matches = _.map(selectedCMD.patterns, (pattern) => {
 			return self.getMatchFiles(pattern)
 		})
-		var matches = _.object(_.pluck(selectedCMD.patterns, 'position'), matches);
 
+		var matches = _.object(_.pluck(selectedCMD.patterns, 'position'), matches);
 		
 		var CMD_List = [];
 
@@ -289,20 +298,16 @@ class CreateTask extends Component {
 		})
 		self.setState({objectCMD: CMD_List})
 	}
+
+
+
 	getTableBody(){
 		const self = this;
 		const {selectedCMD, objectCMD} = self.state;
 		
-		// {
-		// 	executable: "python",
-		// 	patterns: [{pattern1: ".*blbl.*", flag: "somename"}, position: 1]
-		// }
-		// if flag empty => put position / if flag no empty => put real value
-
 		var trows = _.map(objectCMD, (match, index)=>{
 
 			var tcols = _.map(selectedCMD.patterns, (pattern)=>{
-				// return (<td>{match[pattern.position]}</td>)
 
 				return (<td>
 					<FormControl type="text" value={match[pattern.position]} className="mr-sm-2" autoComplete="off" onChange={(e) => {objectCMD[index][pattern.position] = e.target.value, self.setState({...self.state, objectCMD: objectCMD})}}/>
@@ -608,6 +613,7 @@ class CreateTask extends Component {
  	
 		var job_nbr = 0
 		Promise.map(objectCMD, (cli) => {
+
 			job_nbr += 1
 			var cmd = selectedCMD.command
 			Object.keys(cli).forEach(el => {
@@ -624,19 +630,15 @@ class CreateTask extends Component {
 					: cmd = cmd + " " + param}
 			})
 
-
 			return self.clusterpostservice.parseCLIFromString(cmd)	
 			.then((job) => {
 
-
-				console.log(job)
-				console.log(cmd)
 				job.name = jobName+"_"+job_nbr
 				job.parameters = _.compact(job.parameters)
 				job.userEmail = email
 				job.inputs = _.map(selectedCMD.patterns, (pattern)=>{
 
-					if(cli[pattern.position] && pattern.pattern){
+					if(cli[pattern.position] && pattern.pattern && pattern.flag!=="--out"){
 
 						return {
 							name: email + '/' + cli[pattern.position],
@@ -652,13 +654,12 @@ class CreateTask extends Component {
 
 				job.outputs.push({
 					type: 'directory',
-					name: email + '/' + outputDirectory, 
+					name: email + '/', 
 					local: {
 						useDefault: true
 					}
 				})
 
-				console.log(job)
 				return self.clusterpostservice.createAndSubmitJob(job)
 				.catch((e)=>{
 					console.error(e)
@@ -855,7 +856,7 @@ class CreateTask extends Component {
 
 				<HelpCircle style={{color: "green", height: 20, cursor: "pointer", top: 0, bottom: 0, margin: "auto"}} onClick={() => self.setState({showInfosScript: true})}/>
 
-				<FormControl placeholder="output directory" className="mt-1 mb-1 ml-1 mr-1" style={{width: "30%"}} value={self.outputDirectory} onChange={(e) => self.setState({outputDirectory: e.target.value})}/> 
+				<FormControl placeholder="suffix output file" className="mt-1 mb-1 ml-1 mr-1" style={{width: "30%"}} value={self.suffix} onChange={(e) => self.setState({suffix: e.target.value})}/>
 				<FormControl placeholder="job name" className="mt-1 mb-1 ml-1 mr-1" style={{width: "30%"}} value={self.jobName} onChange={(e) => self.setState({jobName: e.target.value})}/> 
 				
 				<Button style={{float: "right"}} size="sm" className="mt-1 mb-1 ml-1 mr-1" disabled={selectedScript=="none"} variant="outline-info" onClick={() => self.setState({createTask: false})}> 
