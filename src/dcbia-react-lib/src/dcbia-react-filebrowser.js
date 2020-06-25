@@ -282,17 +282,26 @@ class Filebrowser extends Component {
 			}
 		})
 
+		var allFiles = []
 		if (filesTask.length !== 0) {
 
 			filesTask.forEach(file => {
 				var tree = self.getTree(file)
 				var flatTree = self.flattenDirectoryMap(tree)
-				fullFlatMap = [].concat(fullFlatMap, flatTree)
+				
+				if (_.isEmpty(flatTree)) {
+					allFiles.push(file)					
+				} else {
+					allFiles = _.union(allFiles, flatTree)
+				}
+
 			})
-			if (fullFlatMap.length !== 0) {
-				self.props.startCreatetask(fullFlatMap, filesTask)
-			}
+			allFiles = _.uniq(allFiles)
+
+			self.props.startCreatetask(allFiles)
 		}
+
+		
 	}
 
 
@@ -520,9 +529,6 @@ class Filebrowser extends Component {
 
 
 
-	// onMouseEnter={(e) => {console.log("Entering :", f.name);e.target.style.borderColor = "black"}}
-	// onMouseLeave={(e) => {console.log("Leaving :", f.name);e.target.style.borderColor = "#D7D8D9"}}
-
 	displayFiles(param) {
 
 		const self = this
@@ -548,6 +554,8 @@ class Filebrowser extends Component {
 					onDragLeave={(e) => self.handleDragLeave(e)}
 					onDragEnter={(e) => self.handleDragEnter(e)}
 					>
+
+
 
 
 						<Row>
@@ -607,6 +615,7 @@ class Filebrowser extends Component {
 
 						</Col>
 						</Row>
+						<hr style= {{ margin: "1px", border: 0, height: 0, "border-top": "1px solid rgba(0, 0, 0, 0.2)", "border-bottom": "1px solid rgba(255, 255, 255, 0.4)"}} />
 				</Card>
 						<Row>
 						<Col md={{offset:"1"}}>
@@ -1352,69 +1361,10 @@ class Filebrowser extends Component {
 							{this.displayFiles(this.getTree())}
 						</Alert>
 					</Container>
-{/*					<Row>
-						<Col md='auto'>
-							<OverlayTrigger overlay={<Tooltip>back to previous folder</Tooltip>}
-											placement={'right'}>
-							<ChevronLeft style={{cursor:'pointer'}} onClick={() => this.backFolder()}/>
-							</OverlayTrigger>
-						</Col>
-						<Col md='auto'>
-							<OverlayTrigger overlay={<Tooltip>back to main folder</Tooltip>}
-											placement={'right'}>
-							<ChevronsLeft style={{cursor:'pointer'}} onClick={() => this.setState({currentFolder: './root', histTest: []})}/> 
-							</OverlayTrigger>
-						</Col>
-					</Row>
-*/}			</Card.Body>
+			</Card.Body>
 		</Card>);
 	}
 
-
-	// getUploadManager(){
-	// 	const self = this;
-	// 	const {loadingUpload, currentFolder} = self.state;
-	// 	return (
-	// 	<Container>
-	// 		<Row>
-	// 			<Col>
-	// 				<Card className="mt-3 mb-3" style={{borderRadius: 10, borderColor: "#1b273e", borderWidth: 1}}> 
-	// 					<Card.Header as="h5" className="info" style={{color: "#1b273e", backgroundColor: "#e0e4ec", borderRadius: 10}}>
-	// 						Upload files
-	// 					</Card.Header>
-	// 					<Card.Body>
-	// 						<Card.Title>
-	// 							<input id="inputUpload" type="file" name="myZipFile"/>
-	// 						</Card.Title>
-	// 						<Card.Text>
-	// 							{loadingUpload ? 
-	// 								<Button variant="info" disabled>
-	// 								<Spinner variant="dark" animation="border" size="sm" role="status"/>
-	// 								<span className="sr-only">Loading...</span>
-	// 								</Button> :
-	// 								<Button variant="info" onClick={() => this.setState({showUpload: true})}> Upload </Button>}
-	// 							&nbsp; <i>Upload in</i> <strong style={{color: "Navy"}}>{currentFolder}</strong>
-	// 							</Card.Text>
-	// 						</Card.Body>
-	// 		  			</Card>
-	//   			</Col>
-	// 		</Row>
-	// 		<Row>
-	// 			<Col>
-	// 				<Card className="mt-3 mb-3" style={{borderColor: "#1b273e", borderRadius: 10, borderWidth: 1}}>
-	// 					<Card.Header as="h5" className="info" style={{color: "#1b273e", backgroundColor: "#e0e4ec", borderRadius: 10}}>
-	// 						Selected files
-	// 					</Card.Header>
-	// 					<Card.Body>
-	// 						{this.displaySelectedFiles()}
-	// 					</Card.Body>
-	// 				</Card>
-	// 			</Col>
-	// 		</Row>
-	// 	</Container>)
-	// }
-
-///////////////////////////////////////////////////////////////////////////////////////
 
 	render() {
 		const self = this

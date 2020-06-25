@@ -11,23 +11,6 @@ import {ClusterpostService} from 'clusterpost-list-react'
 const _ = require('underscore');
 const Promise = require('bluebird');
 
-// example 
-// python script.py var1 --t1 scan.nii 
-// python3 predict.py --surf scan.stl --out outputDirectory/output.vtk --numberOfSubdivisions 10
-
-// save pattern
-
-// how do u know in which line u put the new param 
-// --> keep track of subfolder per pattern
-// have a command per subfolder/pattern 
-
-
-// file.substring(0, file.lastIndexOf('/')
-
-
-
-// update saveEntries everytime commandList is updated (add param/delete flag/rename param)
-
 
 
 class CreateTask extends Component {
@@ -35,61 +18,28 @@ class CreateTask extends Component {
 		super(props)
 
 		this.state = {
-			selectedDirs: [],
 			files: [],
-			subjectList: [],
 			createTask: true,
-
-
-			suffix: "",
-
-			organizedBySubject: false, // true = all, false = bypatient
-
 			newFlag: {
 				pattern : "",
-				flag: ""
+				flag: "",
+				suffix: ""
 			},
 			newParam: {
 				flag: "",
 				value: ""
 			},
-
-			showPopUpEditCol: false,
-			flagToEdit: "",
-
 			selectedScript: "none",
-			commandScript : "no command selected",
-
-			// instead of commandlines and table we use list of current commandlines (with pattern)
-			commandList: {},
-			commandLineList: [],
-
-			saveEntries: [],
-
-			runDisabled: false,
-
+			runDisabled: true,
 			showFiles: false,
-
 			showSavePattern: false,
-
-
-			currentPattern: "",
-
 			scriptsInfos: [],
-
-			showAdvancedOptions: false,
-
 			showInfosScript: false,
-
 			manageScript: true,
-
 			jobName: "",
-
 			selectedCMD: {},
-
 			objectCMD: null,
 
-			newExecutable: {},
 
 			showTemplate: false,
 
@@ -118,27 +68,13 @@ class CreateTask extends Component {
 
 
 
-	createTask(files, selectedDirs) {
+	createTask(files) {
 		const self = this
-		const {currentPattern} = self.state
-		var subjectList = []
-
-		files.forEach(file => {
-			var folder_path = file.substring(0, file.lastIndexOf('/'))
-			if (!subjectList.includes(folder_path)) {
-				subjectList.push(folder_path)
-			}
-		})
 
 		self.setState({
 			...self.state, 
-			commandList: {},
-			files: files, 
-			selectedDirs: selectedDirs,
-			subjectList: subjectList},
+			files: files},
 			() => self.getMatchDir()
-			// ,
-			// () => self.useExistingPattern(currentPattern) 
 
 		)
 		self.cardTask.scrollIntoView({behavior: "smooth"})
@@ -149,31 +85,13 @@ class CreateTask extends Component {
 
 	updateScript(scriptClicked) {
 		const self = this
-		const {commandList, scriptsInfos} = self.state
-		var organizedBySubject
-
-		switch(scriptClicked) {
-			case "condyle":
-				organizedBySubject = false
-			break;
-
-			case "teeth":
-				organizedBySubject = true
-			break;
-
-			default:
-				console.log("nothing")
-				organizedBySubject = false
-		}
+		const {scriptsInfos} = self.state
 
 		scriptsInfos.forEach(script => {
 			if (script.scriptname==scriptClicked) {
 				self.setState({
-					organizedBySubject: organizedBySubject,
 					selectedScript: scriptClicked,
-					commandScript: script.command,
 					currentPattern: script.patterns,
-
 					selectedCMD: script
 				})
 			}
@@ -212,11 +130,7 @@ class CreateTask extends Component {
 		var trows = _.map(selectedCMD.patterns, (pattern)=>{
 			return (
 				<th> 
-{/*					<Edit2 style={{height: 15, cursor: 'pointer'}} onClick={() => this.setState({showPopUpEditCol: true, flagToEdit: pattern.flag})}/>
-*/}
 					{pattern.flag ? pattern.flag : pattern.position}
-{/*					<X style={{color: "red", height: 15, cursor: 'pointer'}} onClick={() => this.deleteFlag(pattern.flag)}/>
-*/}				
 				</th>
 			)
 		})
@@ -239,8 +153,7 @@ class CreateTask extends Component {
 
 	getMatchFiles(pattern) {
 		const self = this
-		const {selectedCMD, files} = self.state
-		var {suffix} = self.state
+		const {files} = self.state
 		const search = new RegExp(".*"+pattern.pattern+".*")
 
 		if (pattern.pattern) {
@@ -254,7 +167,7 @@ class CreateTask extends Component {
 					var pathSplit = file.split('/')
 					var filename = pathSplit[pathSplit.length - 1] 
 					var ind = filename.indexOf('.')
-					filename = filename.slice(0, ind) + suffix + filename.slice(ind);
+					filename = filename.slice(0, ind) + pattern.suffix + filename.slice(ind);
  					pathSplit[pathSplit.length - 1] = filename
 					var fullname = pathSplit.join('/')
 					return fullname
@@ -366,123 +279,11 @@ class CreateTask extends Component {
 
 
 
-// dcbia-filebrowser/view -> shared.token & tasks.token
-// handlers/routes updated with better syntax
-
-// change script to software in all code
-
-
-
-
-
-
-
-
-	// addFlagForAll(newFlag = this.state.newFlag) {
-	// 	const self = this
-	// 	const {files} = self.state
-	// 	const {pattern, flag} = newFlag
-	// 	var {commandList, saveEntries} = self.state
-	// 	const search = new RegExp(".*"+pattern+".*")
-
-	// 	if (pattern!==""&&flag!=="") {
-	// 		var matchFiles = []
-	// 		files.forEach(file => {
-	// 			if (search.test(file)) {
-	// 				matchFiles.push(file)
-	// 			}
-	// 		})
-
-	// 		matchFiles.forEach(file => {
-	// 			if (!Object.keys(commandList).includes(file)) {
-	// 				commandList[file] = {}
-	// 				commandList[file][flag] = file
-	// 			} else {
-	// 				commandList[file][flag] = file
-	// 			}
-	// 		})
-
-	// 		saveEntries.push(newFlag)
-	// 		self.setState({...self.state, commandList: commandList, newFlag: {pattern: "", flag: ""}, saveEntries: saveEntries})
-	// 	}
-	// }
-	// addFlagBySubject(newFlag = this.state.newFlag) {
-	// 	const self = this
-	// 	const {files} = self.state
-	// 	const {pattern, flag} = newFlag
-	// 	var {commandList, saveEntries} = self.state
-	// 	const search = new RegExp(".*"+pattern+".*")
-
-	// 	if (pattern!==""&&flag!=="") {
-	// 		var matchFiles = []
-	// 		files.forEach(file => {
-	// 			if (search.test(file)) {
-	// 				matchFiles.push(file)
-	// 			}
-	// 		})
-
-	// 		matchFiles.forEach(file => {
-	// 			var path = file.substring(0, file.lastIndexOf('/'))
-	// 			if (!Object.keys(commandList).includes(path)) {
-	// 				commandList[path] = {}
-	// 				commandList[path][flag] = file
-	// 			} else {
-	// 				commandList[path][flag] = file
-	// 			}
-	// 		})
-
-	// 		saveEntries.push(newFlag)
-	// 		self.setState({...self.state, commandList: commandList, newFlag: {pattern: "", flag: ""}, saveEntries: saveEntries})
-	// 	}
-	// }
-	// addParamForAll(newParam = this.state.newParam) {
-	// 	const self = this
-	// 	const {flag, value} = newParam
-	// 	if (flag!==""&&value!=="") {
-	// 		var {commandList, saveEntries, files} = self.state
-
-	// 		if (Object.keys(commandList).length==0) {
-	// 			files.forEach(file => {
-	// 				commandList[file] = {}
-	// 				commandList[file][flag] = value
-	// 			})
-	// 		} else {
-	// 			Object.keys(commandList).forEach(command => {
-	// 				commandList[command][flag] = value
-	// 			})
-	// 		}
-
-	// 		saveEntries.push(newParam)
-	// 		self.setState({...self.state, commandList: commandList, newParam: {flag: "", value: ""}, saveEntries: saveEntries})
-	// 	}
-	// }
-	// addParamBySubject(newParam = this.state.newParam) {
-	// 	const self = this
-	// 	const {flag, value} = newParam
-	// 	if (flag!==""&&value!=="") {
-	// 		var {commandList, saveEntries, subjectList} = self.state
-
-	// 		if (Object.keys(commandList).length==0) {
-	// 			subjectList.forEach(folder => {
-	// 				commandList[folder] = {}
-	// 				commandList[folder][flag] = value
-	// 			})
-	// 		} else {
-	// 			Object.keys(commandList).forEach(command => {
-	// 				commandList[command][flag] = value
-	// 			})
-	// 		}
-
-
-	// 		saveEntries.push(newParam)
-	// 		self.setState({...self.state, commandList: commandList, newParam: {flag: "", value: ""}, saveEntries: saveEntries})
-	// 	}
-	// }
 
 
 	popUpInfosScript() {
 		const self = this
-		const {showInfosScript, scriptsInfos, selectedScript, selectedCMD} = self.state
+		const {showInfosScript, selectedScript, selectedCMD} = self.state
 
 		var scriptInfo = []
 		var info
@@ -522,27 +323,6 @@ class CreateTask extends Component {
 	}
 
 
-	useExistingPattern(pattern) {
-		const self = this
-		const {scriptsInfos, selectedScript, organizedBySubject} = self.state
-
-
-		var scriptPattern = pattern.infos
-
-		Object.keys(scriptPattern).forEach(key => {
-			if (Object.keys(scriptPattern[key]).includes("pattern")) {
-				var newFlag = {pattern: scriptPattern[key].pattern, flag: scriptPattern[key].flag}
-				if (organizedBySubject){self.addFlagBySubject(newFlag)} 
-				else {self.addFlagForAll(newFlag)}
-			} else {
-				var newParam = {flag: scriptPattern[key].flag, value: scriptPattern[key].value}
-				if (organizedBySubject) {self.addParamBySubject(newParam)}
-				else {self.addParamForAll(newParam)}
-			}
-
-		})
-
-	}
 
 	popUpSavepattern() {
 		const self = this
@@ -597,10 +377,10 @@ class CreateTask extends Component {
 			|| newSoftware.patterns.length==0) {
 			return false
 		} else {
-			self.dcbiareactservice.uploadscript(newSoftware)
-
+			
 			newSoftware.type = "tasksInfos"
-
+			self.dcbiareactservice.uploadscript(newSoftware)
+			
 			self.setState({newSoftware: {scriptname: "", patterns: [], command: "", description: ""}, showSavePattern: false})
 		}
 	}
@@ -633,7 +413,11 @@ class CreateTask extends Component {
 			return self.clusterpostservice.parseCLIFromString(cmd)	
 			.then((job) => {
 
-				job.name = jobName+"_"+job_nbr
+				if (jobName =="") {
+					job.name = "job_"+job_nbr
+				} else {
+					job.name = jobName+"_"+job_nbr
+				}
 				job.parameters = _.compact(job.parameters)
 				job.userEmail = email
 				job.inputs = _.map(selectedCMD.patterns, (pattern)=>{
@@ -659,7 +443,7 @@ class CreateTask extends Component {
 						useDefault: true
 					}
 				})
-
+				// console.log(job)
 				return self.clusterpostservice.createAndSubmitJob(job)
 				.catch((e)=>{
 					console.error(e)
@@ -670,96 +454,12 @@ class CreateTask extends Component {
 
 
 
-
-	
-
-
-	popUpEditCol() {
-		const self = this
-		const {flagToEdit} = self.state
-		var flagName
-
-		return (
-			
-			<Modal show={this.state.showPopUpEditCol} onHide={() => this.setState({showPopUpEditCol: false, paramToEdit: ""})}>
-				<Modal.Header closeButton>
-					<Modal.Title>Edit name & value for {flagToEdit}</Modal.Title>  
-				</Modal.Header>
-
-				<Modal.Body>
-				<Form>
-					<Form.Control type="text" placeholder="parameter name" className="mr-sm-2" autoComplete="off" onChange={(e) => flagName = e.target.value}/>
-				</Form>
-				</Modal.Body>
-				<Modal.Footer>
-					<Button variant="danger" onClick={() => this.setState({showPopUpEditCol: false})} >
-						Cancel
-					</Button>
-					<Button  variant="success" onClick={() => this.editCol(flagName)}>
-						Edit Parameter
-					</Button>
-				</Modal.Footer>
-			</Modal>
-		)
-	}
-
-	// deleteRow(cmd) {
-	// 	const self = this
-	// 	var {commandList} = self.state
-
-	// 	Object.keys(commandList).forEach(command => {
-	// 		if (command == cmd) {
-	// 			delete commandList[command]
-	// 		}
-	// 	})
-
-	// 	self.setState({commandList: commandList})
-
-	// }
-
-	// deleteFlag(flag) {
-	// 	const self = this
-	// 	var {commandList, saveEntries} = self.state
-
-	// 	Object.keys(commandList).forEach(command => {
-	// 		delete commandList[command][param]
-	// 	})
-
-	// 	saveEntries.forEach(item => {
-	// 		if (item.flag==param) {
-	// 			var ind = saveEntries.indexOf(item)
-	// 			saveEntries.splice(ind, 1);
-	// 		}			
-	// 	})
-	// 	self.setState({commandList: commandList, saveEntries: saveEntries})
-
-	// }
-
-	// editCol(flagName){
-	// 	const self = this
-	// 	const {flagToEdit} = self.state
-	// 	var {commandList} = self.state
-
-	// 	if (flagName!==undefined && flagName!==flagToEdit) {
-	// 		Object.keys(commandList).forEach(command => {
-	// 			Object.defineProperty(commandList[command], 
-	// 							flagName,
-	// 							Object.getOwnPropertyDescriptor(commandList[command], flagToEdit))
-	// 			delete commandList[command][flagToEdit]
-	// 		})
-	// 	}
-
-	// 	self.setState({...self.state, showPopUpEditCol: false, commandList: commandList, flagToEdit: ""})
-	// }
-
-
-
 	manageTasks() {
 		const self = this
-		const {createTask, files, newParam, newFlag, runDisabled, commandScript, commandList, selectedScript, selectedDirs, showFiles, saveEntries, filesSearch, scriptsInfos, manageScript, newPatternName, showInfosScript, showAdvancedOptions, outputDirectory} = self.state
+		const {createTask, files, runDisabled, showFiles, filesSearch, manageScript, newPatternName, showInfosScript, outputDirectory} = self.state
 		
 		var selectedFiles = []
-		selectedDirs.forEach(elem => {
+		files.forEach(elem => {
 			selectedFiles.push(
 				<i style={{"font-size": "15px"}}> {elem} , </i>
 			)
@@ -772,9 +472,7 @@ class CreateTask extends Component {
 			<Card.Header > 
 				Manage task creation
 					<Button style={{float: "right"}} disabled={runDisabled} variant="success" size="sm" className="ml-2 mr-2" ref={(element) => {this.buttonRun = element}} onClick={() => self.createCommandLine()}> Run ! </Button>
-					
-					{/*<Form.Check style={{float: "right"}} type="checkbox" label="Advanced options" onChange={() => self.setState({showAdvancedOptions: !self.state.showAdvancedOptions})}/>*/}
-			</Card.Header>
+				</Card.Header>
 			<Card.Body>
 			<Row>
 
@@ -808,7 +506,7 @@ class CreateTask extends Component {
 
 				<Col>
 					<Alert variant="primary" id="alertFiles"> 
-					<Alert.Heading> selected files : {selectedFiles}</Alert.Heading>
+					<Alert.Heading> search in selected files </Alert.Heading>
 						<FormControl size="sm" id="alertFiles" onChange={(e)=>{this.searchFiles(e.target.value)}} type="text" placeholder="search file/folder" className="mr-sm-2" autoComplete="off"/>
 					</Alert>
 					<Overlay target={document.getElementById("alertFiles")} show={showFiles} placement="bottom">
@@ -837,7 +535,7 @@ class CreateTask extends Component {
 
 	chooseSoftware() {
 		const self = this
-		const {selectedDirs, selectedScript, scriptsInfos} = self.state
+		const {selectedScript, scriptsInfos} = self.state
 
 
 		return (
@@ -856,7 +554,6 @@ class CreateTask extends Component {
 
 				<HelpCircle style={{color: "green", height: 20, cursor: "pointer", top: 0, bottom: 0, margin: "auto"}} onClick={() => self.setState({showInfosScript: true})}/>
 
-				<FormControl placeholder="suffix output file" className="mt-1 mb-1 ml-1 mr-1" style={{width: "30%"}} value={self.suffix} onChange={(e) => self.setState({suffix: e.target.value})}/>
 				<FormControl placeholder="job name" className="mt-1 mb-1 ml-1 mr-1" style={{width: "30%"}} value={self.jobName} onChange={(e) => self.setState({jobName: e.target.value})}/> 
 				
 				<Button style={{float: "right"}} size="sm" className="mt-1 mb-1 ml-1 mr-1" disabled={selectedScript=="none"} variant="outline-info" onClick={() => self.setState({createTask: false})}> 
@@ -875,15 +572,13 @@ class CreateTask extends Component {
 		return (
 
 			<Container>
-
-				{/*<Button variant="outline-danger" size="sm" onClick={() => self.setState({selectedCMD: {}, objectCMD: null, selectedScript: "none", createTask: true})}> Clear cmd </Button>*/}
-
 				
 				<InputGroup className="mt-1 mb-1 ml-2 mr-2">
 					<Button size="sm" variant="primary" onClick={() => self.addFilePattern()}> add file pattern</Button>
 					
 					<FormControl size="sm" value={newFlag.flag} placeholder="flag" type="text" autoComplete="off" onChange={(e) => {newFlag.flag = e.target.value; self.setState({...self.state, newFlag})}}/>
 					<FormControl size="sm" value={newFlag.pattern} placeholder="pattern" type="text" autoComplete="off" onChange={(e) => {newFlag.pattern = e.target.value; self.setState({...self.state, newFlag})}}/>
+					<FormControl size="sm" hidden={newFlag.flag!=="--out"} value={newFlag.suffix} placeholder="suffix" type="text" autoComplete="off" onChange={(e) => {newFlag.suffix = e.target.value; self.setState({...self.state, newFlag})}}/>
 				</InputGroup>
 
 				<InputGroup className="mt-1 mb-1 ml-2 mr-2">
@@ -895,7 +590,7 @@ class CreateTask extends Component {
 
 				<InputGroup>
 					<FormControl size="sm" value={newSoftware.command} placeholder="executable" type="text" autoComplete="off" onChange={(e) => {newSoftware.command = e.target.value; self.setState({...self.state, newSoftware})}}/>
-					<Button className="mt-1 mb-1 ml-2 mr-2" size="sm" variant="success" onClick={() => self.setState({showSavePattern: true})}> Save pattern </Button>
+					<Button className="mt-1 mb-1 ml-2 mr-2" disabled={newSoftware.command==""} size="sm" variant="success" onClick={() => self.setState({showSavePattern: true})}> Save pattern </Button>
 				</InputGroup>
 
 			</Container>
@@ -905,15 +600,19 @@ class CreateTask extends Component {
 	addFilePattern() {
 		const self = this
 		const {newFlag} = self.state
-		const {flag, pattern} = newFlag
+		const {flag, pattern, suffix} = newFlag
 		var {newSoftware} = self.state
 
-		if (flag!=="" && pattern!=="") {
-			var len = newSoftware.patterns.length
 
-			newSoftware.patterns.push({flag: flag, pattern: pattern, position: len+1})
-			self.setState({...self.state, newSoftware: newSoftware, newFlag: {flag: "", pattern: ""}})
-		}
+		if (pattern!=="" && flag!=="") {
+			var len = newSoftware.patterns.length
+			if (flag=="--out"&&suffix!=="") {
+				newSoftware.patterns.push({flag: flag, pattern: pattern, suffix: suffix, position: len+1})
+			} else if (flag!=="--out"){
+				newSoftware.patterns.push({flag: flag, pattern: pattern, position: len+1})				
+			} else {return}
+			self.setState({...self.state, newSoftware: newSoftware, newFlag: {flag: "", pattern: "", suffix: ""}})
+		}	
 	}
 
 	addParam() {
@@ -933,7 +632,7 @@ class CreateTask extends Component {
 
 	getTableCommand() {
 		const self = this
-		const {showAdvancedOptions, selectedScript, showTemplate} = self.state
+		const {selectedScript, showTemplate} = self.state
 
 		return(
 			<Table className="mt-3 mb-3" hidden={selectedScript=="none"} expanded={false} responsive bordered hover size="sm">
@@ -956,7 +655,6 @@ class CreateTask extends Component {
 		const {createTask} = self.state
 		return(
 			<Container fluid>
-				{this.state.showPopUpEditCol ? this.popUpEditCol() : null}
 				{this.state.showSavePattern ? this.popUpSavepattern() : null}
 				{this.state.showInfosScript ? this.popUpInfosScript() : null}
 
