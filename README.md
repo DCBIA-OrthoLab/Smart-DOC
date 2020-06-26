@@ -1,4 +1,4 @@
-# shiny-toot
+# DSCI - Data Storage for Computation and Integration
 
 Is a web application to federate clinical, biological and imaging data. 
 
