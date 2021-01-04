@@ -1,1 +1,0 @@
-var dcbiaPlots = angular.module('dcbia-plots', []);

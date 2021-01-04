@@ -1,1 +1,0 @@
-angular.module('jwt-user-login', ["checklist-model"]);
