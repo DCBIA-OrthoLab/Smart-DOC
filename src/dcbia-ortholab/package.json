@@ -9,7 +9,6 @@
   "author": "juanprietob@gmail.com",
   "license": "Apache-2.0",
   "dependencies": {
-    "dcbia-react-main": "file:../dcbia-react-main",
-    "project": "file:../dcbia-react-main"
+    "dcbia-react-main": "file:../dcbia-react-main"
   }
 }
