@@ -8,6 +8,12 @@ export default class DcbiaReactService {
     this.http = http;
   }
 
+  getUsers(){
+    return this.http({
+      method: 'GET',
+      url: '/dcbia/users'
+    });
+  }
   getClinicalDataCollections(){
     return this.http({
       method: 'GET',

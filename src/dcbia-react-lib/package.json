@@ -1,6 +1,6 @@
 {
   "name": "dcbia-react-lib",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "",
   "author": "",
   "license": "MIT",
@@ -22,7 +22,7 @@
     "deploy": "gh-pages -d example/build"
   },
   "peerDependencies": {
-    "clusterpost-list-react": "^1.1.1",
+    "clusterpost-list-react": "^1.3.0",
     "prop-types": "^15.5.4",
     "react": "^16.12.0",
     "react-dom": "^16.12.0",
@@ -35,20 +35,11 @@
   "devDependencies": {
     "@svgr/rollup": "^2.4.1",
     "babel-core": "^6.26.3",
-    "babel-eslint": "^8.2.5",
     "babel-plugin-external-helpers": "^6.22.0",
     "babel-preset-env": "^1.7.0",
     "babel-preset-react": "^6.24.1",
     "babel-preset-stage-0": "^6.24.1",
     "cross-env": "^5.1.4",
-    "eslint": "^5.0.1",
-    "eslint-config-standard": "^11.0.0",
-    "eslint-config-standard-react": "^6.0.0",
-    "eslint-plugin-import": "^2.13.0",
-    "eslint-plugin-node": "^7.0.1",
-    "eslint-plugin-promise": "^4.0.0",
-    "eslint-plugin-react": "^7.10.0",
-    "eslint-plugin-standard": "^3.1.0",
     "gh-pages": "^1.2.0",
     "react": "^16.12.0",
     "react-dom": "^16.12.0",
