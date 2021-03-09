@@ -21,15 +21,7 @@ class CreateTask extends Component {
 		this.state = {
 			files: [],
 			createTask: true,
-			newFlag: {
-				pattern : "",
-				flag: "",
-				suffix: ""
-			},
-			newParam: {
-				flag: "",
-				value: ""
-			},
+			newFlag: {},
 			selectedSoftware: {},
 			selectedFiles: [],
 			runDisabled: true,
@@ -109,16 +101,32 @@ class CreateTask extends Component {
 						}
 					}
 				}))
-			}else{
-				var value_match = p.value
-				if(p.appendMatchDir && current_dir){
-					value_match = path.join(current_dir, value_match)
-					pattern_matches[key]["matches"] = [{...p, type: 'v', path: value_match}]
-				}else{
-					pattern_matches[key]["matches"] = [{...p, type: 'v'}]
-				}
 			}
 		})
+
+		var max_matches = _.max(_.values(pattern_matches), (match)=>{
+			if(match.pattern && match.matches){
+				return match.matches.length	
+			}
+		})
+
+		if(max_matches && max_matches.matches && max_matches.matches.length > 0){
+			max_matches = max_matches.matches.length
+			_.each(patterns, (p, key)=>{
+				if(p.value){
+					var value_match = p.value
+					if(p.appendMatchDir && current_dir){
+						value_match = path.join(current_dir, value_match)
+						pattern_matches[key]["matches"] = _.map(_.range(max_matches), ()=>{return {...p, type: 'v', path: value_match}})
+					}else{
+						pattern_matches[key]["matches"] = _.map(_.range(max_matches), ()=>{return {...p, type: 'v'}})
+					}	
+				}	
+			})
+		}
+			
+
+		console.log(pattern_matches)
 
 		var sub_matches = _.map(tree, (t)=>{
 			if(t.type == "d"){
@@ -178,7 +186,6 @@ class CreateTask extends Component {
 					var target_path = _.reduce(zm, (mem, m)=>{
 						if(m && m.type == 'f'){
 							var dirname = path.dirname(m.path)
-							console.log(dirname)
 							if(dirname.length < mem || mem == ''){
 								return dirname
 							}
@@ -276,7 +283,7 @@ class CreateTask extends Component {
 		const self = this
 		var scriptsInfos = []
 
-		self.dcbiareactservice.getscript()
+		self.dcbiareactservice.getSoftware()
 		.then(res => {
 			res.data.forEach(script => {
 				scriptsInfos.push(script)
@@ -297,9 +304,9 @@ class CreateTask extends Component {
 			
 			newSoftware.type = "software"
 
-			return self.dcbiareactservice.uploadscript(newSoftware)
+			return self.dcbiareactservice.uploadSoftware(newSoftware)
 			.then(()=>{
-				self.setState({newSoftware: {name: "", patterns: [], command: "", description: ""}})	
+				self.setState({newSoftware: {}})	
 			})
 		}
 	}
@@ -481,7 +488,7 @@ class CreateTask extends Component {
 
 	createNewExecutable() {
 		const self = this
-		const {newParam, newFlag, newSoftware} = self.state
+		const {newFlag, newSoftware} = self.state
 		
 		return (
 			<Col>
@@ -507,7 +514,7 @@ class CreateTask extends Component {
 							<Form.Control value={newFlag.pattern} placeholder="pattern" type="text" autoComplete="off" onChange={(e) => {newFlag.pattern = e.target.value; self.setState({...self.state, newFlag})}}/>
 						</Col>
 						<Col>
-							<Form.Control value={newParam.value} placeholder="value" type="text" autoComplete="off" onChange={(e) => {newParam.value = e.target.value; self.setState({...self.state, newParam})}}/>
+							<Form.Control value={newFlag.value} placeholder="value" type="text" autoComplete="off" onChange={(e) => {newFlag.value = e.target.value; self.setState({...self.state, newFlag})}}/>
 						</Col>
 						<Col>
 							<Form.Control value={newFlag.suffix} placeholder="suffix" type="text" autoComplete="off" onChange={(e) => {newFlag.suffix = e.target.value; self.setState({...self.state, newFlag})}}/>
@@ -553,7 +560,7 @@ class CreateTask extends Component {
 		var {newSoftware} = self.state
 
 		newSoftware.patterns.push({...newFlag, position: newSoftware.patterns.length})
-		self.setState({...self.state, newSoftware: newSoftware, newFlag: {flag: "", pattern: "", suffix: ""}})
+		self.setState({...self.state, newSoftware: newSoftware, newFlag: {}})
 
 	}
 
