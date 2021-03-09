@@ -3,6 +3,29 @@ module.exports = function (server, conf) {
 	
 	var handlers = require('./dataprovider.handlers')(server, conf);
 	var Joi = require('@hapi/joi');	
+
+	server.route({
+	    method: 'GET',
+	    path: '/dcbia/users',
+	    config: {
+			auth: {
+                strategy: 'token',
+                scope: ['dentist']
+            },
+	        handler: handlers.getUserEmails,
+		    validate : {
+		    	query: false,
+		    	params: null,
+		    	payload: false
+		    },
+		    response: {
+		    	schema: Joi.array().items(Joi.object({
+					email: Joi.string().email()
+				}))
+		    },
+	        description: 'Get dsci user emails'
+	    }
+	});
 	
 
 	server.route({
@@ -50,6 +73,17 @@ module.exports = function (server, conf) {
 			    params: null, 
 			    payload: false
 			},
+			response: {
+		    	schema: Joi.array().items(Joi.object(
+		    	{
+		    		type: Joi.string(),
+		    		name: Joi.string(),
+		    		path: Joi.string(),
+		    		files: Joi.array(),
+		    		link: Joi.boolean()
+		    	}
+		    	))
+		    }
 		}
 	})
 
@@ -140,45 +174,7 @@ module.exports = function (server, conf) {
 			},
 		}
 	});
-
-	server.route({
-		method: 'GET',
-		path: '/dcbia/mySharedFiles/{target_path*}',
-		config: {
-			auth: {
-				strategy: 'token',
-				scope: ['dentist']
-			},
-			handler: handlers.mySharedFiles,
-			validate: {
-				query: false,
-			    payload: null,
-			    params: Joi.object({
-					target_path: Joi.string(),
-				})		    
-			},
-		}
-	});
-
-	server.route({
-		method: 'POST',
-		path: '/dcbia/unshareFiles',
-		config: {
-			auth: {
-				strategy: 'token',
-				scope: ['dentist']
-			},
-			handler: handlers.unshareFiles,
-			validate: {
-				query: false,
-			    payload: Joi.object({
-					users: Joi.array(),
-					directory: Joi.string().pattern(/(\.\.)/, { invert: true }),
-				}),
-			    params: null		    
-			},
-		}
-	});
+	
 
 	server.route({
 		method: 'PUT',
@@ -193,7 +189,7 @@ module.exports = function (server, conf) {
 				query: false,
 			    payload: Joi.object({
 			    	source: Joi.string().pattern(/(\.\.)/, { invert: true }),
-			    	target: Joi.string().pattern(/(\.\.)/, { invert: true }),
+			    	target: Joi.string().pattern(/(\.\.)/, { invert: true }).allow(""),
 			    }),
 			    params: null		    
 			},
@@ -214,54 +210,33 @@ module.exports = function (server, conf) {
 				query: false,
 			    payload: Joi.object({
 			    	source: Joi.string().pattern(/(\.\.)/, { invert: true }),
-			    	target: Joi.string().pattern(/(\.\.)/, { invert: true }),
+			    	target: Joi.string().pattern(/(\.\.)/, { invert: true }).allow(""),
 			    }),
 			    params: null		    
 			},
 		}
 	})
 
-	server.route({
-	    method: 'PUT',
-	    path: '/dcbia/rename',
-	    config: {
-			auth: {
-                strategy: 'token',
-                scope: ['dentist']
-            },
-	        handler: handlers.renameFile,
-		    validate : {
-		    	query: false,
-		    	params: null,
-		    	payload: Joi.object({
-		    		source: Joi.string().pattern(/(\.\.)/, { invert: true }),
-		    		newname: Joi.string().pattern(/(\.\.)/, { invert: true })
-		    	})
-		    },
-	        description: 'rename a file or folder'
-	    }
-	});
-
-
-
 
 	server.route({
 		method: 'POST',
-		path: '/dcbia/uploadscript',
+		path: '/dcbia/uploadSoftware',
 		config: {
 			auth: {
 				strategy: 'token',
 				scope: ['dentist']
 			},
-			handler: handlers.uploadscript,
+			handler: handlers.uploadSoftware,
 			validate: {
 				query: false,
 			    payload: Joi.object({
-					scriptname: Joi.string(),
+					name: Joi.string(),
 					description: Joi.string(),
 					command: Joi.string(),
 					patterns: Joi.array(),
-					type: Joi.string().allow("tasksInfos")
+					type: Joi.string().allow("software"),
+					_id: Joi.string().optional(),
+					_rev: Joi.string().optional()
 				}),
 			    params: null		    
 			},
@@ -270,13 +245,13 @@ module.exports = function (server, conf) {
 
 	server.route({
 		method: 'GET',
-		path: '/dcbia/getscript',
+		path: '/dcbia/getSoftware',
 		config: {
 			auth: {
 				strategy: 'token',
 				scope: ['dentist']
 			},
-			handler: handlers.getscript,
+			handler: handlers.getSoftware,
 			validate: {
 				query: false,
 			    payload: null,
@@ -288,17 +263,25 @@ module.exports = function (server, conf) {
 
 	server.route({
 		method: 'DELETE',
-		path: '/dcbia/deletesoftware/{scriptname*}',
+		path: '/dcbia/deleteSoftware/{scriptname*}',
 		config: {
 			auth: {
                 strategy: 'token',
-                scope: ['dentist']
+                scope: ['admin']
             },
 			handler: handlers.deleteSoftware,
 			validate: {
 				query: false,
 				params: null,
-				payload: Joi.string()
+				payload: Joi.object({
+					name: Joi.string(),
+					description: Joi.string(),
+					command: Joi.string(),
+					patterns: Joi.array(),
+					type: Joi.string().allow("software"),
+					_id: Joi.string().required(),
+					_rev: Joi.string().required()
+				})
 			},
 			description: "delete a softwate from the database"
 		}

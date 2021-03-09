@@ -12,30 +12,29 @@ const couchUpdateViews = require('couch-update-views');
 module.exports = function (server, conf) {
 	
 
-	couchUpdateViews.migrateUp(server.methods.dcbia.getCouchDBServer(), path.join(__dirname, "views"));
-	
-	const deleteRecursive = (filepath)=>{
-		try{
-			if(fs.statSync(filepath).isDirectory()){
-				fs.readdirSync(filepath).forEach(function(file) {
-					var currentpath = path.join(filepath, file);
-					deleteRecursive(currentpath);
-				});
-				fs.rmdirSync(filepath);
-			}else{
-				fs.unlinkSync(filepath);
-			}
-		    return true;	
-		}catch(e){
-			console.error(e);
-			return false;
-		}
-		
-	}
+	couchUpdateViews.migrateUp(server.methods.dcbia.getCouchDBServer(), path.join(__dirname, "views"), true);
 
 	var handler = {};
 	/*
 	*/
+
+	handler.getUserEmails = (req, h)=>{
+
+		return server.methods.dcbia.getView('_design/user/_view/info')
+		.then(function(info){
+			return _.pluck(info, 'value');
+		})
+		.then(function(users){
+			return _.map(users, (user)=>{
+				return {
+					email: user.email
+				}
+			})
+		})
+		.catch(function(err){
+			return Boom.badImplementation(err);
+		})
+	}
 
 	handler.uploadFile = (req, h) => {
 		const {auth, params, payload} = req;
@@ -65,20 +64,20 @@ module.exports = function (server, conf) {
 		const {credentials} = auth;
 		const {target_path} = params;
 		
-		return new Promise((resolve, reject)=>{
-			var filename = path.join(conf.datapath, credentials.email, target_path);
+		var target = path.join(conf.datapath, credentials.email, target_path);
 
-			fs.lstat(filename, function(err,stats){
-				if(stats.isSymbolicLink()){
-					fs.unlinkSync(filename)
-					resolve('Shared folder deleted!')
-				} else if(deleteRecursive(filename)){
-					resolve("File deleted!");
-				}else{
-					reject("Cannot delete:", target_path);
-				}
-			});
-		});
+		var real_target = fs.realpathSync(target)
+
+		if(real_target.indexOf(credentials.email) != -1){
+			if(fs.statSync(real_target).isDirectory()){
+				console.log(real_target)
+				fs.rmdirSync(real_target, {recursive: true})
+			}else{
+				fs.unlinkSync(real_target)
+			}
+			return true
+		}
+		return Boom.forbidden("You don't own a parent directory or the file!")
 	}
 
 	const getDirectoryMap = (directory, root_folder)=>{
@@ -91,9 +90,9 @@ module.exports = function (server, conf) {
 			}
 			
 			if (fs.statSync(fullPath).isDirectory()){
-    			return {type:'d', name: filename, path: path.relative(root_folder, fullPath), files: _.compact(getDirectoryMap(fullPath, root_folder))}
+    			return {type:'d', name: filename, path: path.relative(root_folder, fullPath), files: _.compact(getDirectoryMap(fullPath, root_folder)), link: fs.lstatSync(fullPath).isSymbolicLink()}
     		} else {
-    			return {type:'f', name: filename, path: path.relative(root_folder, fullPath)};
+    			return {type:'f', name: filename, path: path.relative(root_folder, fullPath), link: fs.lstatSync(fullPath).isSymbolicLink()};
     		}
 		});
 	}
@@ -110,8 +109,9 @@ module.exports = function (server, conf) {
 				reject(Boom.unauthorized('You are not an admin!'));
 			}else{
 			    var personnalPath = path.join(conf.datapath, user);
-			    if (!fs.existsSync(personnalPath)) {
-					fs.mkdirSync(path.join(personnalPath,'sharedFiles'), { recursive: true }, (err) => {if (err) reject(err)});
+			    var sharedFolder = path.join(personnalPath,'sharedWithMe')
+			    if (!fs.existsSync(sharedFolder)) {
+					fs.mkdirSync(sharedFolder, { recursive: true }, (err) => {if (err) reject(err)});
 			    }
 				resolve(_.compact(getDirectoryMap(personnalPath, personnalPath)));
 			}
@@ -128,9 +128,7 @@ module.exports = function (server, conf) {
 
 			var directorypath = path.join(conf.datapath, credentials.email, newfolder)
 
-			if (directorypath.includes('sharedFiles')){
-				reject(Boom.forbidden("Cannot create directory in sharedFiles!"));
-			}else if(fs.existsSync(directorypath)){
+			if(fs.existsSync(directorypath)){
 				resolve(false);
 			} else {
 				fs.mkdirSync(directorypath, { recursive: true });
@@ -196,7 +194,7 @@ module.exports = function (server, conf) {
 				try{
 
 					if(user != owner){
-						var sharedFolder = path.resolve(path.join(conf.datapath, user, 'sharedFiles'));
+						var sharedFolder = path.resolve(path.join(conf.datapath, user, 'sharedWithMe'));
 						if(!fs.existsSync(sharedFolder)){
 							fs.mkdirSync(sharedFolder, {recursive: true});
 						}
@@ -245,83 +243,6 @@ module.exports = function (server, conf) {
 		}
 	}
 
-	handler.mySharedFiles = (req, h)=>{
-		const {auth, params} = req;
-		const {credentials} = auth;
-		const {target_path} = params;
-
-		var view = '_design/sharedFolders/_view/shared';
-
-		var query = {
-			key: JSON.stringify([credentials.email, target_path]),
-			include_docs: true
-		}
-		
-		return server.methods.dcbia.getViewQs(view, query)
-		.then((res)=>{
-			var docs = _.pluck(res, 'doc');
-			if(docs.length > 0){
-				return docs[0];
-			}else{
-				return [];
-			}
-		})
-		.catch((e)=>{
-			return Boom.notFound(e);
-		});
-	}
-
-	handler.unshareFiles = async (req, h) => {
-		const {query, auth, payload} = req;
-		const {directory, users} = payload;
-		const {credentials} = auth;
-		const owner = credentials.email;
-
-		const sourcePath = path.resolve(path.join(conf.datapath, credentials.email, directory));
-
-		if(fs.existsSync(sourcePath)){
-			return Promise.map(users, (user)=>{
-				try{
-					var sharedFolder = path.resolve(path.join(conf.datapath, user, 'sharedFiles'));
-					var targetPath = path.join(sharedFolder, path.basename(sourcePath))
-
-				  	if(fs.existsSync(targetPath) && fs.lstatSync(targetPath).isSymbolicLink()){
-						fs.unlinkSync(targetPath);
-						return user;
-					}
-					return null;
-				}catch(e){
-					console.error(e);
-					return null;
-				}
-				
-			})
-			.then((users)=>{ return _.compact(users); })
-			.then((users)=>{
-
-				var view = '_design/sharedFolders/_view/shared';
-				var query = {
-					key: JSON.stringify([owner, directory]),
-					include_docs: true
-				}
-		
-				return server.methods.dcbia.getViewQs(view, query)
-				.then(function(rows){
-					var doc = _.pluck(rows, 'doc')[0];
-					doc.users = _.difference(doc.users, _.intersection(doc.users, users));
-					return server.methods.dcbia.uploadDocuments(doc);
-				})
-				.catch(function(e){
-					return Promise.reject(Boom.notFound("You own the folder but never shared it before!"));
-				});
-			})
-		}else{
-			return Promise.reject(Boom.notFound("You don't own this folder"));
-		}
-
-		return true
-	}
-
 	const copyFiles = (source, target)=>{
 		const self = this;
 
@@ -330,43 +251,51 @@ module.exports = function (server, conf) {
 			return Promise.reject(Boom.conflict("File Exists!"));
 		}
 
-		if(fs.existsSync(target) && fs.statSync(target).isDirectory()){
-			//If the target is a directory, it means the source needs to be copy inside the directory
-			//Apend the name of the source
-			target = path.join(target, path.basename(source));
-		}
+		if(source != target){
+			if(fs.existsSync(target) && fs.statSync(target).isDirectory()){
+				//If the target is a directory, it means the source needs to be copy inside the directory
+				//Apend the name of the source
+				target = path.join(target, path.basename(source));
+			}
 
-		if(fs.existsSync(source) && fs.statSync(source).isDirectory()){
-			//Copy recursively everthing in source if it is a directory
-			return Promise.map(fs.readdirSync(source), (filename)=>{
-				var source_path = path.join(source, filename);
-				var target_path = path.join(target, filename);
-				return copyFiles(source_path, target_path);
-			})
-		}else{
-			//If source is anything but a directory
-			//Copy the whole thing
-			return new Promise((resolve, reject)=>{
+			if(source != target){
+				if(fs.existsSync(source) && fs.statSync(source).isDirectory()){
+					//Copy recursively everthing in source if it is a directory
+					fs.mkdirSync(target, {recursive: true});
+					
+					return Promise.map(fs.readdirSync(source), (filename)=>{
+						var source_path = path.join(source, filename);
+						var target_path = path.join(target, filename);
+						return copyFiles(source_path, target_path);
+					})
+				}else{
+					//If source is anything but a directory
+					//Copy the whole thing
+					return new Promise((resolve, reject)=>{
 
-				var target_dir = path.dirname(target);
+						var target_dir = path.dirname(target);
 
-				if(!fs.existsSync(target_dir)){
-					fs.mkdirSync(target_dir, {recursive: true});
+						if(!fs.existsSync(target_dir)){
+							fs.mkdirSync(target_dir, {recursive: true});
+						}
+
+						var reader = fs.createReadStream(source);
+						var writer = fs.createWriteStream(target);
+						reader.pipe(writer);
+
+						writer.on('finish', ()=>{
+							resolve(true);
+						});
+
+						writer.on('error', (err)=>{
+							reject(Boom.badRequest(err));
+						});
+					});	
 				}
-
-				var reader = fs.createReadStream(source);
-				var writer = fs.createWriteStream(target);
-				reader.pipe(writer);
-
-				writer.on('finish', ()=>{
-					resolve();
-				});
-
-				writer.on('error', (err)=>{
-					reject(Boom.badRequest(err));
-				});
-			});
+			}
 		}
+
+		return Promise.reject(Boom.conflict("Source and target are the same!"))
   }
 
   handler.copyFiles = (req, h) => {  
@@ -376,51 +305,71 @@ module.exports = function (server, conf) {
   	const sourcePath = path.join(conf.datapath, credentials.email, source);
   	var targetPath = path.join(conf.datapath, credentials.email, target);
 
-  	return copyFiles(sourcePath, targetPath)
-  	.then(()=>{
-  		return true;
-  	});
+  	return copyFiles(sourcePath, targetPath);
   }
-
-
 
   handler.moveFiles = (req, h) => {  
   	const {credentials} = req.auth;
-  	const {source, target} = req.payload;
+  	var {source, target} = req.payload;
 
-  	const sourcePath = path.join(conf.datapath, credentials.email, source);
-  	var targetPath = path.join(conf.datapath, credentials.email, target);
+  	if(source == 'sharedWithMe'){
+  		return Boom.forbidden("This is the only directory you can't move")
+  	}
 
-  	return copyFiles(sourcePath, targetPath)
-  	.then(()=>{
-  		return deleteRecursive(sourcePath);
-  	});
-  }
+  	source = path.join(conf.datapath, credentials.email, source);
+  	target = path.join(conf.datapath, credentials.email, target);
 
+  	var real_target = target
 
-  handler.renameFile = async(req, h) => {
-	const {credentials} = req.auth;
-	const {source, newname} = req.payload;
+  	if (fs.existsSync(real_target)){
+  		real_target = fs.realpathSync(real_target)
+  	}
 
-	const oldPath = path.join(conf.datapath, credentials.email, source)
-	var targetPath = path.join(conf.datapath, credentials.email, path.dirname(source), newname)
-
-	stats = fs.statSync(oldPath);
-	if(!stats.isDirectory()){
-		targetPath = targetPath
+  	if(fs.existsSync(target) && fs.statSync(target).isDirectory()){
+		//If the target is a directory, it means the source needs to be moved inside the directory
+		//Apend the name of the source
+		target = path.join(target, path.basename(source));
 	}
 
-	fs.rename(oldPath, targetPath, err => {
-		if (err) {throw err};
-	})
+	try{
+		var stat = fs.lstatSync(source)
+		if(stat.isSymbolicLink()){
 
+			var real_path = fs.realpathSync(source)
+			real_path = path.relative(path.dirname(target), real_path)
+
+			if(target.indexOf(source) == 0){
+				return Boom.forbidden("You are moving a shared folder into one of the sub folders")
+			}else{
+				fs.symlinkSync(real_path, target)
+				fs.unlinkSync(source)	
+			}
+
+		}else{
+			var real_source = fs.realpathSync(source)
+
+			if(real_source.indexOf(credentials.email) == -1 && real_target.indexOf(credentials.email) != -1){
+				//This means the file is shared and it should not be moved but it can be copied
+				return copyFiles(real_source, target)
+			}else{
+				if(!fs.existsSync(target)){
+					fs.renameSync(source, target)		
+				}else{
+					return Boom.conflict("File exists!")
+				}
+			}
+		}
+	}catch(e){
+		console.error(e);
+		return Boom.boomify(e)
+	}	
+
+	
   	return true
-
   }
 
-
-  handler.getscript = async(req, h) => {
-	var view = '_design/tasksInfos/_view/tasksInfos';
+  handler.getSoftware = async(req, h) => {
+	var view = '_design/software/_view/softwarePatterns';
 	var query = {
 		include_docs: true
 	}
@@ -435,7 +384,7 @@ module.exports = function (server, conf) {
   }
 
 
-  handler.uploadscript = async(req, h) => {
+  handler.uploadSoftware = async(req, h) => {
   	var {payload} = req
 
 	return server.methods.dcbia.uploadDocuments(payload);
@@ -444,30 +393,12 @@ module.exports = function (server, conf) {
 
   handler.deleteSoftware = async(req, h) => {
   	const {payload} = req
-	var view = '_design/tasksInfos/_view/tasksInfos';
-	var query = {
-		include_docs: true
-	}
 
-	return server.methods.dcbia.getViewQs(view, query)
-	.then((res)=>{
-		var docs = _.pluck(res, 'doc');
 
-		var software = _.filter(docs, (doc) => {
-			return doc.scriptname == payload
-		})
-
-		return server.methods.dcbia.deleteDocument(software[0])
-		.then((res) => {
-			return true
-		})
-
+	return server.methods.dcbia.deleteDocument(payload)
+	.then((res) => {
+		return true
 	})
-
-
-
-
-  	return true
   }
 
 
