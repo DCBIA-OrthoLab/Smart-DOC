@@ -7,6 +7,9 @@ import {Home, User, Users, Cpu, Settings, LogOut, LogIn, File, FilePlus} from 'r
 import NavDropdown from 'react-bootstrap/NavDropdown';
 import Navbar from 'react-bootstrap/Navbar';
 import Nav from 'react-bootstrap/Nav';
+import Container from 'react-bootstrap/Container';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
 import Image from 'react-bootstrap/Image';
 
 class NavBar extends Component{
@@ -80,25 +83,41 @@ class NavBar extends Component{
     const self = this;
     const {user} = self.props;
 
-    return (<Navbar bg="light" expand="lg">
-      <Navbar.Brand href="#/"><Image src="images/icon.png" style={{height: "10vh"}}/></Navbar.Brand>
-      <Navbar.Toggle aria-controls="basic-navbar-nav" />
-      <Navbar.Collapse id="basic-navbar-nav">
-        <Nav className="mr-auto">
-          <Nav.Link><Link class="nav-link" to="/home"><Home/> Home</Link>
-          </Nav.Link>
-            {self.getUpload()}
-            {self.getCreatetask()}
-            {self.getComputing()}
-          <Nav.Link>
-            {self.getSettings()}
-          </Nav.Link>
-          <Nav.Link>
-            {self.getUserDropDown()}
-          </Nav.Link>
-        </Nav>
-      </Navbar.Collapse>
-    </Navbar>);               
+    return (
+    <Container fluid="true">
+      <Row>
+        <Col class="title">
+          <h2>
+            <font color="#002855">
+            <font color="#ffcb0b">D
+            </font>ata <font color="#ffcb0b">S
+            </font>torage for <font color="#ffcb0b">C
+            </font>omputation and <font color="#ffcb0b">I
+            </font>ntegration</font>
+          </h2>
+        </Col>
+      </Row>
+      <Navbar bg="light" expand="lg">
+        <Navbar.Brand href="#/"><Image src="images/icon.png" style={{height: "10vh"}}/></Navbar.Brand>
+        <Navbar.Toggle aria-controls="basic-navbar-nav" />
+        <Navbar.Collapse id="basic-navbar-nav">
+          <Nav className="mr-auto">
+            <Nav.Link><Link class="nav-link" to="/home"><Home/> Home</Link>
+            </Nav.Link>
+              {self.getUpload()}
+              {self.getCreatetask()}
+              {self.getComputing()}
+            <Nav.Link>
+              {self.getSettings()}
+            </Nav.Link>
+            <Nav.Link>
+              {self.getUserDropDown()}
+            </Nav.Link>
+          </Nav>
+        </Navbar.Collapse>
+      </Navbar>
+    </Container>
+    );
 
   }
 }

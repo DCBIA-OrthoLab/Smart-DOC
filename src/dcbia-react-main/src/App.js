@@ -19,7 +19,7 @@ import { connect } from "react-redux";
 import axios from 'axios';
 import store from "./redux/store";
 
-import {DcbiaReactProjects, DcbiaReactMorphologicalData, DcbiaReactClinicalData, DcbiaReactFilebrowser, DcbiaReactCreateTask} from 'dcbia-react-lib'
+import {DcbiaReactProjects, DcbiaReactMorphologicalData, DcbiaReactClinicalData, DcbiaReactFilebrowser, DcbiaReactCreateTask, DcbiaReactService} from 'dcbia-react-lib'
 import {ClusterpostJobs, ClusterpostTokens, ClusterpostDashboard} from 'clusterpost-list-react'
 import {MedImgSurf} from 'react-med-img-viewer';
 
@@ -58,6 +58,9 @@ class App extends Component {
     const jwtauth = new JWTAuthService();
     jwtauth.setHttp(http);
 
+    self.dcbiareactservice = new DcbiaReactService();
+    self.dcbiareactservice.setHttp(http);
+
     http({
       method: 'GET',
       url: '/surf/condyle.vtk',
@@ -67,19 +70,35 @@ class App extends Component {
       self.setState({...self.state, landingVtk: res.data});
     })
 
-    Promise.all([jwtauth.getUser(), jwtauth.getUsers()])
-    .then(function(result){
-      var user = result[0];
-      var users = result[1];
-
-      self.setState({...self.state, user: user, showLogin: false, users: users.data});
-      
+    jwtauth.getUser()
+    .then((user)=>{
       store.dispatch({
         type: 'user-factory', 
         user: user
       });
-
-    });    
+      self.setState({user: user, showLogin: false})
+    })
+    .catch((e)=>{
+      console.error(e)
+    })
+    .then(()=>{
+      return self.dcbiareactservice.getUsers()
+      .then((dsciUsers)=>{
+        self.setState({...self.state, dsciUsers: dsciUsers.data});
+      })
+      .catch((e)=>{
+        console.error(e);
+      })
+    })
+    .then(()=>{
+      return jwtauth.getUsers()
+      .then((users)=>{
+        self.setState({...self.state, users: users.data});
+      })
+      .catch((e)=>{
+        console.error(e)
+      })
+    })
       
   }
 
@@ -122,13 +141,17 @@ class App extends Component {
 
   showFilebrowser(){
     return (
-      <DcbiaReactFilebrowser users={this.state.users} />
+      <Container fluid="true">
+        <DcbiaReactFilebrowser users={this.state.dsciUsers} />
+      </Container>
     )
   }
 
   showCreatetask(){
     return (
-      <DcbiaReactCreateTask/>
+      <Container fluid="true">
+        <DcbiaReactCreateTask/>
+      </Container>
     )
   }
 
@@ -187,22 +210,6 @@ class App extends Component {
 
     render() {
       return (
-        <div>
-        <div className="App">
-          <div> 
-            <div class="title">
-              <h3 id="title">
-                <font color="#002855">
-                <font color="#ffcb0b">D
-                </font>ata <font color="#ffcb0b">S
-                </font>torage for <font color="#ffcb0b">C
-                </font>omputation and <font color="#ffcb0b">I
-                </font>ntegration</font>
-              </h3>
-            </div>
-          </div>  
-        </div>
-
         <HashRouter>
           <header className="App-header">
             <NavBar/>
@@ -221,7 +228,6 @@ class App extends Component {
             <Route exact path="/" component={this.showLanding.bind(this)}/>
           </Container> 
         </HashRouter>
-        </div>
       )
     }
   }
