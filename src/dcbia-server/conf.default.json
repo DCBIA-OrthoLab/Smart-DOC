@@ -1,0 +1,58 @@
+{
+      "host": "localhost",
+      "port": 8180,
+      "tls": {
+        "key": "/path/to/key",
+       	"cert": "/path/to/cert"
+       },
+	"plugins": {
+		"@hapi/vision": {},
+		"@hapi/inert": {},
+		"lout": {},
+		"@hapi/h2o2": {},
+		"@juanprietob/hapi-auth-jwt": {},
+		"hapi-jwt-couch": {
+			"privateKey": "some-key",
+			"saltRounds": 10,
+			"algorithm": { 
+				"algorithm": "HS256"
+			},
+			"algorithms": { 
+				"algorithms": [ "HS256" ] 
+			},
+			"mailer": {
+				"nodemailer": "nodemailer-stub-transport",
+				"from": "DSCI <dcbiaortholab@gmail.com>",
+				"message": "Hello @USERNAME@,<br>Somebody asked me to send you a link to reset your password, hopefully it was you.<br>Follow this <a href='@SERVER@/#/login/reset?token=@TOKEN@'>link</a> to reset your password.<br>The link will expire in 30 minutes.<br>Bye.",
+				"uri": "https://dsci.dent.umich.edu"
+			},
+			"userdb" : {
+				"hostname": "http://localhost:5984",
+				"database": "dsci"
+			}
+		},
+		"couch-provider": {
+			"default" : "dsci",
+			"dsci" : {
+				"hostname": "http://localhost:5984",
+				"database": "dsci",
+				"datapath": "./data/dcbia-couchdb"
+			},
+			"namespace": ["dcbia", "clusterprovider"]
+		},
+		"clusterpost-provider": {
+			"local_storage": "./data/dcbia-filebrowser",
+			"executionservers" : {
+				"compute-node": {
+					"remote": true
+				}
+			}
+		},
+		"dcbia-model": {},
+		"dcbia-filebrowser": {
+			"datapath": "./data/dcbia-filebrowser"
+		},
+		"dcbia-ortholab": {}
+	}
+}
+
