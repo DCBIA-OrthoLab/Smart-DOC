@@ -1,6 +1,6 @@
 {
   "name": "dcbia-server",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Main starting script for dcbia-server application shiny-tooth",
   "main": "index.js",
   "scripts": {
@@ -31,7 +31,7 @@
     "@hapi/inert": "^5.2.2",
     "@hapi/vision": "^5.5.2",
     "@juanprietob/hapi-auth-jwt": "github:juanprietob/hapi-auth-jwt#master",
-    "clusterpost-provider": "^4.4.1",
+    "clusterpost-provider": "^4.4.2",
     "couch-provider": "^3.0.1",
     "couch-update-views": "^1.0.9",
     "dcbia-filebrowser": "file:../dcbia-filebrowser",
