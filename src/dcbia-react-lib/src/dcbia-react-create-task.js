@@ -27,7 +27,7 @@ class CreateTask extends Component {
 			runDisabled: true,
 			showFiles: false,
 			showSavePattern: false,
-			scriptsInfos: [],
+			softwares: [],
 			showInfosScript: false,
 			manageScript: true,
 			jobName: "",
@@ -59,12 +59,11 @@ class CreateTask extends Component {
 		self.clusterpostservice = new ClusterpostService();
 		self.clusterpostservice.setHttp(self.props.http);
 
-		self.getScriptInfos()
+		self.getSofwares()
 	}
 
 	selectScript(script) {
 		const self = this
-		const {scriptsInfos} = self.state
 
 		self.setState({
 			selectedSoftware: script
@@ -124,9 +123,6 @@ class CreateTask extends Component {
 				}	
 			})
 		}
-			
-
-		console.log(pattern_matches)
 
 		var sub_matches = _.map(tree, (t)=>{
 			if(t.type == "d"){
@@ -221,7 +217,6 @@ class CreateTask extends Component {
 		const self = this;
 		const {jobs} = self.state;
 		return Promise.map(jobs, (job)=>{
-			console.log(job)
 			if(job.inputs.length > 0){
 				return self.clusterpostservice.createAndSubmitJob(job)	
 			}
@@ -271,7 +266,7 @@ class CreateTask extends Component {
 					{selectedSoftware.description}
 				</Modal.Body>
 				<Modal.Footer>
-						<Button variant="danger" onClick={() => {self.dcbiareactservice.deleteSoftware(selectedSoftware); self.setState({showInfosScript: false, selectedSoftware: "none"})}}>
+						<Button variant="danger" onClick={() => {self.dcbiareactservice.deleteSoftware(selectedSoftware).then(()=>{self.getSofwares()}); self.setState({showInfosScript: false, selectedSoftware: "none"})}}>
 							<XCircle/> Delete software
 						</Button>
 				</Modal.Footer>
@@ -279,25 +274,23 @@ class CreateTask extends Component {
 		)
 	}
 
-	getScriptInfos() {
+	getSofwares() {
 		const self = this
-		var scriptsInfos = []
+		var softwares = []
 
 		self.dcbiareactservice.getSoftware()
 		.then(res => {
-			res.data.forEach(script => {
-				scriptsInfos.push(script)
-			})
-			self.setState({scriptsInfos: scriptsInfos})
+			self.setState({softwares: res.data})
 		})
 	}
 
-	uploadScriptInfos() {
+	saveSoftware() {
 		const self = this
-		const {newSoftware} = self.state
+		var {newSoftware} = self.state
 
 		if (newSoftware.description==""
 			|| newSoftware.command==""
+			|| (!newSoftware.patterns) 
 			|| newSoftware.patterns.length==0) {
 			return false
 		} else {
@@ -306,7 +299,14 @@ class CreateTask extends Component {
 
 			return self.dcbiareactservice.uploadSoftware(newSoftware)
 			.then(()=>{
-				self.setState({newSoftware: {}})	
+				newSoftware = {
+					name: "",
+					description: "",
+					command: "",
+					patterns: []
+				}
+				self.setState({newSoftware})
+				return self.getSofwares()
 			})
 		}
 	}
@@ -428,7 +428,7 @@ class CreateTask extends Component {
 									<Nav.Link eventKey="softwareTab" onClick={()=>{self.setState({...self.state, activeKey: "softwareTab"})}}>Software</Nav.Link>
 								</Nav.Item>
 								<Nav.Item>
-									<Nav.Link eventKey="createSoftwareTab" onClick={()=>{self.setState({...self.state, activeKey: "createSoftwareTab"})}}>Create new software</Nav.Link>
+									<Nav.Link eventKey="createSoftwareTab" onClick={()=>{self.setState({...self.state, activeKey: "createSoftwareTab"})}}>Create/Edit software</Nav.Link>
 								</Nav.Item>
 							</Nav>
 						</Col>
@@ -456,7 +456,7 @@ class CreateTask extends Component {
 
 	chooseSoftware() {
 		const self = this
-		const {selectedSoftware, scriptsInfos, runDisabled} = self.state
+		const {selectedSoftware, softwares, runDisabled} = self.state
 
 		return (
 			<ButtonGroup>
@@ -466,8 +466,8 @@ class CreateTask extends Component {
 				  </Dropdown.Toggle>
 				  <Dropdown.Menu>
 			  		{
-			  			_.map(scriptsInfos, (script) =>{
-			  					return (<Dropdown.Item onClick={(e) => self.selectScript(script)}>{script.name}</Dropdown.Item>)
+			  			_.map(softwares, (software) =>{
+			  					return (<Dropdown.Item onClick={(e) => self.selectScript(software)}>{software.name}</Dropdown.Item>)
 			  				}
 			  			)
 			  		}
@@ -488,51 +488,30 @@ class CreateTask extends Component {
 
 	createNewExecutable() {
 		const self = this
-		const {newFlag, newSoftware} = self.state
+		var {newSoftware} = self.state
 		
 		return (
 			<Col>
 				
-				<Form>
+				<Form onSubmit={(e) => {self.saveSoftware()}}>
 					<Form.Row>
-						<Col>
-							<Form.Control value={newSoftware.name} placeholder="name" type="text" autoComplete="off" onChange={(e) => {newSoftware.name = e.target.value; self.setState({...self.state, newSoftware})}}/>
-						</Col>
-						<Col>
-							<Form.Control value={newSoftware.description} placeholder="description" type="text" autoComplete="off" onChange={(e) => {newSoftware.description = e.target.value; self.setState({...self.state, newSoftware})}}/>
-						</Col>
+						<Form.Control value={newSoftware.name} placeholder="name" type="text" autoComplete="off" onChange={(e) => {newSoftware.name = e.target.value; self.setState({newSoftware})}}/>
+						<Form.Control value={newSoftware.description} placeholder="description" type="text" autoComplete="off" onChange={(e) => {newSoftware.description = e.target.value; self.setState({newSoftware})}}/>
 					</Form.Row>
 					<Form.Row>
-						<Button variant="primary" onClick={() => self.addParam()}> add parameter</Button>
-						<Col>
-							<Form.Check value={newFlag.appendMatchDir} label="Append match dir" type="checkbox" onChange={(e) => {newFlag.appendMatchDir = e.target.checked; self.setState({...self.state, newFlag})}}/>
-						</Col>
-						<Col>
-							<Form.Control value={newFlag.flag} placeholder="flag" type="text" autoComplete="off" onChange={(e) => {newFlag.flag = e.target.value; self.setState({...self.state, newFlag})}}/>
-						</Col>
-						<Col>
-							<Form.Control value={newFlag.pattern} placeholder="pattern" type="text" autoComplete="off" onChange={(e) => {newFlag.pattern = e.target.value; self.setState({...self.state, newFlag})}}/>
-						</Col>
-						<Col>
-							<Form.Control value={newFlag.value} placeholder="value" type="text" autoComplete="off" onChange={(e) => {newFlag.value = e.target.value; self.setState({...self.state, newFlag})}}/>
-						</Col>
-						<Col>
-							<Form.Control value={newFlag.suffix} placeholder="suffix" type="text" autoComplete="off" onChange={(e) => {newFlag.suffix = e.target.value; self.setState({...self.state, newFlag})}}/>
-						</Col>
-						<Col>
-							<Form.Control value={newFlag.prefix} placeholder="prefix" type="text" autoComplete="off" onChange={(e) => {newFlag.prefix = e.target.value; self.setState({...self.state, newFlag})}}/>
-						</Col>
+						<Form.Control value={newSoftware.command} placeholder="executable" type="text" autoComplete="off" onChange={(e) => {newSoftware.command = e.target.value; self.setState({newSoftware})}}/>
 					</Form.Row>
-
 					<Form.Row>
-						<Form.Control value={newSoftware.command} placeholder="executable" type="text" autoComplete="off" onChange={(e) => {newSoftware.command = e.target.value; self.setState({...self.state, newSoftware})}}/>
-						<Button className="mt-1 mb-1 ml-2 mr-2" disabled={newSoftware.command==""} size="sm" variant="success" onClick={() => self.uploadScriptInfos()}> Save software </Button>
+						<ButtonGroup>
+							<Button variant="primary" onClick={() => self.addParam()}> add parameter</Button>
+							<Button disabled={newSoftware.command==""} variant="success" type="submit"> Save software </Button>
+						</ButtonGroup>
 					</Form.Row>
 				</Form>
 				<Row>
 					<Alert variant="info">
 						<Alert.Heading>Software parameters</Alert.Heading>
-						<InputGroup className="mt-1 mb-1 ml-2 mr-2">
+						<InputGroup>
 							{
 								_.map(newSoftware.patterns, (p)=>{
 									return (
@@ -556,11 +535,19 @@ class CreateTask extends Component {
 
 	addParam() {
 		const self = this
-		const {newFlag} = self.state
 		var {newSoftware} = self.state
 
+		var newFlag = {
+			appendMatchDir: false,
+			flag: "",
+			pattern: "",
+			value: "",
+			suffix: "",
+			prefix: ""
+		}
+
 		newSoftware.patterns.push({...newFlag, position: newSoftware.patterns.length})
-		self.setState({...self.state, newSoftware: newSoftware, newFlag: {}})
+		self.setState({...self.state, newSoftware: newSoftware})
 
 	}
 
