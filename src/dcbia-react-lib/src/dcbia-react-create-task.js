@@ -159,6 +159,10 @@ class CreateTask extends Component {
 				return self.clusterpostservice.parseCLI(cmd)
 				.then((job)=>{
 
+					job.data = {
+						software_id: selectedSoftware._id
+					}
+
 					job.inputs = _.map(zm, (m)=>{
 						if(m && m.type == 'f'){
 							return {
