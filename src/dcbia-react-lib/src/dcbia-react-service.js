@@ -352,30 +352,4 @@ export default class DcbiaReactService {
   });
  }
 
- uploadSoftware(infos) {
-  return this.http({
-    method: 'POST',
-    url: '/dcbia/uploadSoftware',
-    data: infos
-  });
- }
-
- getSoftware() {
-  return this.http({
-    method: 'GET',
-    url: '/dcbia/getSoftware',
-  });
- }
-
- deleteSoftware(name) {
-  return this.http({
-    method: 'DELETE',
-    url: '/dcbia/deleteSoftware',
-    data: name
-  });
- }
-
-
-
-
 }

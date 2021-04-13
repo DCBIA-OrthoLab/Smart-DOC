@@ -1,6 +1,6 @@
 {
   "name": "dcbia-react-lib",
-  "version": "2.0.1",
+  "version": "2.1.0",
   "description": "",
   "author": "",
   "license": "MIT",
@@ -56,7 +56,7 @@
     "dist"
   ],
   "dependencies": {
-    "clusterpost-list-react": "^1.4.1",
+    "clusterpost-list-react": "^1.5.1",
     "jszip": "^3.4.0",
     "mkdirp": "^0.5.1",
     "underscore": "^1.9.1"

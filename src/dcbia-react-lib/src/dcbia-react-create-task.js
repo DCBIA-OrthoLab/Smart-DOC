@@ -6,7 +6,7 @@ import {Edit2, X, ChevronDown, ChevronUp, HelpCircle, XCircle} from 'react-feath
 import DcbiaReactFilebrowser from './dcbia-react-filebrowser'
 import DcbiaReactService from './dcbia-react-service'
 
-import {ClusterpostService} from 'clusterpost-list-react'
+import {ClusterpostService, ClusterpostSoftware} from 'clusterpost-list-react'
 
 const _ = require('underscore');
 const Promise = require('bluebird');
@@ -59,15 +59,7 @@ class CreateTask extends Component {
 		self.clusterpostservice = new ClusterpostService();
 		self.clusterpostservice.setHttp(self.props.http);
 
-		self.getSofwares()
-	}
-
-	selectScript(script) {
-		const self = this
-
-		self.setState({
-			selectedSoftware: script
-		})
+		self.getSoftwares()
 	}
 
 	match(f, p){
@@ -266,7 +258,7 @@ class CreateTask extends Component {
 					{selectedSoftware.description}
 				</Modal.Body>
 				<Modal.Footer>
-						<Button variant="danger" onClick={() => {self.dcbiareactservice.deleteSoftware(selectedSoftware).then(()=>{self.getSofwares()}); self.setState({showInfosScript: false, selectedSoftware: "none"})}}>
+						<Button variant="danger" onClick={() => {self.clusterpostservice.deleteSoftware(selectedSoftware).then(()=>{self.getSoftwares()}); self.setState({showInfosScript: false, selectedSoftware: "none"})}}>
 							<XCircle/> Delete software
 						</Button>
 				</Modal.Footer>
@@ -274,41 +266,13 @@ class CreateTask extends Component {
 		)
 	}
 
-	getSofwares() {
+	getSoftwares() {
 		const self = this
-		var softwares = []
 
-		self.dcbiareactservice.getSoftware()
+		self.clusterpostservice.getSoftware()
 		.then(res => {
 			self.setState({softwares: res.data})
 		})
-	}
-
-	saveSoftware() {
-		const self = this
-		var {newSoftware} = self.state
-
-		if (newSoftware.description==""
-			|| newSoftware.command==""
-			|| (!newSoftware.patterns) 
-			|| newSoftware.patterns.length==0) {
-			return false
-		} else {
-			
-			newSoftware.type = "software"
-
-			return self.dcbiareactservice.uploadSoftware(newSoftware)
-			.then(()=>{
-				newSoftware = {
-					name: "",
-					description: "",
-					command: "",
-					patterns: []
-				}
-				self.setState({newSoftware})
-				return self.getSofwares()
-			})
-		}
 	}
 
 	getJobListItem(job){
@@ -467,7 +431,11 @@ class CreateTask extends Component {
 				  <Dropdown.Menu>
 			  		{
 			  			_.map(softwares, (software) =>{
-			  					return (<Dropdown.Item onClick={(e) => self.selectScript(software)}>{software.name}</Dropdown.Item>)
+			  					return (<Dropdown.Item onClick={(e) => {
+			  						self.setState({
+			  							selectedSoftware: software
+			  						})
+			  					}}>{software.name}</Dropdown.Item>)
 			  				}
 			  			)
 			  		}
@@ -491,64 +459,8 @@ class CreateTask extends Component {
 		var {newSoftware} = self.state
 		
 		return (
-			<Col>
-				
-				<Form onSubmit={(e) => {self.saveSoftware()}}>
-					<Form.Row>
-						<Form.Control value={newSoftware.name} placeholder="name" type="text" autoComplete="off" onChange={(e) => {newSoftware.name = e.target.value; self.setState({newSoftware})}}/>
-						<Form.Control value={newSoftware.description} placeholder="description" type="text" autoComplete="off" onChange={(e) => {newSoftware.description = e.target.value; self.setState({newSoftware})}}/>
-					</Form.Row>
-					<Form.Row>
-						<Form.Control value={newSoftware.command} placeholder="executable" type="text" autoComplete="off" onChange={(e) => {newSoftware.command = e.target.value; self.setState({newSoftware})}}/>
-					</Form.Row>
-					<Form.Row>
-						<ButtonGroup>
-							<Button variant="primary" onClick={() => self.addParam()}> add parameter</Button>
-							<Button disabled={newSoftware.command==""} variant="success" type="submit"> Save software </Button>
-						</ButtonGroup>
-					</Form.Row>
-				</Form>
-				<Row>
-					<Alert variant="info">
-						<Alert.Heading>Software parameters</Alert.Heading>
-						<InputGroup>
-							{
-								_.map(newSoftware.patterns, (p)=>{
-									return (
-										<InputGroup>
-											<Form.Check value={p.appendMatchDir} defaultChecked={p.appendMatchDir} label="Append match dir" type="checkbox" onChange={(e) => {p.appendMatchDir = e.target.checked; self.setState({...self.state, newSoftware})}}/>
-											<FormControl value={p.flag} placeholder="flag" type="text" autoComplete="off" onChange={(e) => {p.flag = e.target.value; self.setState({...self.state, newSoftware}) }}/>
-											<FormControl value={p.pattern} placeholder="pattern" type="text" autoComplete="off" onChange={(e) => {p.pattern = e.target.value; self.setState({...self.state, newSoftware}) }}/>
-											<FormControl value={p.value} placeholder="value" type="text" autoComplete="off" onChange={(e) => {p.value = e.target.value; self.setState({...self.state, newSoftware}) }}/>
-											<FormControl value={p.suffix} placeholder="suffix" type="text" autoComplete="off" onChange={(e) => {p.suffix = e.target.value; self.setState({...self.state, newSoftware}) }}/>
-											<FormControl value={p.prefix} placeholder="prefix" type="text" autoComplete="off" onChange={(e) => {p.prefix = e.target.value; self.setState({...self.state, newSoftware}) }}/>
-										</InputGroup>
-									)
-								})
-							}
-						</InputGroup>
-					</Alert>
-				</Row>
-			</Col>
+			<ClusterpostSoftware newSoftware={newSoftware}/>
 		)
-	}
-
-	addParam() {
-		const self = this
-		var {newSoftware} = self.state
-
-		var newFlag = {
-			appendMatchDir: false,
-			flag: "",
-			pattern: "",
-			value: "",
-			suffix: "",
-			prefix: ""
-		}
-
-		newSoftware.patterns.push({...newFlag, position: newSoftware.patterns.length})
-		self.setState({...self.state, newSoftware: newSoftware})
-
 	}
 
 	getFileManager(){
