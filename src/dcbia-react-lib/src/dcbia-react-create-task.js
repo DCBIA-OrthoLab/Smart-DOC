@@ -149,9 +149,9 @@ class CreateTask extends Component {
 							var dirname = path.dirname(m.path)
 							var filename = path.basename(m.path)
 							var ext = path.extname(filename)
-							return [m.flag, "\"" + path.join(email, dirname, prefix + filename.replace(ext, "") + suffix + ext) + "\""]
+							return [m.flag, path.join(email, dirname, prefix + filename.replace(ext, "") + suffix + ext)]
 						}else if(m.value){
-							return [m.flag, "\"" + prefix + m.value + suffix + "\""]
+							return [m.flag, prefix + m.value + suffix]
 						}
 					}
 				})))]
