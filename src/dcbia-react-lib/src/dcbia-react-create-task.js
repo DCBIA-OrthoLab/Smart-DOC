@@ -175,17 +175,17 @@ class CreateTask extends Component {
 					job.inputs = _.compact(job.inputs)
 
 					//find the smallest common directory
-					var target_path = _.reduce(zm, (mem, m)=>{
-						if(m && m.type == 'f'){
-							var dirname = path.dirname(m.path)
-							if(dirname.length < mem || mem == ''){
-								return dirname
-							}
-						}
-						return mem
-					}, '')
+					// var target_path = _.reduce(zm, (mem, m)=>{
+					// 	if(m && m.type == 'f'){
+					// 		var dirname = path.dirname(m.path)
+					// 		if(dirname.length < mem || mem == ''){
+					// 			return dirname
+					// 		}
+					// 	}
+					// 	return mem
+					// }, '')
 
-					target_path = email + '/' + target_path
+					var target_path = './'
 
 					job.outputs.push({
 						type: 'directory',
