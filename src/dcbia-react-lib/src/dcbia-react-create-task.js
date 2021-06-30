@@ -104,10 +104,10 @@ class CreateTask extends Component {
 		if(max_matches && max_matches.matches && max_matches.matches.length > 0){
 			max_matches = max_matches.matches.length
 			_.each(patterns, (p, key)=>{
-				if(p.value){
-					var value_match = p.value
+				if(p.value || p.appendMatchDir){
+					var value_match = p.value? p.value: ""
 					if(p.appendMatchDir && current_dir){
-						value_match = path.join(current_dir, value_match)
+						value_match = path.join(current_dir, value_match).trim()
 						pattern_matches[key]["matches"] = _.map(_.range(max_matches), ()=>{return {...p, type: 'v', path: value_match}})
 					}else{
 						pattern_matches[key]["matches"] = _.map(_.range(max_matches), ()=>{return {...p, type: 'v'}})
