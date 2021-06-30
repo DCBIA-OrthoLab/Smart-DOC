@@ -357,11 +357,12 @@ class CreateTask extends Component {
 							<Button variant="outline-info">{selectedSoftware.command}</Button>
 							{
 								_.compact(_.map(patterns, (p, idx)=>{
-									if(p.value != ""){
+									if(p.value && p.value != ""){
 										return (<Button onClick={()=>{
 											self.setState({showPopupFileSelect: true, pattenrs_idx: idx})
 										}}>{p.flag + " " + p.value} <File/></Button>)
 									}
+									return null
 								}))
 							}
 						</Alert>
