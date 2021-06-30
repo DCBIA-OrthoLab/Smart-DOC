@@ -360,7 +360,7 @@ class CreateTask extends Component {
 									if(p.value && p.value != ""){
 										return (<Button onClick={()=>{
 											self.setState({showPopupFileSelect: true, pattenrs_idx: idx})
-										}}>{p.flag + " " + p.value} <File/></Button>)
+										}}>{(p.flag? p.flag:"")+ " " + p.value} <File/></Button>)
 									}
 									return null
 								}))
