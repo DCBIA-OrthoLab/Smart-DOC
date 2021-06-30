@@ -820,7 +820,7 @@ class Filebrowser extends Component {
 			<Row>
 				<Col>
 					<Dropdown
-						draggable={!self.props.createtask}
+						draggable={true}
 						onDrag={(e) => self.handleDrag(e)}
 						onDragStart={(e) => self.handleDragStart(e,f)}
 						onDrop={(e) => self.handleDrop(e,f)}

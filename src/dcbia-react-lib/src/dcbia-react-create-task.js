@@ -2,7 +2,7 @@ import React, {Component} from 'react'
 
 import { connect } from "react-redux";
 import {Accordion, ListGroup, Container, Button, Table, Card, Col, Row, DropdownButton, Dropdown, Form, Modal, Alert, OverlayTrigger, Overlay, Tooltip, Popover, Badge, ButtonToolbar, ButtonGroup, InputGroup, FormControl, Spinner, Navbar, Nav, Breadcrumb, ProgressBar, Collapse, Tabs, Tab} from 'react-bootstrap'
-import {Edit2, X, ChevronDown, ChevronUp, HelpCircle, XCircle} from 'react-feather'
+import {Edit2, X, ChevronDown, ChevronUp, HelpCircle, XCircle, File} from 'react-feather'
 import DcbiaReactFilebrowser from './dcbia-react-filebrowser'
 import DcbiaReactService from './dcbia-react-service'
 
@@ -342,6 +342,35 @@ class CreateTask extends Component {
 		}</ListGroup.Item>)
 	}
 
+	getGlobalSoftwareDefinition(){
+		const self = this
+		const {selectedSoftware} = self.state
+
+		var patterns = selectedSoftware.patterns
+
+		if(patterns){
+			return (
+				<Row>
+					<Col>
+						<Alert className="mt-3" style={{borderColor: "#1b273e", borderWidth: 3, borderRadius: 10}} >
+							<Alert.Heading>Edit values globally for generated tasks</Alert.Heading>
+							<Button variant="outline-info">{selectedSoftware.command}</Button>
+							{
+								_.compact(_.map(patterns, (p, idx)=>{
+									if(p.value != ""){
+										return (<Button onClick={()=>{
+											self.setState({showPopupFileSelect: true, pattenrs_idx: idx})
+										}}>{p.flag + " " + p.value} <File/></Button>)
+									}
+								}))
+							}
+						</Alert>
+					</Col>
+				</Row>
+			)
+		}
+	}
+
 	getJobsList() {
 		const self = this
 		const {jobs} = self.state
@@ -472,6 +501,36 @@ class CreateTask extends Component {
 		return <DcbiaReactFilebrowser createtask={true} startCreatetask={(filesMap)=>{self.startCreatetask(filesMap)}} />
 	}
 
+	popUpFileSelect() {
+		const self = this
+		var {showPopupFileSelect, pattenrs_idx, selectedSoftware} = self.state
+		const {user} = self.props
+
+		return (
+			
+			<Modal show={self.state.showPopupFileSelect} onHide={() => this.setState({showPopupFileSelect: false})}>
+				<Modal.Header closeButton>
+					<Modal.Title>Select file</Modal.Title>  
+				</Modal.Header>
+
+				<Modal.Body>
+					<DcbiaReactFilebrowser createtask={true} startCreatetask={(filesMap)=>{
+						if(_.keys(filesMap).length > 0){
+							selectedSoftware.patterns[pattenrs_idx].value = path.join(user.email, filesMap[_.keys(filesMap)[0]].path)
+						}
+						self.setState({showPopupFileSelect: false, selectedSoftware})
+						
+					}} />
+				</Modal.Body>
+				<Modal.Footer>
+					<Button variant="danger" onClick={() => this.setState({showPopupFileSelect: false})} >
+						Close
+					</Button>
+				</Modal.Footer>
+			</Modal>
+		)
+	}
+
 	render() {
 		const self = this
 		const {createTask} = self.state
@@ -480,9 +539,10 @@ class CreateTask extends Component {
 				
 				{this.state.showInfosScript ? this.popUpInfosScript() : null}
 				{self.manageTasks()}
+				{self.getGlobalSoftwareDefinition()}
 				{self.getJobsList()}
 				{self.getFileManager()}
-					
+				{self.popUpFileSelect()}
 			</Container>
 		)
 	}
