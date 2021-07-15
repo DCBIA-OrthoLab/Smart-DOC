@@ -174,16 +174,15 @@ class CreateTask extends Component {
 
 					job.inputs = _.compact(job.inputs)
 
-					//find the smallest common directory
-					// var target_path = _.reduce(zm, (mem, m)=>{
-					// 	if(m && m.type == 'f'){
-					// 		var dirname = path.dirname(m.path)
-					// 		if(dirname.length < mem || mem == ''){
-					// 			return dirname
-					// 		}
-					// 	}
-					// 	return mem
-					// }, '')
+					_.each(selectedSoftware.patterns, (p)=>{
+						if(p.selectedFile){
+							job.inputs.push({
+								name: path.join(user.email, p.selectedFile.path),
+								local_storage: true,
+								type: p.selectedFile.type
+							})
+						}
+					})
 
 					var target_path = './'
 
@@ -518,6 +517,7 @@ class CreateTask extends Component {
 					<DcbiaReactFilebrowser createtask={true} startCreatetask={(filesMap)=>{
 						if(_.keys(filesMap).length > 0){
 							selectedSoftware.patterns[pattenrs_idx].value = path.join(user.email, filesMap[_.keys(filesMap)[0]].path)
+							selectedSoftware.patterns[pattenrs_idx].selectedFile = filesMap[_.keys(filesMap)[0]]
 						}
 						self.setState({showPopupFileSelect: false, selectedSoftware})
 						
