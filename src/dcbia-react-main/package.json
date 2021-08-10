@@ -1,6 +1,6 @@
 {
   "name": "dcbia-react-main",
-  "version": "2.2.4",
+  "version": "2.3.0",
   "private": true,
   "dependencies": {
     "axios": "^0.19.2",
@@ -13,11 +13,11 @@
     "react-dom": "^16.14.0",
     "react-dropzone": "^10.2.2",
     "react-feather": "^2.0.9",
-    "react-hapi-jwt-auth": "^1.1.4",
+    "react-hapi-jwt-auth": "^1.1.6",
     "react-redux": "^7.2.4",
     "react-router-dom": "^5.2.0",
     "react-scripts": "3.2.0",
-    "redux": "^4.1.0",
+    "redux": "^4.1.1",
     "underscore": "^1.13.1"
   },
   "devDependencies": {
