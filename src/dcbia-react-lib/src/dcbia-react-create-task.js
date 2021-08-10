@@ -1,7 +1,7 @@
 import React, {Component} from 'react'
 
 import { connect } from "react-redux";
-import {Accordion, ListGroup, Container, Button, Table, Card, Col, Row, DropdownButton, Dropdown, Form, Modal, Alert, OverlayTrigger, Overlay, Tooltip, Popover, Badge, ButtonToolbar, ButtonGroup, InputGroup, FormControl, Spinner, Navbar, Nav, Breadcrumb, ProgressBar, Collapse, Tabs, Tab} from 'react-bootstrap'
+import {Accordion, ListGroup, Container, Button, Table, Card, Col, Row, DropdownButton, Dropdown, Form, Modal, Alert, OverlayTrigger, Overlay, Tooltip, Popover, Badge, ButtonToolbar, ButtonGroup, InputGroup, FormControl, Spinner, Navbar, Nav, NavDropdown, Breadcrumb, ProgressBar, Collapse, Tabs, Tab} from 'react-bootstrap'
 import {Edit2, X, ChevronDown, ChevronUp, HelpCircle, XCircle, File} from 'react-feather'
 import DcbiaReactFilebrowser from './dcbia-react-filebrowser'
 import DcbiaReactService from './dcbia-react-service'
@@ -12,7 +12,6 @@ const _ = require('underscore');
 const Promise = require('bluebird');
 const normalize_path = require('normalize-path');
 const path = require('path');
-
 
 class CreateTask extends Component {
 	constructor(props) {
@@ -274,7 +273,30 @@ class CreateTask extends Component {
 
 		self.clusterpostservice.getSoftware()
 		.then(res => {
-			self.setState({softwares: res.data})
+
+			var software_groups = _.groupBy(res.data, (soft)=>{return soft.group})
+
+			software_groups = _.map(software_groups, (group, key)=>{
+				if(key != "undefined"){
+					return {
+						key,
+						items: _.map(_.groupBy(group, (soft)=>{return soft.subgroup}), (group, key)=>{
+							if(key != "undefined"){
+								return {
+									key,
+									items: [group]
+								}
+							}else{
+								return group
+							}
+						})
+					}
+				}else{
+					return group
+				}
+			})
+
+			self.setState({softwares: res.data, software_groups})
 		})
 	}
 
@@ -449,26 +471,71 @@ class CreateTask extends Component {
 		)
 	}
 
+	chooseSoftwareGroup(software_group){
+		const self = this
 
+		return (
+			<Dropdown className="mt-1 mb-1 ml-2 mr-2">
+			  <Dropdown.Toggle variant="" id="dropdown-sub">
+			    <i id="dropdown-sub-text">{software_group.key}</i>
+			  </Dropdown.Toggle>
+			  <Dropdown.Menu>
+		  		{
+		  			_.map(software_group.items, (software) =>{
+		  					if(_.isObject(software) && software.key && software.items){
+		  						return self.chooseSoftwareGroup(software)
+		  					}else{
+		  						return (_.map(software, (soft)=>{
+		  							return (<Dropdown.Item onClick={(e) => {
+			  							self.setState({
+			  								selectedSoftware: soft
+			  							})
+			  						}}>{soft.name}</Dropdown.Item>)
+		  						}))
+		  					}
+		  				}
+		  			)
+		  		}
+			  </Dropdown.Menu>
+			</Dropdown>
+		)
+	}
 
 	chooseSoftware() {
 		const self = this
-		const {selectedSoftware, softwares, runDisabled} = self.state
-
+		const {selectedSoftware, softwares, software_groups, runDisabled, showDrop} = self.state
+		
 		return (
 			<ButtonGroup>
-				<Dropdown className="mt-1 mb-1 ml-2 mr-2">
-				  <Dropdown.Toggle variant="info">
-				    <i>Select: {selectedSoftware.name}</i>
+				<Dropdown className="mt-1 mb-1 ml-2 mr-2"
+					show={showDrop}
+					onClick={(e)=>{
+						if(e.target.id == "dropdown-main" || e.target.id == "dropdown-text"){
+							self.setState({showDrop: !showDrop})
+						}else if(e.target && (e.target.tagName == "BUTTON" || e.target.tagName == "I")){
+							self.setState({showDrop: true})
+						}else{
+							self.setState({showDrop: false})
+						}
+					}}
+				>
+				  <Dropdown.Toggle variant="info" id="dropdown-main">
+				    <i id="dropdown-text">Select: {selectedSoftware.name}</i>
 				  </Dropdown.Toggle>
 				  <Dropdown.Menu>
 			  		{
-			  			_.map(softwares, (software) =>{
-			  					return (<Dropdown.Item onClick={(e) => {
-			  						self.setState({
-			  							selectedSoftware: software
-			  						})
-			  					}}>{software.name}</Dropdown.Item>)
+			  			_.map(software_groups, (software) =>{
+			  					if(_.isObject(software) && software.key && software.items){
+			  						return self.chooseSoftwareGroup(software)
+			  					}else{
+			  						return (_.map(software, (soft)=>{
+			  							return (<Dropdown.Item onClick={(e) => {
+				  							self.setState({
+				  								selectedSoftware: soft
+				  							})
+				  						}}>{soft.name}</Dropdown.Item>)
+			  						}))
+			  					}
 			  				}
 			  			)
 			  		}
