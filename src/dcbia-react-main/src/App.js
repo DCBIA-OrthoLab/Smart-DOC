@@ -71,11 +71,11 @@ class App extends Component {
     })
 
     jwtauth.getUser()
-    .then((user)=>{
-      store.dispatch({
+    .then((user)=>{store.dispatch({
         type: 'user-factory', 
         user: user
-      });
+      })
+      ;
       self.setState({user: user, showLogin: false})
     })
     .catch((e)=>{
@@ -150,7 +150,7 @@ class App extends Component {
   showCreatetask(){
     return (
       <Container fluid="true">
-        <DcbiaReactCreateTask/>
+        <DcbiaReactCreateTask users={this.state.dsciUsers}/>
       </Container>
     )
   }
@@ -217,7 +217,7 @@ class App extends Component {
           
           <Container fluid="true" style={{height: "100%", minHeight: "90vh"}}>
             <Route path="/login" component={this.login.bind(this)}/>
-            <Route path="/logout" component={this.login.bind(this)}/>
+            <Route path="/logout" component={this.showLanding.bind(this)}/>
             <Route path="/user" component={this.profile.bind(this)}/>
             <Route path="/filebrowser" component={this.showFilebrowser.bind(this)}/>
             <Route path="/createtask" component={this.showCreatetask.bind(this)}/>

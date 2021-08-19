@@ -70,7 +70,14 @@ class NavBar extends Component{
       return <NavDropdown title={<User/>} id="basic-nav-dropdown">
           <NavDropdown.Item onClick={()=>{history.push('/user')}}><User/> Profile</NavDropdown.Item>
           <NavDropdown.Divider/>
-          <NavDropdown.Item onClick={()=>{history.push('/logout')}}><LogOut/> Logout</NavDropdown.Item>
+          <NavDropdown.Item onClick={()=>{
+            history.push('/logout')
+            localStorage.removeItem('clusterpost_token');
+            store.dispatch({ 
+              type: 'user-factory', 
+              user: {}
+            })
+          }}><LogOut/> Logout</NavDropdown.Item>
         </NavDropdown>
     }else{
       return <NavDropdown title={<User/>} id="basic-nav-dropdown">
