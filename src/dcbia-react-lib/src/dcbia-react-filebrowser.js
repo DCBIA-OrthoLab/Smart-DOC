@@ -749,7 +749,7 @@ class Filebrowser extends Component {
 						))
 
 					} id={"dropbread-dropdown-custom-components"}>
-						<Breadcrumb>
+						<Breadcrumb onDragOver={(e)=>{self.handleDragOver(e)}} onDrop={(e)=>{self.handleDropHome(e)}}>
 							<Breadcrumb.Item onClick={() => self.goToFolder("")}>{"home"}</Breadcrumb.Item>
 						</Breadcrumb>
 					</Dropdown.Toggle>
@@ -811,6 +811,21 @@ class Filebrowser extends Component {
 		if(f.type == 'd' && directoryMap[f.path]){
 			return (<Row><Col sm={{offset:"1"}}>{self.displayFiles(f.files)}</Col></Row>)
 		}
+	}
+
+	handleDropHome(e){
+		const self = this
+		var {filesMap} = self.state
+		
+	    e.preventDefault();
+	    e.stopPropagation();
+
+		self.setState({filesToMove: filesMap}, ()=>{
+			self.pasteFiles({
+				type: 'd',
+				path: './'
+			})
+		})
 	}
 
 	getFileListItem(f){

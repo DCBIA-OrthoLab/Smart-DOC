@@ -565,7 +565,7 @@ class CreateTask extends Component {
 
 	getFileManager(){
 		const self = this;
-		return <DcbiaReactFilebrowser createtask={true} startCreatetask={(filesMap)=>{self.startCreatetask(filesMap)}} />
+		return <DcbiaReactFilebrowser createtask={true} users={self.props.users} startCreatetask={(filesMap)=>{self.startCreatetask(filesMap)}} />
 	}
 
 	popUpFileSelect() {
