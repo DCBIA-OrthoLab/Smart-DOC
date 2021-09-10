@@ -108,6 +108,20 @@ class CreateTask extends Component {
 					if(p.appendMatchDir && current_dir){
 						value_match = path.join(current_dir, value_match).trim()
 						pattern_matches[key]["matches"] = _.map(_.range(max_matches), ()=>{return {...p, type: 'v', path: value_match}})
+					}else if(p.appendMatchDir && current_dir == undefined){
+						current_dir = _.find(tree, (t)=>{
+							if(t.type == "f"){
+								return true
+							}
+							return false
+						})
+						if(current_dir == undefined){
+							current_dir = "./"
+						}else{
+							current_dir = path.dirname(current_dir.path)
+						}
+						value_match = path.join(current_dir, value_match).trim()
+						pattern_matches[key]["matches"] = _.map(_.range(max_matches), ()=>{return {...p, type: 'v', path: value_match}})
 					}else{
 						pattern_matches[key]["matches"] = _.map(_.range(max_matches), ()=>{return {...p, type: 'v'}})
 					}	
