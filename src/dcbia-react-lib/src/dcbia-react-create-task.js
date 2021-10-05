@@ -394,7 +394,7 @@ class CreateTask extends Component {
 								_.compact(_.map(patterns, (p, idx)=>{
 									if(p.value && p.value != ""){
 										return (<Button onClick={()=>{
-											self.setState({showPopupFileSelect: true, pattenrs_idx: idx})
+											self.setState({showPopupFileSelect: true, patterns_idx: idx})
 										}}>{(p.flag? p.flag:"")+ " " + p.value} <File/></Button>)
 									}
 									return null
@@ -584,9 +584,12 @@ class CreateTask extends Component {
 
 	popUpFileSelect() {
 		const self = this
-		var {showPopupFileSelect, pattenrs_idx, selectedSoftware} = self.state
+		var {showPopupFileSelect, patterns_idx, selectedSoftware} = self.state
 		const {user} = self.props
-
+		var initial_value = ""
+		if(selectedSoftware && selectedSoftware.patterns && selectedSoftware.patterns.length > patterns_idx){
+			initial_value = selectedSoftware.patterns[patterns_idx].value
+		}
 		return (
 			
 			<Modal show={self.state.showPopupFileSelect} onHide={() => this.setState({showPopupFileSelect: false})}>
@@ -595,10 +598,15 @@ class CreateTask extends Component {
 				</Modal.Header>
 
 				<Modal.Body>
+					<FormControl placeholder="Value" value={initial_value} 
+						onChange={(e) => {
+							selectedSoftware.patterns[patterns_idx].value = e.target.value
+							self.setState({selectedSoftware})
+						}}/> 
 					<DcbiaReactFilebrowser createtask={true} startCreatetask={(filesMap)=>{
 						if(_.keys(filesMap).length > 0){
-							selectedSoftware.patterns[pattenrs_idx].value = path.join(user.email, filesMap[_.keys(filesMap)[0]].path)
-							selectedSoftware.patterns[pattenrs_idx].selectedFile = filesMap[_.keys(filesMap)[0]]
+							selectedSoftware.patterns[patterns_idx].value = path.join(user.email, filesMap[_.keys(filesMap)[0]].path)
+							selectedSoftware.patterns[patterns_idx].selectedFile = filesMap[_.keys(filesMap)[0]]
 						}
 						self.setState({showPopupFileSelect: false, selectedSoftware})
 						
