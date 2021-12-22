@@ -352,4 +352,12 @@ export default class DcbiaReactService {
   });
  }
 
+ sendUserEmail (data) {
+    return this.http({
+      method: 'POST',
+      url: '/dcbia/requestAccess',
+      data: data
+    });
+  }
+
 }

@@ -117,6 +117,11 @@ module.exports = function (server, conf) {
         	owner: Joi.string().email().optional()
         });
 
+	var userMessage = Joi.object({
+			meesage: Joi.string(),
+        	user: Joi.string().email()
+        });
+
 
 	server.route({
 		path: '/dcbia/clinical/collections',
@@ -875,6 +880,27 @@ module.exports = function (server, conf) {
 			},
 			description: 'Get the attachment files from the database'
 	    }
+	});
+
+	server.route({
+		method: 'POST',
+		path: "/dcbia/requestAccess",
+		config: {
+			auth: {
+                strategy: 'token',
+                scope: ['default']
+            },
+			handler: handlers.sendUserMessage,
+			validate: {
+				query: false,
+		        payload: userMessage,
+		        params: null
+			},
+			payload:{
+				output: 'data'
+			},
+			description: 'This route will be used to post job documents to the couch database.'
+		}
 	});
 
 
