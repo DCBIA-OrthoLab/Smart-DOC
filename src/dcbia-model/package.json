@@ -11,7 +11,8 @@
     "couch-update-views": "^1.0.9",
     "request": "^2.69.0",
     "underscore": "^1.8.3",
-    "nodemailer": "^6.3.1"
+    "nodemailer": "^6.3.1",
+    "nodemailer-smtp-transport": "^2.7.4"
   },
   "scripts": {
     "test": "lab -v -m 6000 test.js"
@@ -27,6 +28,7 @@
   "license": "Apache-2.0",
   "devDependencies": {
     "code": "^3.0.2",
-    "lab": "^11.0.1"
+    "lab": "^11.0.1",
+    "nodemailer-stub-transport": "^1.1.0"
   }
 }
