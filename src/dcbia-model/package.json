@@ -1,6 +1,6 @@
 {
   "name": "dcbia-model",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Federate clinical, biological and morphological data in a node.js and couchdb environment.",
   "main": "index.js",
   "dependencies": {
