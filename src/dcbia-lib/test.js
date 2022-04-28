@@ -38,8 +38,8 @@ dcbia.setServer("http://localhost:8180")
 lab.experiment("Test dcbia lib", function(){
 
     var user = {
-        email: "sbrosset@umich.edu",
-        password: "Sbrosset0"
+        email: "jprieto@med.unc.edu",
+        password: "123TestTest!"
     }
 
     var clinicaldatapost = {
@@ -63,11 +63,60 @@ lab.experiment("Test dcbia lib", function(){
     var id = "";
     var idWrongScope = "";
 
+    // lab.test('returns true when new user is login.', function(){
+    //     return dcbia.userLogin({email: "juanprietob@gmail.com", "password": "808BuitragoK-9!"})
+    //     .then(function(res){
+    //         Joi.assert(res.token, Joi.string().required());
+    //     });
+        
+    // });
+
+
+    // lab.test('returns true when a whole directory structure is created', function(){
+        
+    //     var directory_root = 10;
+        
+    //     var root_dir = 'my_deep_test_subjects';
+
+    //     const create_recursive = (path_current)=>{
+    //         fs.mkdirSync(path_current, {recursive: true});
+
+    //         var full_path = path.join(path_current, _.uniqueId("T1") + ".nrrd")
+    //         fs.writeFileSync(full_path, _.uniqueId("Some text"));
+
+    //         full_path = path.join(path_current, _.uniqueId("T2") + ".nrrd")
+    //         fs.writeFileSync(full_path, _.uniqueId("Some text"));
+
+    //         full_path = path.join(path_current, _.uniqueId("FA") + ".nrrd")
+    //         fs.writeFileSync(full_path, _.uniqueId("Some text"));
+            
+    //     }
+
+    //     _.map(_.range(directory_root), (r)=>{
+    //         var path_current = path.join(root_dir, _.uniqueId("d"));
+            
+    //         create_recursive(path_current);
+    //     });
+
+    
+    // });
+
+    // lab.test('returns true when user upload a directory', function(){
+        
+    //     var dirname = 'my_deep_test_subjects';
+    //     var target = 'test/my_deep_test_subjects/';
+
+    //     return dcbia.uploadDirectory(target, dirname)
+    //     .then(function(res){
+    //         expect(res).to.be.an.array().to.include('File uploaded!');
+    //     }); 
+    // });
+
+
     lab.test('returns true when new user is login.', function(){
         return dcbia.userLogin(user)
         .then(function(res){
             Joi.assert(res.token, Joi.string().required());
-            // console.log(res)
         });
         
     });
