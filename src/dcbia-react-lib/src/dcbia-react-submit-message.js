@@ -70,7 +70,7 @@ class SubmitMessage extends Component {
             <Card>
               <Card.Body>
                 <Card.Text>
-                  Hello {user.name}, currently you do not have full privileges <UserMinus/> to run our methods through DSCI. Please <a href="mailto:jprieto@med.unc.edu?subject=DSCI">contact us</a> to gain full access. <br> 
+                  Hello {user.name}, currently you do not have full privileges <UserMinus/> to run our methods through DSCI. Please <a href="mailto:jprieto@med.unc.edu?subject=DSCI">contact us</a> to gain full access. <br/> 
                   You may also fill out this form and tell us a short description about your project.  
                 </Card.Text>
               </Card.Body>

@@ -11,6 +11,9 @@ var nodemailer = require('nodemailer');
 
 module.exports = function (server, conf) {
 	
+	var handler = {};
+	/*
+	*/
 
 	couchUpdateViews.migrateUp(server.methods.dcbia.getCouchDBServer(), path.join(__dirname, 'views'), true);
 
@@ -91,12 +94,6 @@ module.exports = function (server, conf) {
 	    method: validateOwnershipPromise,
 	    options: {}
 	});
-
-	var handler = {};
-	/*
-	*/
-
-
 
 
 	handler.createDocument = function(req, h){
