@@ -23,7 +23,8 @@ class Filebrowser extends Component {
 		super(props)
 		const self = this
 		this.state = {
-
+			createtask: self.props.createtask,
+			startCreateTask: self.props.startCreateTask,
 
 			fileToUpload: null,
 			uploadPath: null,
@@ -83,20 +84,20 @@ class Filebrowser extends Component {
 
 	componentDidMount() {
 		const self = this
-		const {location} = this.state
+		const {location, createtask} = this.state
 
 		this.dcbiareactservice = new DcbiaReactService();
 		this.dcbiareactservice.setHttp(this.props.http);	
 
 		self.updateDirectoryMap()
 		.then(()=>{
-			if(location){				
-				const {csv} = qs.parse(location.search);
-				if(csv){
+			if(location && !createtask){				
+				const {file_path} = qs.parse(location.search);
+				if(file_path){
 					const treeMap = self.state.treeMap					
-					var f_list = self.searchFiles(csv, treeMap);					
+					var f_list = self.searchFiles(file_path, treeMap);
 					if(f_list.length > 0){
-						self.setState({selectedCSV: f_list[0], showCSVEdit: true})
+						self.goToFile(f_list[0])
 					}
 			    }
 		    }
@@ -115,9 +116,15 @@ class Filebrowser extends Component {
 
 	urlChanged(location, action){
 		const self = this
-		const {csv} = qs.parse(location.search);
-		if(csv == undefined){			
+		const {file_path} = qs.parse(location.search);
+		if(file_path == undefined){			
 			self.setState({selectedCSV: {}, showCSVEdit: false})
+	    }else{
+	    	const treeMap = self.state.treeMap					
+			var f_list = self.searchFiles(file_path, treeMap);
+			if(f_list.length > 0){
+				self.goToFile(f_list[0])
+			}
 	    }
 	}
 
@@ -861,6 +868,22 @@ class Filebrowser extends Component {
 		this.setState({currentFolder: path.normalize(folder_path)})
 	}
 
+	goToFile(f){
+		const self = this
+		const {startCreateTask} = self.state
+		if(f){
+			console.log(startCreateTask)
+			if(startCreateTask){
+				startCreateTask(f)
+			}else{
+				var ext = path.extname(f.path)
+				if(ext === '.csv'){
+					self.setState({showCSVEdit: true, selectedCSV: f})		
+				}	
+			}
+		}
+	}
+
 	displayNextLevel(f){
 		const self = this
 		const {directoryMap} = self.state
@@ -891,7 +914,7 @@ class Filebrowser extends Component {
 		return (
 			<Row>
 				<Col>
-					<Dropdown
+					<Dropdown id={_.uniq()}
 						draggable={true}
 						onDrag={(e) => self.handleDrag(e)}
 						onDragStart={(e) => self.handleDragStart(e,f)}
@@ -903,6 +926,8 @@ class Filebrowser extends Component {
 							if (e.detail === 2) {
 								if(f.type === 'd'){
 									self.goToFolder(f.path)
+								}else if(f.type === 'f'){
+									self.goToFile(f)
 								}
 							}
 						}}>
@@ -943,12 +968,6 @@ class Filebrowser extends Component {
 								<Dropdown.Item onClick={() => self.createCSV(f)} ><Download style={{color: "black", height: 15, cursor:"pointer"}}/> Create CSV</Dropdown.Item>
 						        : ""
 						    }
-						    {
-								path.extname(f.path) === '.csv'?
-								<Dropdown.Item onClick={() => {self.setState({showCSVEdit: true, selectedCSV: f})}} ><Edit2 style={{color: "black", height: 15, cursor:"pointer"}}/> Edit CSV</Dropdown.Item>
-						        : ""
-						    }
-							
 							<Dropdown.Item onClick={() => self.downloadFiles()} ><Download style={{color: "black", height: 15, cursor:"pointer"}}/> Download</Dropdown.Item>
 							<Dropdown.Item onClick={() => self.setState({fileToRename: f, fileToRenameNewName: f.name, showPopupRename: true})} ><Edit3 style={{color: "black", height: 15, cursor:"pointer"}}/> Rename</Dropdown.Item>
 							<Dropdown.Item onClick={() => self.copyFiles()} ><Copy style={{color: "black", height: 15, cursor:"pointer"}} /> Copy </Dropdown.Item>
@@ -1113,7 +1132,7 @@ class Filebrowser extends Component {
 				<Row>
 					<Col>
 						{showCSVEdit? 
-							<EditCSV csv={selectedCSV}/>:
+							<EditCSV csv_obj={selectedCSV}/>:
 							self.getFileManager()
 						}
 					</Col>					

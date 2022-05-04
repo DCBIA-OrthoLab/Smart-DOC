@@ -305,11 +305,14 @@ export default class DcbiaReactService {
   })
  }
 
- downloadFiles(file) {
+ downloadFiles(file, responseType) {
+  if(responseType == undefined){
+    responseType = 'blob'
+  }
   return this.http({
     method: 'GET',
     url: '/dcbia/download/' + file,
-    responseType: 'blob'
+    responseType: responseType
   })
  }
 

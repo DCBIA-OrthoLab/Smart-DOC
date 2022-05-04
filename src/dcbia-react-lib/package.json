@@ -58,6 +58,7 @@
   ],
   "dependencies": {
     "clusterpost-list-react": "^1.6.1",
+    "csvtojson": "^2.0.10",
     "jszip": "^3.4.0",
     "mkdirp": "^0.5.1",
     "underscore": "^1.9.1"
