@@ -9,8 +9,10 @@ import Dropzone from 'react-dropzone'
 
 
 import DcbiaReactService from './dcbia-react-service'
+import EditCSV from './dcbia-react-edit-csv'
+import { withRouter } from 'react-router-dom';
 
-
+import qs from 'query-string';
 
 const _ = require('underscore');
 const Promise = require('bluebird');
@@ -19,7 +21,7 @@ const path = require('path');
 class Filebrowser extends Component {
 	constructor(props) {
 		super(props)
-
+		const self = this
 		this.state = {
 
 
@@ -65,23 +67,58 @@ class Filebrowser extends Component {
 
 			filesToCopy: {},
 			filesToMove: {},
-			selectedUsers: {}
+			selectedUsers: {},
+
+			showCSVEdit: false,
+			selectedCSV: {},
+			location: this.props.history.location
 			}
 
 		this.updateDirectoryMap = this.updateDirectoryMap.bind(this)
+		this.urlChanged = this.urlChanged.bind(this)
+
+		this.props.history.listen(this.urlChanged);
 
 	}
 
 	componentDidMount() {
 		const self = this
+		const {location} = this.state
 
 		this.dcbiareactservice = new DcbiaReactService();
 		this.dcbiareactservice.setHttp(this.props.http);	
 
 		self.updateDirectoryMap()
+		.then(()=>{
+			if(location){				
+				const {csv} = qs.parse(location.search);
+				if(csv){
+					const treeMap = self.state.treeMap					
+					var f_list = self.searchFiles(csv, treeMap);					
+					if(f_list.length > 0){
+						self.setState({selectedCSV: f_list[0], showCSVEdit: true})
+					}
+			    }
+		    }
+		})
 
 		document.addEventListener("keydown", (e)=>{self.handleKeyDown(e)});
 		document.addEventListener("keyup", (e)=>{self.handleKeyUp(e)});
+	    
+	}
+
+	componentDidUpdate() {
+		const self = this
+		const {location} = this.state
+	    
+	}
+
+	urlChanged(location, action){
+		const self = this
+		const {csv} = qs.parse(location.search);
+		if(csv == undefined){			
+			self.setState({selectedCSV: {}, showCSVEdit: false})
+	    }
 	}
 
 	getTree(optionnalSearch=null) {
@@ -198,15 +235,17 @@ class Filebrowser extends Component {
 		if (user !== undefined) {
 
 			// var username = user["name"]
-			self.dcbiareactservice.getDirectoryMap()
-			.then(function(res){
-				var treeMap = res.data
-				self.setState({treeMap: treeMap})
+			return new Promise((resolve, reject)=>{
+				return self.dcbiareactservice.getDirectoryMap()
+				.then(function(res){
+					var treeMap = res.data
+					self.setState({treeMap: treeMap}, ()=>{resolve()})
 
+				})
 			})
+		}else{
+			return Promise.resolve()
 		}
-
-
 	}
 
 	updateFilesList(f) {	
@@ -800,6 +839,24 @@ class Filebrowser extends Component {
 		)
 	}
 
+	createCSV(f){
+
+		const self = this
+
+		var csv = "patientId,file\n"
+
+		csv += _.map(f.files, (f)=>{
+			return "," + f.path
+		}).join("\n")
+
+		var uploadPath = f.path + ".csv"
+
+		return self.dcbiareactservice.uploadFile(uploadPath, csv)
+		.then(()=>{
+			self.updateDirectoryMap()
+		})
+	}
+
 	goToFolder(folder_path) {
 		this.setState({currentFolder: path.normalize(folder_path)})
 	}
@@ -881,6 +938,18 @@ class Filebrowser extends Component {
 							</ListGroup.Item>
 						</Dropdown.Toggle>
 						<Dropdown.Menu>
+							{
+								f.type === 'd'?
+								<Dropdown.Item onClick={() => self.createCSV(f)} ><Download style={{color: "black", height: 15, cursor:"pointer"}}/> Create CSV</Dropdown.Item>
+						        : ""
+						    }
+						    {
+								path.extname(f.path) === '.csv'?
+								<Dropdown.Item onClick={() => {self.setState({showCSVEdit: true, selectedCSV: f})}} ><Edit2 style={{color: "black", height: 15, cursor:"pointer"}}/> Edit CSV</Dropdown.Item>
+						        : ""
+						    }
+							
+							<Dropdown.Item onClick={() => self.downloadFiles()} ><Download style={{color: "black", height: 15, cursor:"pointer"}}/> Download</Dropdown.Item>
 							<Dropdown.Item onClick={() => self.setState({fileToRename: f, fileToRenameNewName: f.name, showPopupRename: true})} ><Edit3 style={{color: "black", height: 15, cursor:"pointer"}}/> Rename</Dropdown.Item>
 							<Dropdown.Item onClick={() => self.copyFiles()} ><Copy style={{color: "black", height: 15, cursor:"pointer"}} /> Copy </Dropdown.Item>
 							<Dropdown.Item onClick={() => self.cutFiles()} ><Scissors style={{color: "black", height: 15, cursor:"pointer"}} /> Cut </Dropdown.Item>
@@ -1031,6 +1100,7 @@ class Filebrowser extends Component {
 
 	render() {
 		const self = this
+		var {showCSVEdit, selectedCSV} = self.state
 
 		return(
 			<Container fluid="true">
@@ -1042,16 +1112,16 @@ class Filebrowser extends Component {
 				{this.state.showPopupRename ? this.popUpRename() : null}
 				<Row>
 					<Col>
-						{self.getFileManager()}
-					</Col>
+						{showCSVEdit? 
+							<EditCSV csv={selectedCSV}/>:
+							self.getFileManager()
+						}
+					</Col>					
 				</Row>
 			</Container>
 		)
 	}
 }
-
-
-
 
 
 
@@ -1074,4 +1144,4 @@ const mapStateToProps = (state, ownProps) => {
 //   }
 // }
 
-export default connect(mapStateToProps)(Filebrowser);
+export default withRouter(connect(mapStateToProps)(Filebrowser));
