@@ -305,11 +305,14 @@ export default class DcbiaReactService {
   })
  }
 
- downloadFiles(file) {
+ downloadFiles(file, responseType) {
+  if(responseType == undefined){
+    responseType = 'blob'
+  }
   return this.http({
     method: 'GET',
     url: '/dcbia/download/' + file,
-    responseType: 'blob'
+    responseType: responseType
   })
  }
 
@@ -351,5 +354,13 @@ export default class DcbiaReactService {
     url: '/dcbia/mySharedFiles/' + target_path,
   });
  }
+
+ sendUserEmail (data) {
+    return this.http({
+      method: 'POST',
+      url: '/dcbia/requestAccess',
+      data: data
+    });
+  }
 
 }

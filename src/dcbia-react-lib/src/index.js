@@ -4,3 +4,5 @@ export {default as DcbiaReactMorphologicalData} from './dcbia-react-morphologica
 export {default as DcbiaReactClinicalData} from './dcbia-react-clinical-data'
 export {default as DcbiaReactFilebrowser} from './dcbia-react-filebrowser'
 export {default as DcbiaReactCreateTask} from './dcbia-react-create-task'
+export {default as DcbiaReactSubmitMessage} from './dcbia-react-submit-message'
+export {default as DcbiaEditCSV} from './dcbia-react-edit-csv'

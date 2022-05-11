@@ -7,11 +7,58 @@ var couchUpdateViews = require('couch-update-views');
 var path = require('path');
 var qs = require('querystring');
 var fs = require('fs');
+var nodemailer = require('nodemailer');
 
 module.exports = function (server, conf) {
 	
+	var handler = {};
+	/*
+	*/
 
 	couchUpdateViews.migrateUp(server.methods.dcbia.getCouchDBServer(), path.join(__dirname, 'views'), true);
+
+	var transporter;
+
+	if(conf.mailer){
+		if(conf.mailer.nodemailer === 'nodemailer-stub-transport'){
+			transporter = nodemailer.createTransport(require(conf.mailer.nodemailer)());
+		}else{
+			transporter = nodemailer.createTransport(conf.mailer.nodemailer);
+		}
+		transporter.verify(function(error, success) {
+			if (error) {
+				console.log(error);
+			}
+		});
+	}
+
+	handler.sendUserMessage = function(req, h){
+
+		var doc = req.payload;
+
+		var mailOptions = {
+		    from: doc.user,
+		    to: "jprieto@med.unc.edu",
+		    subject: 'DSCI full access',
+		    html: doc.message
+		};
+		
+		return new Promise(function(resolve, reject){
+			if(transporter){
+				transporter.sendMail(mailOptions, function(error, info){
+				    if(error){
+				        reject(Boom.badImplementation(error));
+				    }else{
+				    	resolve();
+				    }
+				});	
+			}else{
+				reject(Boom.badImplementation("Transporter not initialized"));
+			}
+			
+		})
+	}
+	
 
 	const validateOwnership = function(doc, credentials){
 		
@@ -51,12 +98,6 @@ module.exports = function (server, conf) {
 	    method: validateOwnershipPromise,
 	    options: {}
 	});
-
-	var handler = {};
-	/*
-	*/
-
-
 
 
 	handler.createDocument = function(req, h){

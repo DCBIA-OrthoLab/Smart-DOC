@@ -13,13 +13,16 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Card from 'react-bootstrap/Card';
 import Modal from 'react-bootstrap/Modal';
-import Jumbotron from 'react-bootstrap/Jumbotron';
+import Carousel from 'react-bootstrap/Carousel';
+import FormControl from 'react-bootstrap/FormControl';
+import InputGroup from 'react-bootstrap/InputGroup';
+import Button from 'react-bootstrap/Button';
 import { connect } from "react-redux";
 
 import axios from 'axios';
 import store from "./redux/store";
 
-import {DcbiaReactProjects, DcbiaReactMorphologicalData, DcbiaReactClinicalData, DcbiaReactFilebrowser, DcbiaReactCreateTask, DcbiaReactService} from 'dcbia-react-lib'
+import {DcbiaReactProjects, DcbiaReactMorphologicalData, DcbiaReactClinicalData, DcbiaReactFilebrowser, DcbiaReactCreateTask, DcbiaReactService, DcbiaReactSubmitMessage} from 'dcbia-react-lib'
 import {ClusterpostJobs, ClusterpostTokens, ClusterpostDashboard} from 'clusterpost-list-react'
 import {MedImgSurf} from 'react-med-img-viewer';
 
@@ -57,6 +60,7 @@ class App extends Component {
     
     const jwtauth = new JWTAuthService();
     jwtauth.setHttp(http);
+    this.jwtauth = jwtauth;
 
     self.dcbiareactservice = new DcbiaReactService();
     self.dcbiareactservice.setHttp(http);
@@ -103,33 +107,91 @@ class App extends Component {
   }
 
   showLanding(){
+    return (
+      this.showAbout());
+  }
+
+  showAbout(){
     const {landingVtk} = this.state;
     return (
-      <Container fluid="true">
-        <Row>
-          <Col sm={6}>
-            <Card>
-              <Card.Img variant="top" src="images/teeth.png"/>
-              <Card.Body>
-                <Card.Text>
-                  An open-source, free comprehensive platform for data sharing and computation
-                  allowing dental researchers scientists to support patient-specific decision making and assessment of the disease progression.
-                </Card.Text>
-              </Card.Body>
-            </Card>
-          </Col>
-          <Col sm={6}>
-            <MedImgSurf data={[{data: landingVtk, color: [0,255,255]}]}/>
-          </Col>
-        </Row>
-      </Container>);
+      <Carousel style={{height: "50%"}} variant="primary">
+      <Carousel.Item>
+          <Container fluid="true" style={{height: "40%"}}>
+            <Row>
+              <Col sm={6}>
+                <Card>
+                  <Card.Body>
+                    <Card.Text>
+                      An open-source, free comprehensive platform for data sharing and computation
+                      allowing dental researchers scientists to support patient-specific decision making and assessment of the disease progression.
+                    </Card.Text>
+                  </Card.Body>
+                  <Card.Img variant="top" src="images/teeth.png"/>
+                </Card>
+              </Col>
+              <Col sm={6}>
+                <MedImgSurf data={[{data: landingVtk, color: [0,255,255]}]}/>
+              </Col>
+            </Row>
+          </Container>
+        </Carousel.Item>
+        <Carousel.Item>
+          <img
+            src="images/Slide1.jpg"
+            alt="First slide"
+          />
+          <Carousel.Caption style={{color: "goldenrod"}}>
+            <h3>Root Canal Segmentation (RCSeg)</h3>
+            <p>Also available in a docker container. Further documentation <a href="https://github.com/DCBIA-OrthoLab/CBCT_seg" target="_blank">here</a></p>
+          </Carousel.Caption>
+        </Carousel.Item>
+        <Carousel.Item>
+          <img
+            src="images/Slide2.jpg"
+            alt="Second slide"
+          />
+
+          <Carousel.Caption style={{color: "goldenrod"}}>
+            <h3>Dental Model Segmentation (DentalModelSeg)</h3>
+            <p>Also available in a docker container. Further documentation <a href="https://github.com/DCBIA-OrthoLab/fly-by-cnn" target="_blank">here</a></p>
+          </Carousel.Caption>
+        </Carousel.Item>
+        <Carousel.Item>
+          <img
+            src="images/Slide3.jpg"
+            alt="Third slide"
+          />
+
+          <Carousel.Caption style={{color: "goldenrod"}}>
+            <h3>Universal labeling and merging</h3>
+            <p>Also available in a docker container. Further documentation <a href="https://github.com/DCBIA-OrthoLab/fly-by-cnn" target="_blank">here</a></p>
+          </Carousel.Caption>
+        </Carousel.Item>
+      </Carousel>)
+  }
+
+  sendMessage(){
+    const self = this
+    const {subject, message} = self.state
+
+    console.log(subject, message)
   }
  
   showHome(){
-    return (
-      <Container fluid="true">
-          <ClusterpostDashboard/>
-      </Container>);
+    const self = this
+    const {user, subject, message} = this.state;
+    if(user && user.scope && user.scope.indexOf('clusterpost') != -1){
+      return (
+        <Container fluid="true">
+            <ClusterpostDashboard/>
+        </Container>);
+    }else{
+      return (
+        <Container fluid="true">
+          <DcbiaReactSubmitMessage/>
+        </Container>
+      )
+    }
   }
 
   showComputing(){
@@ -212,7 +274,7 @@ class App extends Component {
       return (
         <HashRouter>
           <header className="App-header">
-            <NavBar/>
+            <NavBar jwtauth={this.jwtauth}/>
           </header>
           
           <Container fluid="true" style={{height: "100%", minHeight: "90vh"}}>
@@ -224,6 +286,7 @@ class App extends Component {
             <Route path="/computing" component={this.showComputing.bind(this)}/>
             <Route path="/admin/users" component={this.adminUsers.bind(this)}/>
             <Route path="/admin/servers" component={this.adminServers.bind(this)}/>
+            <Route path="/about" component={this.showHome.bind(this)}/>
             <Route path="/home" component={this.showHome.bind(this)}/>
             <Route exact path="/" component={this.showLanding.bind(this)}/>
           </Container> 

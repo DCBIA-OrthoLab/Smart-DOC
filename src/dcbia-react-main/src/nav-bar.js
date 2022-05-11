@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import store from "./redux/store";
 import {withRouter} from 'react-router-dom';
-import {Home, User, Users, Cpu, Settings, LogOut, LogIn, File, FilePlus} from 'react-feather';
+import {Home, User, Users, Cpu, Settings, LogOut, LogIn, File, FilePlus, Info} from 'react-feather';
 import NavDropdown from 'react-bootstrap/NavDropdown';
 import Navbar from 'react-bootstrap/Navbar';
 import Nav from 'react-bootstrap/Nav';
@@ -68,6 +68,7 @@ class NavBar extends Component{
     
     if(user && user.scope && user.scope.indexOf('default') != -1){
       return <NavDropdown title={<User/>} id="basic-nav-dropdown">
+          <NavDropdown.Item onClick={()=>{history.push('/about')}}><Info/> About</NavDropdown.Item>
           <NavDropdown.Item onClick={()=>{history.push('/user')}}><User/> Profile</NavDropdown.Item>
           <NavDropdown.Divider/>
           <NavDropdown.Item onClick={()=>{
@@ -132,7 +133,7 @@ class NavBar extends Component{
 const mapStateToProps = (state, ownProps) => {
   return {
     http: state.jwtAuthReducer.http, 
-    user: state.jwtAuthReducer.user
+    user: state.jwtAuthReducer.user,
   }
 }
 
