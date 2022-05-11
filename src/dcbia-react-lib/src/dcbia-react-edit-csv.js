@@ -2,8 +2,7 @@ import React, {Component} from 'react'
 
 import { connect } from "react-redux";
 import {Container, Button, Table, Card, Col, Row, DropdownButton, Dropdown, Form, Alert, OverlayTrigger, Overlay, Tooltip, Popover, Badge, ButtonToolbar, ButtonGroup, InputGroup, FormControl, Spinner, Navbar, Nav, NavDropdown, Breadcrumb, ProgressBar, Modal} from 'react-bootstrap'
-import {Save, GitMerge} from 'react-feather'
-import DcbiaReactFilebrowser from './dcbia-react-filebrowser'
+import {Save, Edit2} from 'react-feather'
 import DcbiaReactService from './dcbia-react-service'
 
 import {ClusterpostService, ClusterpostSoftware} from 'clusterpost-list-react'
@@ -25,10 +24,13 @@ class EditCSV extends Component {
     this.state = {
       file: {},
       csv_obj: props.csv_obj,
+      merge_csv: props.merge_csv,
       csv_json: {},
-      needsSaveOutline: "outline-primary"
+      csv_json_arr: [],
+      needsSaveOutline: "outline-primary",
+      showEdit: false
     }
-
+    
     if(this.state.csv_obj && this.state.csv_obj.path){
       this.props.history.push({
         search: qs.stringify({file_path: this.state.csv_obj.path})
@@ -40,7 +42,7 @@ class EditCSV extends Component {
 
   componentDidMount() {
     const self = this
-    const {csv_obj} = this.state
+    const {csv_obj, merge_csv} = this.state
 
     self.dcbiareactservice = new DcbiaReactService();
     self.dcbiareactservice.setHttp(self.props.http);
@@ -48,14 +50,33 @@ class EditCSV extends Component {
     self.clusterpostservice = new ClusterpostService();
     self.clusterpostservice.setHttp(self.props.http);
 
-    self.dcbiareactservice.downloadFiles(csv_obj.path, 'text')
-    .then((res)=>{
-      csvtojson()
-      .fromString(res.data)
-      .then((csv_json)=>{
-        self.setState({csv_json})
+    if(merge_csv){
+      Promise.map(merge_csv, (csv)=>{
+        return self.dcbiareactservice.downloadFiles(csv.path, 'text')
+        .then((res)=>{
+          csvtojson()
+          .fromString(res.data)
+          .then((csv_json)=>{
+            return csv_json
+          })
+        })
       })
-    })
+      .then((csv_json_arr)=>{
+        self.setState(csv_json_arr)
+      })
+    }else{
+      self.dcbiareactservice.downloadFiles(csv_obj.path, 'text')
+      .then((res)=>{
+        csvtojson()
+        .fromString(res.data)
+        .then((csv_json)=>{
+          // var csv_json_arr = [csv_json]
+          self.setState(csv_json)
+        })
+      })
+    }
+
+    
   }
 
   saveCSV(){
@@ -86,20 +107,16 @@ class EditCSV extends Component {
   getToolBar(){
     const self = this
     const {needsSaveOutline} = self.state
+    var {showEdit} = self.state
+    showEdit = !showEdit
     return (
       <Navbar bg="light">
           <Nav className="mr-auto">
               <Button variant={needsSaveOutline} onClick={() => self.saveCSV()}>
                 <Save/>
               </Button>
-              <Button onClick=
-                {
-                  ()=>{
-                    self.setState({showPopupFileSelect: true})
-                  }
-                }
-              >
-                <GitMerge/>
+              <Button onClick={()=>{self.setState({showEdit})}}>
+                <Edit2/>
               </Button>
           </Nav>
       </Navbar>
@@ -119,12 +136,18 @@ class EditCSV extends Component {
             <thead>
               <tr>
                 {_.map(table_head, (h)=>{
-                  return (<th><Form.Control type="text" value={h} onChange={(e)=>{
-                    var new_h = e.target.value
+                  return (<th>
+                    {
+                      showEdit?
+                        <Form.Control type="text" value={h} onChange={(e)=>{
+                          var new_h = e.target.value
 
-                    var csv_json_new_head = JSON.stringify(csv_json).replace("\"" + h + "\":", "\"" + new_h + "\":")
-                    self.setState({csv_json: JSON.parse(csv_json_new_head), needsSaveOutline: 'outline-warning'})
-                  }}/></th>)
+                          var csv_json_new_head = JSON.stringify(csv_json).replace("\"" + h + "\":", "\"" + new_h + "\":")
+                          self.setState({csv_json: JSON.parse(csv_json_new_head), needsSaveOutline: 'outline-warning'})
+                        }}/> :
+                        h
+                    }
+                  </th>)
                 })}
               </tr>
             </thead>
@@ -158,67 +181,12 @@ class EditCSV extends Component {
     return csv_json_to_merge
   }
 
-  mergeFiles(filesMap){
-
-    const self = this
-    var {csv_json} = self.state
-    var k = _.keys(filesMap)
-
-    if(k.length > 0){
-      csv_obj = filesMap[k[0]]
-
-      self.dcbiareactservice.downloadFiles(csv_obj.path, 'text')
-      .then((res)=>{
-        csvtojson()
-        .fromString(res.data)
-        .then((csv_json_to_merge)=>{
-          csv_json = self.mergeJSON(csv_json, csv_json_to_merge)
-          self.setState({csv_json})
-        })
-      })
-    }
-    
-    
-  }
-
-  popUpFileSelect() {
-    const self = this
-    var {showPopupFileSelect, patterns_idx, selectedSoftware} = self.state
-    const {user} = self.props
-    var initial_value = ""
-    if(selectedSoftware && selectedSoftware.patterns && selectedSoftware.patterns.length > patterns_idx){
-      initial_value = selectedSoftware.patterns[patterns_idx].value
-    }
-    return (
-      
-      <Modal show={self.state.showPopupFileSelect} onHide={() => this.setState({showPopupFileSelect: false})}>
-        <Modal.Header closeButton>
-          <Modal.Title>Select file</Modal.Title>  
-        </Modal.Header>
-
-        <Modal.Body>
-          <DcbiaReactFilebrowser createtask={true} startCreatetask={(filesMap)=>{
-            self.mergeFiles(filesMap)
-            self.setState({showPopupFileSelect: false})
-            
-          }} />
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="danger" onClick={() => this.setState({showPopupFileSelect: false})} >
-            Close
-          </Button>
-        </Modal.Footer>
-      </Modal>
-    )
-  }
-
   render() {
     const self = this
     return(
       <Container fluid="true">
         {self.getToolBar()}
         {self.getTable()}
-        {self.popUpFileSelect()}
       </Container>
     )
   }

@@ -3,7 +3,7 @@ import React, {Component} from 'react'
 import { connect } from "react-redux";
 import {Container, Button, Table, Card, Alert, Col, Row, DropdownButton, Dropdown, Form, Modal, OverlayTrigger, Overlay, Tooltip, Popover, Badge, ButtonToolbar, ButtonGroup, InputGroup, FormControl, Spinner, Navbar, Nav, Breadcrumb, ProgressBar, ListGroup} from 'react-bootstrap'
 
-import {Trash2, Folder, Plus, ArrowLeft, ArrowDown, ArrowRight, MinusSquare, PlusSquare, CheckSquare, XSquare, X, CornerDownLeft, FolderMinus, FolderPlus, MoreVertical, ChevronLeft, ChevronsLeft, Share2, Circle, Download, File, UploadCloud, Move, Edit3, Edit2, Copy, Clipboard, Scissors} from 'react-feather'
+import {Trash2, Folder, Plus, ArrowLeft, ArrowDown, ArrowRight, MinusSquare, PlusSquare, CheckSquare, XSquare, X, CornerDownLeft, FolderMinus, FolderPlus, MoreVertical, ChevronLeft, ChevronsLeft, Share2, Circle, Download, File, UploadCloud, Move, Edit3, Edit2, Copy, Clipboard, Scissors, GitMerge} from 'react-feather'
 
 import Dropzone from 'react-dropzone'
 
@@ -884,6 +884,21 @@ class Filebrowser extends Component {
 		}
 	}
 
+	mergeCSVFiles(){
+		const self = this
+		const {filesMap} = self.state
+
+		var isCSV = _.reduce(_.map(filesMap, (f)=>{
+			if(path.extname(f.name) == ".csv"){
+				return true
+			}
+		}), (memo, t)=>{ return memo * t}, true);
+
+		if(isCSV){
+			self.setState({mergeCSV: filesMap, showCSVEdit: true})
+		}
+	}
+
 	displayNextLevel(f){
 		const self = this
 		const {directoryMap} = self.state
@@ -1043,7 +1058,13 @@ class Filebrowser extends Component {
 					<Row>
 
 						<Button className="mr-sm-2" variant="outline-success" hidden={!self.props.createtask} onClick={() => self.manageCreateTask()}> Validate Files Selection </Button>
-					
+              			<Col>
+							<OverlayTrigger overlay={<Tooltip>Merge CSV files</Tooltip>} placement={'top'}>
+								<Button hidden={self.props.createtask} variant="primary" onClick={() => self.mergeCSVFiles()}>
+									<GitMerge style={{"color": "white"}}> </GitMerge>
+								</Button>
+							</OverlayTrigger>
+						</Col>
 						<Col>
 							<OverlayTrigger overlay={<Tooltip>Download files</Tooltip>} placement={'top'}>
 								<Button hidden={self.props.createtask} variant="success" onClick={() => self.downloadFiles()}>
@@ -1119,7 +1140,7 @@ class Filebrowser extends Component {
 
 	render() {
 		const self = this
-		var {showCSVEdit, selectedCSV} = self.state
+		var {showCSVEdit, selectedCSV, mergeCSV} = self.state
 
 		return(
 			<Container fluid="true">
@@ -1132,7 +1153,7 @@ class Filebrowser extends Component {
 				<Row>
 					<Col>
 						{showCSVEdit? 
-							<EditCSV csv_obj={selectedCSV}/>:
+							<EditCSV csv_obj={selectedCSV} merge_csv={mergeCSV}/>:
 							self.getFileManager()
 						}
 					</Col>					
