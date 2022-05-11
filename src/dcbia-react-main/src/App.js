@@ -180,7 +180,6 @@ class App extends Component {
   showHome(){
     const self = this
     const {user, subject, message} = this.state;
-    console.log(user)
     if(user && user.scope && user.scope.indexOf('clusterpost') != -1){
       return (
         <Container fluid="true">

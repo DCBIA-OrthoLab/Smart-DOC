@@ -25,13 +25,12 @@ module.exports = function (server, conf) {
 		}else{
 			transporter = nodemailer.createTransport(conf.mailer.nodemailer);
 		}
+		transporter.verify(function(error, success) {
+			if (error) {
+				console.log(error);
+			}
+		});
 	}
-
-	transporter.verify(function(error, success) {
-		if (error) {
-			console.log(error);
-		}
-	});
 
 	handler.sendUserMessage = function(req, h){
 
@@ -45,13 +44,18 @@ module.exports = function (server, conf) {
 		};
 		
 		return new Promise(function(resolve, reject){
-			transporter.sendMail(mailOptions, function(error, info){
-			    if(error){
-			        reject(Boom.badImplementation(error));
-			    }else{
-			    	resolve();
-			    }
-			});
+			if(transporter){
+				transporter.sendMail(mailOptions, function(error, info){
+				    if(error){
+				        reject(Boom.badImplementation(error));
+				    }else{
+				    	resolve();
+				    }
+				});	
+			}else{
+				reject(Boom.badImplementation("Transporter not initialized"));
+			}
+			
 		})
 	}
 	
