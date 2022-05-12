@@ -26,7 +26,7 @@ class EditCSV extends Component {
       csv_obj: props.csv_obj,
       merge_csv: props.merge_csv,
       csv_json: {},
-      csv_json_arr: [],
+      merge_csv_arr: {},
       needsSaveOutline: "outline-primary",
       showEdit: false
     }
@@ -50,33 +50,54 @@ class EditCSV extends Component {
     self.clusterpostservice = new ClusterpostService();
     self.clusterpostservice.setHttp(self.props.http);
 
-    if(merge_csv){
-      Promise.map(merge_csv, (csv)=>{
-        return self.dcbiareactservice.downloadFiles(csv.path, 'text')
-        .then((res)=>{
-          csvtojson()
-          .fromString(res.data)
-          .then((csv_json)=>{
-            return csv_json
-          })
-        })
-      })
-      .then((csv_json_arr)=>{
-        self.setState(csv_json_arr)
-      })
-    }else{
-      self.dcbiareactservice.downloadFiles(csv_obj.path, 'text')
-      .then((res)=>{
-        csvtojson()
-        .fromString(res.data)
-        .then((csv_json)=>{
-          // var csv_json_arr = [csv_json]
-          self.setState(csv_json)
-        })
-      })
-    }
+    if(merge_csv){    	    	
+    	Promise.map(_.keys(merge_csv), (cskey)=>{
+    		var csv = merge_csv[cskey]
+    		
+    		return self.dcbiareactservice.downloadFiles(csv.path, 'text')
+		    .then((res)=>{
+		      return res.data
+		    })
+    	})
+    	.then((csv_json_data)=>{
+    		return Promise.map(csv_json_data, (data)=>{
+	    		return csvtojson()
+						.fromString(data)		      
+						.then((csv_json)=>{
+						return csv_json
+					})
+    		})
+    	})
+    	.then((csv_json_arr)=>{
 
-    
+    		var csv_obj_0 = merge_csv[_.keys(merge_csv)[0]]
+
+    		var csv_json_0 = csv_json_arr[0]
+    		var csv_json_1 = csv_json_arr[1]
+
+    		var csv_json = _.map(csv_json_0, (row_0)=>{
+    			var row_1 = _.find(csv_json_1, (row_1)=>{
+    				return row_1["patientId"] == row_0["patientId"]
+    			})
+    			return _.extend(row_0, row_1)
+    		})
+    		self.setState({csv_json, csv_obj: {path: csv_obj_0.path.replace('.csv', '_merged.csv')}})
+    	})
+    	.catch((e)=>{
+    		console.error(e, "CANT MERGE the CSV. Maybe there is no patientId field")
+    	})
+    	
+    }else{
+    	self.dcbiareactservice.downloadFiles(csv_obj.path, 'text')
+	    .then((res)=>{
+	      csvtojson()
+	      .fromString(res.data)
+	      .then((csv_json)=>{
+	        // var csv_json_arr = [csv_json]
+	        self.setState({csv_json})
+	      })
+	    })
+    }
   }
 
   saveCSV(){
@@ -115,7 +136,7 @@ class EditCSV extends Component {
               <Button variant={needsSaveOutline} onClick={() => self.saveCSV()}>
                 <Save/>
               </Button>
-              <Button onClick={()=>{self.setState({showEdit})}}>
+              <Button variant="outline-primary" onClick={()=>{self.setState({showEdit})}}>
                 <Edit2/>
               </Button>
           </Nav>
@@ -125,7 +146,7 @@ class EditCSV extends Component {
 
   getTable(){
     const self = this
-    var {csv_json} = self.state
+    var {csv_json, showEdit} = self.state
 
     if(csv_json.length > 0){
       var table_head = _.keys(csv_json[0])
@@ -152,15 +173,21 @@ class EditCSV extends Component {
               </tr>
             </thead>
             <tbody>
-              {
+            	{                
                 _.map(csv_json, (r, idx)=>{
                   return (
                     <tr>{
                       _.map(table_head, (h)=>{
-                        return (<td><Form.Control type="text" name="name" value={r[h]} onChange={(e)=>{
-                          csv_json[idx][h] = e.target.value
-                          self.setState({csv_json, needsSaveOutline: 'outline-warning'})
-                        }}/></td>)
+                        return (
+
+                        	showEdit?
+	                        	<td><Form.Control type="text" name="name" value={r[h]} onChange={(e)=>{
+	                          csv_json[idx][h] = e.target.value
+	                          self.setState({csv_json, needsSaveOutline: 'outline-warning'})
+	                        }}/></td> :
+
+	                        <td> {r[h]} </td>
+                        )
                       })
                     }
                     </tr>
