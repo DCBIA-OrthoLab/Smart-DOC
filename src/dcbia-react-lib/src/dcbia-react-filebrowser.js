@@ -3,7 +3,7 @@ import React, {Component} from 'react'
 import { connect } from "react-redux";
 import {Container, Button, Table, Card, Alert, Col, Row, DropdownButton, Dropdown, Form, Modal, OverlayTrigger, Overlay, Tooltip, Popover, Badge, ButtonToolbar, ButtonGroup, InputGroup, FormControl, Spinner, Navbar, Nav, Breadcrumb, ProgressBar, ListGroup} from 'react-bootstrap'
 
-import {Trash2, Folder, Plus, ArrowLeft, ArrowDown, ArrowRight, MinusSquare, PlusSquare, CheckSquare, XSquare, X, CornerDownLeft, FolderMinus, FolderPlus, MoreVertical, ChevronLeft, ChevronsLeft, Share2, Circle, Download, File, UploadCloud, Move, Edit3, Edit2, Copy, Clipboard, Scissors, GitMerge} from 'react-feather'
+import {Trash2, Folder, Plus, ArrowLeft, ArrowDown, ArrowRight, MinusSquare, PlusSquare, CheckSquare, XSquare, X, CornerDownLeft, FolderMinus, FolderPlus, MoreVertical, ChevronLeft, ChevronsLeft, Share2, Circle, Download, File, UploadCloud, Move, Edit3, Edit2, Copy, Clipboard, Scissors, GitMerge, RefreshCw} from 'react-feather'
 
 import Dropzone from 'react-dropzone'
 
@@ -232,6 +232,11 @@ class Filebrowser extends Component {
 		.then(()=>{
 			self.updateDirectoryMap();
 		})
+	}
+
+	refreshBrowser(){
+		const self = this
+		self.updateDirectoryMap()
 	}
 
 
@@ -1058,10 +1063,17 @@ class Filebrowser extends Component {
 					<Row>
 
 						<Button className="mr-sm-2" variant="outline-success" hidden={!self.props.createtask} onClick={() => self.manageCreateTask()}> Validate Files Selection </Button>
+						<Col>
+							<OverlayTrigger overlay={<Tooltip>Refesh</Tooltip>} placement={'top'}>
+								<Button hidden={self.props.createtask} variant="outline-primary" onClick={() => self.refreshBrowser()}>
+									<RefreshCw/>
+								</Button>
+							</OverlayTrigger>
+						</Col>
               			<Col>
 							<OverlayTrigger overlay={<Tooltip>Merge CSV files</Tooltip>} placement={'top'}>
-								<Button hidden={self.props.createtask} variant="primary" onClick={() => self.mergeCSVFiles()}>
-									<GitMerge style={{"color": "white"}}> </GitMerge>
+								<Button hidden={self.props.createtask} variant="outline-primary" onClick={() => self.mergeCSVFiles()}>
+									<GitMerge/>
 								</Button>
 							</OverlayTrigger>
 						</Col>

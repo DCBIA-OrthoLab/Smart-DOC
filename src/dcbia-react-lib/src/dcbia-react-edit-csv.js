@@ -81,7 +81,12 @@ class EditCSV extends Component {
     			})
     			return _.extend(row_0, row_1)
     		})
-    		self.setState({csv_json, csv_obj: {path: csv_obj_0.path.replace('.csv', '_merged.csv')}})
+
+        var file_path = csv_obj_0.path.replace('.csv', '_merged.csv')
+        self.props.history.push({
+          search: qs.stringify({file_path})
+        });
+    		self.setState({csv_json, csv_obj: {path: file_path}, needsSaveOutline: 'outline-warning'})
     	})
     	.catch((e)=>{
     		console.error(e, "CANT MERGE the CSV. Maybe there is no patientId field")
@@ -118,7 +123,7 @@ class EditCSV extends Component {
       return self.dcbiareactservice.uploadFile(csv_obj.path, csv)
       .then((res)=>{
 
-        self.setState({needsSaveOutline: 'outline-info'})
+        self.setState({needsSaveOutline: 'outline-primary'})
         
       })
     }
