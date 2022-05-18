@@ -125,7 +125,7 @@ class CreateTask extends Component {
 					}else{
 						pattern_matches[key]["matches"] = _.map(_.range(max_matches), ()=>{return {...p, type: 'v'}})
 					}	
-				}else if(p.flag && !p.value){
+				}else if(p.flag && !p.value && !p.pattern && !p.suffix && !p.prefix){
 					pattern_matches[key]["matches"] = _.map(_.range(max_matches), ()=>{return {...p, type: 'v'}})
 				}	
 			})
