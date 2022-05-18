@@ -1,4 +1,4 @@
-import React, {Component} from 'react'
+import React, {Component, useRef} from 'react'
 
 import { connect } from "react-redux";
 import {Accordion, ListGroup, Container, Button, Table, Card, Col, Row, DropdownButton, Dropdown, Form, Modal, Alert, OverlayTrigger, Overlay, Tooltip, Popover, Badge, ButtonToolbar, ButtonGroup, InputGroup, FormControl, Spinner, Navbar, Nav, NavDropdown, Breadcrumb, ProgressBar, Collapse, Tabs, Tab} from 'react-bootstrap'
@@ -165,6 +165,8 @@ class CreateTask extends Component {
 							return [m.flag, path.join(email, dirname, prefix + filename.replace(ext, "") + suffix + ext)]
 						}else if(m.value){
 							return [m.flag, prefix + m.value + suffix]
+						}else if(m.flag){
+							return [m.flag]
 						}
 					}
 				})))]
@@ -177,6 +179,20 @@ class CreateTask extends Component {
 					}
 
 					job.inputs = _.map(zm, (m)=>{
+						if(m && m.type == 'f' && m.inputDir){
+							return {
+								name: email + '/' + path.dirname(m.path),
+								local_storage: true,
+								type: 'd'
+							}
+						}
+						if(m && m.type == 'd' && m.inputDir){
+							return {
+								name: email + '/' + m.path,
+								local_storage: true,
+								type: 'd'
+							}
+						}
 						if(m && m.type == 'f'){
 							return {
 								name: email + '/' + m.path,
@@ -561,8 +577,9 @@ class CreateTask extends Component {
 
 				<FormControl placeholder="job name" className="mt-1 mb-1 ml-1 mr-1" style={{width: "30%"}} value={self.jobName} onChange={(e) => self.setState({jobName: e.target.value})}/> 
 
+				
 				<Button size="sm" disabled={runDisabled} variant="success" onClick={() => self.submitJobs()}> Run! </Button>
-
+				
 			</ButtonGroup>
 		)
 
