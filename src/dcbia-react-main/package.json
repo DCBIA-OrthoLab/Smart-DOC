@@ -1,6 +1,6 @@
 {
   "name": "dcbia-react-main",
-  "version": "2.5.2",
+  "version": "2.5.3",
   "private": true,
   "dependencies": {
     "axios": "^0.19.2",
