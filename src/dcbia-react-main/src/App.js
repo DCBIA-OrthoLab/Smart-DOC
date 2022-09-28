@@ -9,6 +9,8 @@ import Activity from './Activity'
 import {JWTAuth, JWTAuthInterceptor, JWTAuthProfile, JWTAuthService, JWTAuthUsers} from 'react-hapi-jwt-auth';
 
 import Container from 'react-bootstrap/Container';
+import Accordion from'react-bootstrap/Accordion';
+import Alert from'react-bootstrap/Alert';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Card from 'react-bootstrap/Card';
@@ -17,6 +19,7 @@ import Carousel from 'react-bootstrap/Carousel';
 import FormControl from 'react-bootstrap/FormControl';
 import InputGroup from 'react-bootstrap/InputGroup';
 import Button from 'react-bootstrap/Button';
+import Toast from 'react-bootstrap/Toast';
 import { connect } from "react-redux";
 
 import axios from 'axios';
@@ -26,6 +29,9 @@ import {DcbiaReactProjects, DcbiaReactMorphologicalData, DcbiaReactClinicalData,
 import {ClusterpostJobs, ClusterpostTokens, ClusterpostDashboard} from 'clusterpost-list-react'
 import {MedImgSurf} from 'react-med-img-viewer';
 
+import { Chrono } from "react-chrono";
+
+import {FolderPlus, Share2, BookOpen, Book} from 'react-feather'
 
 class App extends Component {
   
@@ -42,7 +48,8 @@ class App extends Component {
     this.state = {
       user: {},
       showLogin: true,
-      test: false
+      test: false,
+      showIntegration: false
     }
 
     store.dispatch({
@@ -112,62 +119,196 @@ class App extends Component {
   }
 
   showAbout(){
-    const {landingVtk} = this.state;
-    return (
-      <Carousel style={{height: "50%"}} variant="primary">
-      <Carousel.Item>
-          <Container fluid="true" style={{height: "40%"}}>
-            <Row>
-              <Col sm={6}>
-                <Card>
-                  <Card.Body>
-                    <Card.Text>
-                      An open-source, free comprehensive platform for data sharing and computation
-                      allowing dental researchers scientists to support patient-specific decision making and assessment of the disease progression.
-                    </Card.Text>
-                  </Card.Body>
-                  <Card.Img variant="top" src="images/teeth.png"/>
-                </Card>
-              </Col>
-              <Col sm={6}>
-                <MedImgSurf data={[{data: landingVtk, color: [0,255,255]}]}/>
-              </Col>
-            </Row>
-          </Container>
-        </Carousel.Item>
-        <Carousel.Item>
-          <img
-            src="images/Slide1.jpg"
-            alt="First slide"
-          />
-          <Carousel.Caption style={{color: "goldenrod"}}>
-            <h3>Root Canal Segmentation (RCSeg)</h3>
-            <p>Also available in a docker container. Further documentation <a href="https://github.com/DCBIA-OrthoLab/CBCT_seg" target="_blank">here</a></p>
-          </Carousel.Caption>
-        </Carousel.Item>
-        <Carousel.Item>
-          <img
-            src="images/Slide2.jpg"
-            alt="Second slide"
-          />
+    const self = this;
+    const {landingVtk, showIntegration} = this.state;
 
-          <Carousel.Caption style={{color: "goldenrod"}}>
-            <h3>Dental Model Segmentation (DentalModelSeg)</h3>
-            <p>Also available in a docker container. Further documentation <a href="https://github.com/DCBIA-OrthoLab/fly-by-cnn" target="_blank">here</a></p>
-          </Carousel.Caption>
-        </Carousel.Item>
-        <Carousel.Item>
-          <img
-            src="images/Slide3.jpg"
-            alt="Third slide"
-          />
+    // return (
+    //   <Carousel style={{height: "50%"}} variant="primary">
+    //   <Carousel.Item>
+    //       <Container fluid="true" style={{height: "40%"}}>
+    //         <Row>
+    //           <Col sm={6}>
+    //             <Card>
+    //               <Card.Body>
+    //                 <Card.Text>
+    //                   An open-source, free comprehensive platform for data sharing and computation
+    //                   allowing dental researchers scientists to support patient-specific decision making and assessment of the disease progression.
+    //                 </Card.Text>
+    //               </Card.Body>
+    //               <Card.Img variant="top" src="images/teeth.png"/>
+    //             </Card>
+    //           </Col>
+    //           <Col sm={6}>
+    //             <MedImgSurf data={[{data: landingVtk, color: [0,255,255]}]}/>
+    //           </Col>
+    //         </Row>
+    //       </Container>
+    //     </Carousel.Item>
+    //     <Carousel.Item>
+    //       <img
+    //         src="images/Slide1.jpg"
+    //         alt="First slide"
+    //       />
+    //       <Carousel.Caption style={{color: "goldenrod"}}>
+    //         <h3>Root Canal Segmentation (RCSeg)</h3>
+    //         <p>Also available in a docker container. Further documentation <a href="https://github.com/DCBIA-OrthoLab/CBCT_seg" target="_blank">here</a></p>
+    //       </Carousel.Caption>
+    //     </Carousel.Item>
+    //     <Carousel.Item>
+    //       <img
+    //         src="images/Slide2.jpg"
+    //         alt="Second slide"
+    //       />
 
-          <Carousel.Caption style={{color: "goldenrod"}}>
-            <h3>Universal labeling and merging</h3>
-            <p>Also available in a docker container. Further documentation <a href="https://github.com/DCBIA-OrthoLab/fly-by-cnn" target="_blank">here</a></p>
-          </Carousel.Caption>
-        </Carousel.Item>
-      </Carousel>)
+    //       <Carousel.Caption style={{color: "goldenrod"}}>
+    //         <h3>Dental Model Segmentation (DentalModelSeg)</h3>
+    //         <p>Also available in a docker container. Further documentation <a href="https://github.com/DCBIA-OrthoLab/fly-by-cnn" target="_blank">here</a></p>
+    //       </Carousel.Caption>
+    //     </Carousel.Item>
+    //     <Carousel.Item>
+    //       <img
+    //         src="images/Slide3.jpg"
+    //         alt="Third slide"
+    //       />
+
+    //       <Carousel.Caption style={{color: "goldenrod"}}>
+    //         <h3>Universal labeling and merging</h3>
+    //         <p>Also available in a docker container. Further documentation <a href="https://github.com/DCBIA-OrthoLab/fly-by-cnn" target="_blank">here</a></p>
+    //       </Carousel.Caption>
+    //     </Carousel.Item>
+    //   </Carousel>)
+    return (<Chrono mode="VERTICAL">
+              <Container>
+                <Row>
+                  <h2>Data Storage for Computation and Integration</h2>
+                </Row>
+                <Row>
+                  <Col sm={4}>
+                    <Card>
+                      <Card.Body>
+                        <Card.Text>
+                          The Data Storage for Computation and Integration (DSCI) is an open-source comprehensive platform for data storage, sharing and computation allowing clinicians and dental researchers to support patient-specific decision in Dentistry.
+                        </Card.Text>
+                      </Card.Body>
+                    </Card>
+                  </Col>
+                  <Col sm={4}>
+                    <MedImgSurf data={[{data: landingVtk, color: [0,255,255]}]}/>
+                  </Col>
+                </Row>
+              </Container>
+              <Container>
+                <Row>
+                  <h2>Data Storage </h2>
+                </Row>
+                <Row>
+                  <Col sm={4}>
+                    <Card>
+                      <Card.Body>
+                        <FolderPlus color="green" size={120}/>
+                        <Card.Text>
+                          Create folders and archive anonymized data in a safe cloud base environment 
+                        </Card.Text>
+                      </Card.Body>
+                    </Card>
+                  </Col>
+                  <Col sm={4}>
+                    <Card>
+                      <Card.Body>
+                        <Share2 color="red" size={120}/>
+                        <Card.Text>
+                          Create folders and archive anonymized data in a safe cloud base environment 
+                        </Card.Text>
+                      </Card.Body>
+                    </Card>
+                  </Col>
+                </Row>
+              </Container>
+              <Container>
+                <Row>
+                  <h2>Computation and Integration</h2>
+                </Row>
+                <Row>
+                  <Col sm={3}>
+                    <Alert variant="warning">
+                      <Alert.Heading>Integration</Alert.Heading>
+                      <p>
+                        9 tasks
+                      </p>
+                      <hr/>
+                      <div className="d-flex justify-content-end">
+                        <Button onClick={()=>{self.setState({showIntegration: !showIntegration})}} variant="warning">
+                          <BookOpen hidden={showIntegration}/>
+                          <Book hidden={!showIntegration}/>
+                        </Button>
+                      </div>
+                    </Alert>
+                  </Col>
+                  <Col sm={3}>
+                    <Alert variant="dark">
+                      <Alert.Heading>Utilities</Alert.Heading>
+                      <p>
+                        4 tasks
+                      </p>
+                    </Alert>
+                  </Col>
+                  <Col sm={3}>
+                    <Alert variant="warning">
+                      <Alert.Heading>Segmentation</Alert.Heading>
+                      <p>
+                        5 tasks
+                      </p>
+                    </Alert>
+                  </Col>
+                  <Col sm={3}>
+                    <p>
+                      Create several tasks that will help patient-specific decisions required in different specialties in Dentistry
+                    </p>
+                  </Col>
+                </Row>
+                <Row>
+                  <Card style={showIntegration? {display: 'block'}: {display: 'none'}}>
+                      <Container fluid="true">
+                        <Row>
+                          <Col sm={4}>
+                            <Card>
+                              <Card.Img variant="top" src="images/tmjoai.png"/>
+                            </Card>
+                          </Col>
+                          <Col sm={4}>
+                            <Card>
+                              <Card.Body>
+                                <Card.Text>
+                                  Create folders and archive anonymized data in a safe cloud base environment 
+                                </Card.Text>
+                              </Card.Body>
+                            </Card>
+                          </Col>
+                          <Col sm={4}>
+                            <Card>
+                              <Card.Body>
+                                <Card.Text>
+                                  Create folders and archive anonymized data in a safe cloud base environment 
+                                </Card.Text>
+                              </Card.Body>
+                            </Card>
+                          </Col>
+                        </Row>
+                      </Container>
+                  </Card>
+                </Row>
+              </Container>
+              <Container>
+                <Row>
+                  <h2>Why the DSCI?</h2>
+                </Row>
+                <Row>
+                  <p>
+                    The DSCI is a user-friendly open access platform that allows the analysis of multimodal 3D image features and diverse patient biological and clinical data in a very easy, quick and simple way.
+                  </p>
+                </Row>
+              </Container>
+            </Chrono>)
   }
 
   sendMessage(){
