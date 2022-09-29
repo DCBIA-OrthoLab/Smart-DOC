@@ -77,7 +77,7 @@ class App extends Component {
 
     http({
       method: 'GET',
-      url: '/surf/condyle.vtk',
+      url: '/surf/skull.vtk',
       responseType: 'text'
     })
     .then((res)=>{
