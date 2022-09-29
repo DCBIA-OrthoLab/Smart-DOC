@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Route, HashRouter } from 'react-router-dom';
+import { Route, HashRouter} from 'react-router-dom';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -19,7 +19,7 @@ import Carousel from 'react-bootstrap/Carousel';
 import FormControl from 'react-bootstrap/FormControl';
 import InputGroup from 'react-bootstrap/InputGroup';
 import Button from 'react-bootstrap/Button';
-import Toast from 'react-bootstrap/Toast';
+import Form from 'react-bootstrap/Form';
 import { connect } from "react-redux";
 
 import axios from 'axios';
@@ -31,7 +31,7 @@ import {MedImgSurf} from 'react-med-img-viewer';
 
 import { Chrono } from "react-chrono";
 
-import {FolderPlus, Share2, BookOpen, Book} from 'react-feather'
+import {FolderPlus, Share2, BookOpen, Book, User} from 'react-feather'
 
 class App extends Component {
   
@@ -49,7 +49,10 @@ class App extends Component {
       user: {},
       showLogin: true,
       test: false,
-      showIntegration: false
+      showIntegration: false,
+      showUtilities: false,
+      showSegmentation: false,
+      showTimeLineLogin: false
     }
 
     store.dispatch({
@@ -113,6 +116,14 @@ class App extends Component {
       
   }
 
+  createUser(){
+    const self = this;
+    const {newUser} = self.state
+
+    console.log(newUser)
+
+  }
+
   showLanding(){
     return (
       this.showAbout());
@@ -120,7 +131,8 @@ class App extends Component {
 
   showAbout(){
     const self = this;
-    const {landingVtk, showIntegration} = this.state;
+    const {landingVtk, showIntegration, showUtilities, showSegmentation, showTimeLineLogin} = this.state;
+    var newUser = this.state.newUser
 
     // return (
     //   <Carousel style={{height: "50%"}} variant="primary">
@@ -250,6 +262,13 @@ class App extends Component {
                       <p>
                         4 tasks
                       </p>
+                      <hr/>
+                      <div className="d-flex justify-content-end">
+                        <Button onClick={()=>{self.setState({showUtilities: !showUtilities})}} variant="dark">
+                          <BookOpen hidden={showUtilities}/>
+                          <Book hidden={!showUtilities}/>
+                        </Button>
+                      </div>
                     </Alert>
                   </Col>
                   <Col sm={3}>
@@ -258,6 +277,13 @@ class App extends Component {
                       <p>
                         5 tasks
                       </p>
+                      <hr/>
+                      <div className="d-flex justify-content-end">
+                        <Button onClick={()=>{self.setState({showSegmentation: !showSegmentation})}} variant="warning">
+                          <BookOpen hidden={showSegmentation}/>
+                          <Book hidden={!showSegmentation}/>
+                        </Button>
+                      </div>
                     </Alert>
                   </Col>
                   <Col sm={3}>
@@ -277,20 +303,111 @@ class App extends Component {
                           </Col>
                           <Col sm={4}>
                             <Card>
-                              <Card.Body>
-                                <Card.Text>
-                                  Create folders and archive anonymized data in a safe cloud base environment 
-                                </Card.Text>
-                              </Card.Body>
+                              <Card.Img variant="top" src="images/tmjoai_train.png"/>
                             </Card>
                           </Col>
                           <Col sm={4}>
                             <Card>
-                              <Card.Body>
-                                <Card.Text>
-                                  Create folders and archive anonymized data in a safe cloud base environment 
-                                </Card.Text>
-                              </Card.Body>
+                              <Card.Img variant="top" src="images/tmjoai_retrain.png"/>
+                            </Card>
+                          </Col>
+                        </Row>
+                        <Row>
+                          <Col sm={4}>
+                            <Card>
+                              <Card.Img variant="top" src="images/ulms.png"/>
+                            </Card>
+                          </Col>
+                          <Col sm={4}>
+                            <Card>
+                              <Card.Img variant="top" src="images/tmjpi.png"/>
+                            </Card>
+                          </Col>
+                          <Col sm={4}>
+                            <Card>
+                              <Card.Img variant="top" src="images/tmjpi_train.png"/>
+                            </Card>
+                          </Col>
+                        </Row>
+                        <Row>
+                          <Col sm={4}>
+                            <Card>
+                              <Card.Img variant="top" src="images/mfsda_select.png"/>
+                            </Card>
+                          </Col>
+                          <Col sm={4}>
+                            <Card>
+                              <Card.Img variant="top" src="images/mfsda.png"/>
+                            </Card>
+                          </Col>
+                          <Col sm={4}>
+                            <Card>
+                              <Card.Img variant="top" src="images/mfsda_create.png"/>
+                            </Card>
+                          </Col>
+                        </Row>
+                      </Container>
+                  </Card>
+                  <Card style={showUtilities? {display: 'block'}: {display: 'none'}}>
+                      <Container fluid="true">
+                        <Row>
+                          <Col sm={6}>
+                            <Card>
+                              <Card.Img variant="top" src="images/bone_texture.png"/>
+                            </Card>
+                          </Col>
+                          <Col sm={6}>
+                            <Card>
+                              <Card.Img variant="top" src="images/histogram_match.png"/>
+                            </Card>
+                          </Col>
+                        </Row>
+                        <Row>
+                          <Col sm={6}>
+                            <Card>
+                              <Card.Img variant="top" src="images/merge_csv.png"/>
+                            </Card>
+                          </Col>
+                          <Col sm={6}>
+                            <Card>
+                              <Card.Img variant="top" src="images/rescale_intensity.png"/>
+                            </Card>
+                          </Col>
+                        </Row>
+                      </Container>
+                  </Card>
+                  <Card style={showSegmentation? {display: 'block'}: {display: 'none'}}>
+                      <Container fluid="true">
+                        <Row>
+                          <Col sm={8}>
+                            <Row>
+                              <Col sm={6}>
+                                <Card>
+                                  <Card.Img variant="top" src="images/mand_seg.png"/>
+                                </Card>
+                              </Col>
+                              <Col sm={6}>
+                                <Card>
+                                  <Card.Img variant="top" src="images/root_canal_seg.png"/>
+                                </Card>
+                              </Col>
+                            </Row>
+                            <Row>
+                              <Col sm={6}>
+                                <Card>
+                                  <Card.Img variant="top" src="images/amasss.png"/>
+                                </Card>
+                              </Col>
+                              <Col sm={6}>
+                                <Card>
+                                  <Card.Img variant="top" src="images/tmjseg.png"/>
+                                </Card>
+                              </Col>
+                            </Row>                            
+                          </Col>
+                          <Col sm={4}>
+                            <Card>
+                              <Card.Img variant="top" src="images/dental_model_seg.png"/>
                             </Card>
                           </Col>
                         </Row>
@@ -303,9 +420,27 @@ class App extends Component {
                   <h2>Why the DSCI?</h2>
                 </Row>
                 <Row>
-                  <p>
-                    The DSCI is a user-friendly open access platform that allows the analysis of multimodal 3D image features and diverse patient biological and clinical data in a very easy, quick and simple way.
-                  </p>
+                  <Col sm={4}>
+                    <p>
+                      The DSCI is a user-friendly open access platform that allows the analysis of multimodal 3D image features and diverse patient biological and clinical data in a very easy, quick and simple way.
+                    </p>
+                  </Col>
+                </Row>
+              </Container>
+              <Container>
+                <Row>
+                  <Card>
+                    <Card.Body>
+                      <Card.Text>
+                        <Button onClick={()=>{self.setState({showTimeLineLogin: !showTimeLineLogin})}} variant="success">
+                        Create Account
+                        </Button>
+                      </Card.Text>
+                      {
+                        showTimeLineLogin? <JWTAuth></JWTAuth> : ''
+                      }
+                    </Card.Body>
+                  </Card>
                 </Row>
               </Container>
             </Chrono>)
