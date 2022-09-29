@@ -249,7 +249,7 @@ class App extends Component {
                       </p>
                       <hr/>
                       <div className="d-flex justify-content-end">
-                        <Button onClick={()=>{self.setState({showIntegration: !showIntegration})}} variant="warning">
+                        <Button onClick={()=>{self.setState({showIntegration: !showIntegration, showUtilities: false, showSegmentation: false})}} variant="warning">
                           <BookOpen hidden={showIntegration}/>
                           <Book hidden={!showIntegration}/>
                         </Button>
@@ -264,7 +264,7 @@ class App extends Component {
                       </p>
                       <hr/>
                       <div className="d-flex justify-content-end">
-                        <Button onClick={()=>{self.setState({showUtilities: !showUtilities})}} variant="dark">
+                        <Button onClick={()=>{self.setState({showUtilities: !showUtilities, showIntegration: false, showSegmentation: false})}} variant="dark">
                           <BookOpen hidden={showUtilities}/>
                           <Book hidden={!showUtilities}/>
                         </Button>
@@ -279,7 +279,7 @@ class App extends Component {
                       </p>
                       <hr/>
                       <div className="d-flex justify-content-end">
-                        <Button onClick={()=>{self.setState({showSegmentation: !showSegmentation})}} variant="warning">
+                        <Button onClick={()=>{self.setState({showSegmentation: !showSegmentation, showIntegration:false, showUtilities: false})}} variant="warning">
                           <BookOpen hidden={showSegmentation}/>
                           <Book hidden={!showSegmentation}/>
                         </Button>
