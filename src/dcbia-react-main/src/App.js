@@ -205,7 +205,10 @@ class App extends Component {
                     </Card>
                   </Col>
                   <Col sm={4}>
-                    <MedImgSurf data={[{data: landingVtk, color: [0,255,255]}]}/>
+                    {/*<MedImgSurf data={[{data: landingVtk, color: [0,255,255]}]}/>*/}
+                    <video width="320" height="240" controls autoplay>
+                      <source src="videos/dsci.mov" type="video/mp4"/>
+                    </video>
                   </Col>
                 </Row>
               </Container>
