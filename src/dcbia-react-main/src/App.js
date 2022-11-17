@@ -77,7 +77,7 @@ class App extends Component {
 
     http({
       method: 'GET',
-      url: '/surf/skull.vtk',
+      url: '/surf/skull_d.vtk',
       responseType: 'text'
     })
     .then((res)=>{
@@ -194,9 +194,9 @@ class App extends Component {
                 <Row>
                   <h2>Data Storage for Computation and Integration</h2>
                 </Row>
-                <Row>
+                <Row className="justify-content-md-center">
                   <Col sm={4}>
-                    <Card>
+                    <Card bg="info">
                       <Card.Body>
                         <Card.Text>
                           The Data Storage for Computation and Integration (DSCI) is an open-source comprehensive platform for data storage, sharing and computation allowing clinicians and dental researchers to support patient-specific decision in Dentistry.
@@ -205,10 +205,12 @@ class App extends Component {
                     </Card>
                   </Col>
                   <Col sm={4}>
-                    {/*<MedImgSurf data={[{data: landingVtk, color: [0,255,255]}]}/>*/}
-                    <video width="320" height="240" controls autoplay>
+                    <video width="256" height="256" controls  muted  autoPlay>
                       <source src="videos/dsci.mov" type="video/mp4"/>
                     </video>
+                  </Col>
+                  <Col sm={4}>
+                    <MedImgSurf data={[{data: landingVtk, color: [0,255,255]}]}/>
                   </Col>
                 </Row>
               </Container>
@@ -216,9 +218,9 @@ class App extends Component {
                 <Row>
                   <h2>Data Storage </h2>
                 </Row>
-                <Row>
+                <Row className="justify-content-md-center">
                   <Col sm={4}>
-                    <Card>
+                    <Card bg="success">
                       <Card.Body>
                         <FolderPlus color="green" size={120}/>
                         <Card.Text>
@@ -228,7 +230,7 @@ class App extends Component {
                     </Card>
                   </Col>
                   <Col sm={4}>
-                    <Card>
+                    <Card bg="warning">
                       <Card.Body>
                         <Share2 color="red" size={120}/>
                         <Card.Text>
@@ -243,7 +245,7 @@ class App extends Component {
                 <Row>
                   <h2>Computation and Integration</h2>
                 </Row>
-                <Row>
+                <Row className="justify-content-md-center">
                   <Col sm={3}>
                     <Alert variant="warning">
                       <Alert.Heading>Integration</Alert.Heading>
@@ -295,7 +297,7 @@ class App extends Component {
                     </p>
                   </Col>
                 </Row>
-                <Row>
+                <Row className="justify-content-md-center">
                   <Card style={showIntegration? {display: 'block'}: {display: 'none'}}>
                       <Container fluid="true">
                         <Row>
@@ -422,16 +424,28 @@ class App extends Component {
                 <Row>
                   <h2>Why the DSCI?</h2>
                 </Row>
-                <Row>
+                <Row className="justify-content-md-center">
                   <Col sm={4}>
-                    <p>
-                      The DSCI is a user-friendly open access platform that allows the analysis of multimodal 3D image features and diverse patient biological and clinical data in a very easy, quick and simple way.
-                    </p>
+                    <Card bg="secondary">
+                      <Card.Body>
+                        <Card.Text>
+                          The DSCI is a user-friendly open access platform that allows the analysis of multimodal 3D image features and diverse patient biological and clinical data in a very easy, quick and simple way.
+                        </Card.Text>
+                      </Card.Body>
+                    </Card>
+                  </Col>
+                  <Col sm={4}>
+                    <Card>
+                      <Card.Img variant="top" src="images/SlicerAutomatedDentalTools.png"/>
+                      <Card.Body>
+                        <Button variant="primary" href="https://www.slicer.org/">3DSlicer</Button>
+                      </Card.Body>
+                    </Card>
                   </Col>
                 </Row>
               </Container>
               <Container>
-                <Row>
+                <Row className="justify-content-md-center">
                   <Card>
                     <Card.Body>
                       <Card.Text>
@@ -556,7 +570,7 @@ class App extends Component {
             <NavBar jwtauth={this.jwtauth}/>
           </header>
           
-          <Container fluid="true" style={{height: "100%", minHeight: "90vh"}}>
+          <Container style={{height: "100%", minHeight: "90vh"}}>
             <Route path="/login" component={this.login.bind(this)}/>
             <Route path="/logout" component={this.showLanding.bind(this)}/>
             <Route path="/user" component={this.profile.bind(this)}/>

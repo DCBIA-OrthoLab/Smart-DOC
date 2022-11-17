@@ -92,7 +92,7 @@ class NavBar extends Component{
     const {user} = self.props;
 
     return (
-    <Container fluid="true">
+    <Container>
       <Row>
         <Col class="title">
           <h2>
