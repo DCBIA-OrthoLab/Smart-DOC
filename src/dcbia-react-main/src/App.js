@@ -20,6 +20,7 @@ import FormControl from 'react-bootstrap/FormControl';
 import InputGroup from 'react-bootstrap/InputGroup';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
+import ListGroup from 'react-bootstrap/ListGroup';
 import { connect } from "react-redux";
 
 import axios from 'axios';
@@ -27,7 +28,7 @@ import store from "./redux/store";
 
 import {DcbiaReactProjects, DcbiaReactMorphologicalData, DcbiaReactClinicalData, DcbiaReactFilebrowser, DcbiaReactCreateTask, DcbiaReactService, DcbiaReactSubmitMessage} from 'dcbia-react-lib'
 import {ClusterpostJobs, ClusterpostTokens, ClusterpostDashboard} from 'clusterpost-list-react'
-import {MedImgSurf} from 'react-med-img-viewer';
+import {MedImgSurf} from 'react-med-img';
 
 import { Chrono } from "react-chrono";
 
@@ -52,7 +53,10 @@ class App extends Component {
       showIntegration: false,
       showUtilities: false,
       showSegmentation: false,
-      showTimeLineLogin: false
+      showCreateUser: false,
+      showDataFolder: false,
+      showDataSharing: false,
+      surfData: [{ surf: "skull_d.vtk", color: [0, 255, 255] }]
     }
 
     store.dispatch({
@@ -61,6 +65,8 @@ class App extends Component {
     });
 
     this.clusterpost = {};
+
+    this.showCreateUserRef = React.createRef()
 
     const self = this;
 
@@ -75,14 +81,14 @@ class App extends Component {
     self.dcbiareactservice = new DcbiaReactService();
     self.dcbiareactservice.setHttp(http);
 
-    http({
-      method: 'GET',
-      url: '/surf/skull_d.vtk',
-      responseType: 'text'
-    })
-    .then((res)=>{
-      self.setState({...self.state, landingVtk: res.data});
-    })
+    // http({
+    //   method: 'GET',
+    //   url: '/surf/skull_d.vtk',
+    //   responseType: 'text'
+    // })
+    // .then((res)=>{
+    //   self.setState({...self.state, landingVtk: res.data});
+    // })
 
     jwtauth.getUser()
     .then((user)=>{store.dispatch({
@@ -116,14 +122,6 @@ class App extends Component {
       
   }
 
-  createUser(){
-    const self = this;
-    const {newUser} = self.state
-
-    console.log(newUser)
-
-  }
-
   showLanding(){
     return (
       this.showAbout());
@@ -131,7 +129,8 @@ class App extends Component {
 
   showAbout(){
     const self = this;
-    const {landingVtk, showIntegration, showUtilities, showSegmentation, showTimeLineLogin} = this.state;
+    const {landingVtk, showIntegration, showUtilities, showSegmentation, surfData, showDataFolder, showDataSharing, showCreateUser} = this.state;
+
     var newUser = this.state.newUser
 
     // return (
@@ -189,14 +188,14 @@ class App extends Component {
     //       </Carousel.Caption>
     //     </Carousel.Item>
     //   </Carousel>)
-    return (<Chrono mode="VERTICAL">
-              <Container>
+    return (<ListGroup>
+              <ListGroup.Item>
                 <Row>
                   <h2>Data Storage for Computation and Integration</h2>
                 </Row>
                 <Row className="justify-content-md-center">
                   <Col sm={4}>
-                    <Card bg="info">
+                    <Card style={{border: 'none'}}>
                       <Card.Body>
                         <Card.Text>
                           The Data Storage for Computation and Integration (DSCI) is an open-source comprehensive platform for data storage, sharing and computation allowing clinicians and dental researchers to support patient-specific decision in Dentistry.
@@ -210,38 +209,90 @@ class App extends Component {
                     </video>
                   </Col>
                   <Col sm={4}>
-                    <MedImgSurf data={[{data: landingVtk, color: [0,255,255]}]}/>
+                    <MedImgSurf background={[1, 1, 1]} data={surfData}/>
                   </Col>
                 </Row>
-              </Container>
-              <Container>
+              </ListGroup.Item>
+              <ListGroup.Item variant="dark">
                 <Row>
                   <h2>Data Storage </h2>
                 </Row>
                 <Row className="justify-content-md-center">
                   <Col sm={4}>
-                    <Card bg="success">
+                    <Card bg="dark" text="light">
                       <Card.Body>
                         <FolderPlus color="green" size={120}/>
                         <Card.Text>
                           Create folders and archive anonymized data in a safe cloud base environment 
                         </Card.Text>
+                        <div className="d-flex justify-content-end">
+                          <Button onClick={()=>{self.setState({showDataFolder: !showDataFolder, showDataSharing:false})}} variant="light">
+                            <BookOpen hidden={showDataFolder}/>
+                            <Book hidden={!showDataFolder}/>
+                          </Button>
+                        </div>
                       </Card.Body>
                     </Card>
                   </Col>
                   <Col sm={4}>
-                    <Card bg="warning">
+                    <Card bg="dark" text="light">
                       <Card.Body>
                         <Share2 color="red" size={120}/>
                         <Card.Text>
-                          Create folders and archive anonymized data in a safe cloud base environment 
+                          Share small or large data safely with a single click in a few seconds
                         </Card.Text>
+                        <div className="d-flex justify-content-end">
+                          <Button onClick={()=>{self.setState({showDataFolder: false, showDataSharing:!showDataSharing})}} variant="light">
+                            <BookOpen hidden={showDataSharing}/>
+                            <Book hidden={!showDataSharing}/>
+                          </Button>
+                        </div>
                       </Card.Body>
                     </Card>
                   </Col>
                 </Row>
-              </Container>
-              <Container>
+                <Row>
+                  <Container fluid="true" style={showDataFolder? {display: 'block'}: {display: 'none'}}>
+                    <Alert variant="dark">
+                      <Alert.Heading>Store precious data safely</Alert.Heading>
+                      <p>
+                        There are a variety of services offered by DSCI that help with storing and managing data. 
+                        The 'FAIR Guiding Principles for scientific data management and stewardship' were published in <Alert.Link href='https://www.nature.com/articles/sdata201618'>Scientific Data</Alert.Link> to provide guidelines to improve <i>Findability</i>, <i>Accessibility</i>, <i>Interoperability</i>, and <i>Reuse</i> of digital assets. 
+                      </p>
+                      <hr/>
+                      <p>
+                        The principles emphasize machine-actionability (<i>i.e.</i>, the capacity of computational systems
+                        to find, access, interoperate, and reuse data with none or minimal human intervention)
+                        because humans increasingly rely on computational support to deal with data as a result of the increase in volume, complexity, and creation speed of data.
+                      </p>
+                    </Alert>
+                  </Container>
+                  <Container fluid="true" style={showDataSharing? {display: 'block'}: {display: 'none'}}>
+                    <Alert variant="dark">
+                      <Alert.Heading>Data sharing</Alert.Heading>
+                      <p>
+                      The ultimate goal of FAIR is to optimize data reusability and sharing. 
+                      To achieve this, metadata and data should be well-described so that they can be replicated 
+                      and/or combined in different settings. 
+                      </p>
+                      <hr/>
+                      <p>FAIR sharing principles refer to:</p>
+                      <ul>
+                        <li>Data (or any digital object)</li>
+                        <li>Metadata (information about that digital object)</li> 
+                        <li>Infrastructure.</li>
+                      </ul>
+                      <p>
+                        Both metadata and data are registered or indexed in a searchable resource (the infrastructure component).
+                      </p>
+                      <p>
+                        For more information, please refer to <Alert.Link href="https://sharing.nih.gov/data-management-and-sharing-policy/about-data-management-and-sharing-policies/data-management-and-sharing-policy-overview">NIH Data Management and Sharing Policy.</Alert.Link>
+                      </p>
+                    </Alert>
+                  </Container>
+                </Row>
+              </ListGroup.Item>
+              <ListGroup.Item>
                 <Row>
                   <h2>Computation and Integration</h2>
                 </Row>
@@ -298,135 +349,129 @@ class App extends Component {
                   </Col>
                 </Row>
                 <Row className="justify-content-md-center">
-                  <Card style={showIntegration? {display: 'block'}: {display: 'none'}}>
-                      <Container fluid="true">
-                        <Row>
-                          <Col sm={4}>
-                            <Card>
-                              <Card.Img variant="top" src="images/tmjoai.png"/>
-                            </Card>
-                          </Col>
-                          <Col sm={4}>
-                            <Card>
-                              <Card.Img variant="top" src="images/tmjoai_train.png"/>
-                            </Card>
-                          </Col>
-                          <Col sm={4}>
-                            <Card>
-                              <Card.Img variant="top" src="images/tmjoai_retrain.png"/>
-                            </Card>
-                          </Col>
-                        </Row>
-                        <Row>
-                          <Col sm={4}>
-                            <Card>
-                              <Card.Img variant="top" src="images/ulms.png"/>
-                            </Card>
-                          </Col>
-                          <Col sm={4}>
-                            <Card>
-                              <Card.Img variant="top" src="images/tmjpi.png"/>
-                            </Card>
-                          </Col>
-                          <Col sm={4}>
-                            <Card>
-                              <Card.Img variant="top" src="images/tmjpi_train.png"/>
-                            </Card>
-                          </Col>
-                        </Row>
-                        <Row>
-                          <Col sm={4}>
-                            <Card>
-                              <Card.Img variant="top" src="images/mfsda_select.png"/>
-                            </Card>
-                          </Col>
-                          <Col sm={4}>
-                            <Card>
-                              <Card.Img variant="top" src="images/mfsda.png"/>
-                            </Card>
-                          </Col>
-                          <Col sm={4}>
-                            <Card>
-                              <Card.Img variant="top" src="images/mfsda_create.png"/>
-                            </Card>
-                          </Col>
-                        </Row>
-                      </Container>
-                  </Card>
-                  <Card style={showUtilities? {display: 'block'}: {display: 'none'}}>
-                      <Container fluid="true">
+                  <Container fluid="true" style={showIntegration? {display: 'block'}: {display: 'none'}}>
+                    <Row>
+                      <Col sm={4}>
+                        <Card style={{border: 'none'}}>
+                          <Card.Img variant="top" src="images/tmjoai.png"/>
+                        </Card>
+                      </Col>
+                      <Col sm={4}>
+                        <Card style={{border: 'none'}}>
+                          <Card.Img variant="top" src="images/tmjoai_train.png"/>
+                        </Card>
+                      </Col>
+                      <Col sm={4}>
+                        <Card style={{border: 'none'}}>
+                          <Card.Img variant="top" src="images/tmjoai_retrain.png"/>
+                        </Card>
+                      </Col>
+                    </Row>
+                    <Row>
+                      <Col sm={4}>
+                        <Card style={{border: 'none'}}>
+                          <Card.Img variant="top" src="images/ulms.png"/>
+                        </Card>
+                      </Col>
+                      <Col sm={4}>
+                        <Card style={{border: 'none'}}>
+                          <Card.Img variant="top" src="images/tmjpi.png"/>
+                        </Card>
+                      </Col>
+                      <Col sm={4}>
+                        <Card style={{border: 'none'}}>
+                          <Card.Img variant="top" src="images/tmjpi_train.png"/>
+                        </Card>
+                      </Col>
+                    </Row>
+                    <Row>
+                      <Col sm={4}>
+                        <Card style={{border: 'none'}}>
+                          <Card.Img variant="top" src="images/mfsda_select.png"/>
+                        </Card>
+                      </Col>
+                      <Col sm={4}>
+                        <Card style={{border: 'none'}}>
+                          <Card.Img variant="top" src="images/mfsda.png"/>
+                        </Card>
+                      </Col>
+                      <Col sm={4}>
+                        <Card style={{border: 'none'}}>
+                          <Card.Img variant="top" src="images/mfsda_create.png"/>
+                        </Card>
+                      </Col>
+                    </Row>
+                  </Container>
+                  <Container fluid="true" style={showUtilities? {display: 'block'}: {display: 'none'}}>
+                    <Row>
+                      <Col sm={6}>
+                        <Card style={{border: 'none'}}>
+                          <Card.Img variant="top" src="images/bone_texture.png"/>
+                        </Card>
+                      </Col>
+                      <Col sm={6}>
+                        <Card style={{border: 'none'}}>
+                          <Card.Img variant="top" src="images/histogram_match.png"/>
+                        </Card>
+                      </Col>
+                    </Row>
+                    <Row>
+                      <Col sm={6}>
+                        <Card style={{border: 'none'}}>
+                          <Card.Img variant="top" src="images/merge_csv.png"/>
+                        </Card>
+                      </Col>
+                      <Col sm={6}>
+                        <Card style={{border: 'none'}}>
+                          <Card.Img variant="top" src="images/rescale_intensity.png"/>
+                        </Card>
+                      </Col>
+                    </Row>
+                  </Container>
+                  <Container fluid="true" style={showSegmentation? {display: 'block'}: {display: 'none'}}>
+                    <Row>
+                      <Col sm={8}>
                         <Row>
                           <Col sm={6}>
-                            <Card>
-                              <Card.Img variant="top" src="images/bone_texture.png"/>
+                            <Card style={{border: 'none'}}>
+                              <Card.Img variant="top" src="images/mand_seg.png"/>
                             </Card>
                           </Col>
                           <Col sm={6}>
-                            <Card>
-                              <Card.Img variant="top" src="images/histogram_match.png"/>
+                            <Card style={{border: 'none'}}>
+                              <Card.Img variant="top" src="images/root_canal_seg.png"/>
                             </Card>
                           </Col>
                         </Row>
                         <Row>
                           <Col sm={6}>
-                            <Card>
-                              <Card.Img variant="top" src="images/merge_csv.png"/>
+                            <Card style={{border: 'none'}}>
+                              <Card.Img variant="top" src="images/amasss.png"/>
                             </Card>
                           </Col>
                           <Col sm={6}>
-                            <Card>
-                              <Card.Img variant="top" src="images/rescale_intensity.png"/>
+                            <Card style={{border: 'none'}}>
+                              <Card.Img variant="top" src="images/tmjseg.png"/>
                             </Card>
                           </Col>
-                        </Row>
-                      </Container>
-                  </Card>
-                  <Card style={showSegmentation? {display: 'block'}: {display: 'none'}}>
-                      <Container fluid="true">
-                        <Row>
-                          <Col sm={8}>
-                            <Row>
-                              <Col sm={6}>
-                                <Card>
-                                  <Card.Img variant="top" src="images/mand_seg.png"/>
-                                </Card>
-                              </Col>
-                              <Col sm={6}>
-                                <Card>
-                                  <Card.Img variant="top" src="images/root_canal_seg.png"/>
-                                </Card>
-                              </Col>
-                            </Row>
-                            <Row>
-                              <Col sm={6}>
-                                <Card>
-                                  <Card.Img variant="top" src="images/amasss.png"/>
-                                </Card>
-                              </Col>
-                              <Col sm={6}>
-                                <Card>
-                                  <Card.Img variant="top" src="images/tmjseg.png"/>
-                                </Card>
-                              </Col>
-                            </Row>                            
-                          </Col>
-                          <Col sm={4}>
-                            <Card>
-                              <Card.Img variant="top" src="images/dental_model_seg.png"/>
-                            </Card>
-                          </Col>
-                        </Row>
-                      </Container>
-                  </Card>
+                        </Row>                            
+                      </Col>
+                      <Col sm={4}>
+                        <Card style={{border: 'none'}}>
+                          <Card.Img variant="top" src="images/dental_model_seg.png"/>
+                        </Card>
+                      </Col>
+                    </Row>
+                  </Container>
                 </Row>
-              </Container>
-              <Container>
+              </ListGroup.Item>
+              <ListGroup.Item variant="dark">
                 <Row>
                   <h2>Why the DSCI?</h2>
                 </Row>
                 <Row className="justify-content-md-center">
-                  <Col sm={4}>
-                    <Card bg="secondary">
+                  <Col sm={8}>
+                    <Card bg="dark" text="light">
                       <Card.Body>
                         <Card.Text>
                           The DSCI is a user-friendly open access platform that allows the analysis of multimodal 3D image features and diverse patient biological and clinical data in a very easy, quick and simple way.
@@ -434,40 +479,33 @@ class App extends Component {
                       </Card.Body>
                     </Card>
                   </Col>
-                  <Col sm={4}>
+                  {/*<Col sm={4}>
                     <Card>
                       <Card.Img variant="top" src="images/SlicerAutomatedDentalTools.png"/>
                       <Card.Body>
                         <Button variant="primary" href="https://www.slicer.org/">3DSlicer</Button>
                       </Card.Body>
                     </Card>
-                  </Col>
+                  </Col>*/}
                 </Row>
-              </Container>
-              <Container>
+              </ListGroup.Item>
+              <ListGroup.Item>
                 <Row className="justify-content-md-center">
-                  <Card>
+                  <Card ref={self.showCreateUserRef}>
                     <Card.Body>
                       <Card.Text>
-                        <Button onClick={()=>{self.setState({showTimeLineLogin: !showTimeLineLogin})}} variant="success">
+                        <Button onClick={()=>{self.setState({showCreateUser: !showCreateUser})}} variant="success">
                         Create Account
                         </Button>
                       </Card.Text>
                       {
-                        showTimeLineLogin? <JWTAuth></JWTAuth> : ''
+                        showCreateUser? <JWTAuth isCreateUser={true}></JWTAuth> : ''
                       }
                     </Card.Body>
                   </Card>
                 </Row>
-              </Container>
-            </Chrono>)
-  }
-
-  sendMessage(){
-    const self = this
-    const {subject, message} = self.state
-
-    console.log(subject, message)
+              </ListGroup.Item>
+            </ListGroup>)
   }
  
   showHome(){
@@ -527,10 +565,18 @@ class App extends Component {
   }  
 
   componentWillReceiveProps(newProps){
-     if(newProps.user !== this.props.user){
-         this.setState({user: newProps.user})
-     }
-     this.setState({showLogin: true});
+    
+    const self = this
+
+    if(newProps.user !== this.props.user){
+       this.setState({user: newProps.user})
+    }
+    this.setState({showLogin: true});
+
+    if(newProps.showCreateUser !== this.props.showCreateUser){
+      this.showCreateUserRef.current.scrollIntoView({ behavior: 'smooth' })
+      this.setState({showCreateUser: !self.state.showCreateUser})
+    }
   }
 
   handleHide(){
@@ -592,6 +638,7 @@ const mapStateToProps = (state, ownProps) => {
   return {
     user: state.jwtAuthReducer.user,
     showLogin: state.navbarReducer.showLogin,
+    showCreateUser: state.navbarReducer.showCreateUser,
   }
 }
 

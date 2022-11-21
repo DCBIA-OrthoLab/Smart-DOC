@@ -11,13 +11,15 @@ import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Image from 'react-bootstrap/Image';
+import Button from 'react-bootstrap/Button';
 
 class NavBar extends Component{
   constructor(props) {
     super(props);
 
     this.state = {
-      showLogin: false
+      showLogin: false, 
+      showCreateUser: false
     }
   }
 
@@ -87,6 +89,18 @@ class NavBar extends Component{
     }
   }
 
+  getCreateUser(){
+    const self = this
+    return <Button onClick={()=>{
+      
+      self.setState({showCreateUser: !self.state.showCreateUser}, ()=>{
+        store.dispatch({type: 'user-create', showCreateUser: self.state.showCreateUser})
+      })
+    }} variant="success">
+        Create Account
+    </Button>
+  }
+
   render() {
     const self = this;
     const {user} = self.props;
@@ -120,6 +134,9 @@ class NavBar extends Component{
             </Nav.Link>
             <Nav.Link>
               {self.getUserDropDown()}
+            </Nav.Link>
+            <Nav.Link style={{display: user && user.scope? 'none': 'block'}}>
+              {self.getCreateUser()}
             </Nav.Link>
           </Nav>
         </Navbar.Collapse>

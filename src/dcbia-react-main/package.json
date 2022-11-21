@@ -1,6 +1,6 @@
 {
   "name": "dcbia-react-main",
-  "version": "2.6.4",
+  "version": "2.6.5",
   "private": true,
   "dependencies": {
     "axios": "^0.19.2",
@@ -15,6 +15,7 @@
     "react-dropzone": "^10.2.2",
     "react-feather": "^2.0.9",
     "react-hapi-jwt-auth": "^1.1.6",
+    "react-med-img": "^1.2.0",
     "react-redux": "^7.2.4",
     "react-router-dom": "^5.2.0",
     "react-scripts": "3.2.0",
@@ -22,8 +23,7 @@
     "underscore": "^1.13.1"
   },
   "devDependencies": {
-    "clusterpost-list-react": "^1.5.1",
-    "react-med-img-viewer": "^0.2.0"
+    "clusterpost-list-react": "^1.5.1"
   },
   "scripts": {
     "start": "react-scripts --max_old_space_size=8192 start",

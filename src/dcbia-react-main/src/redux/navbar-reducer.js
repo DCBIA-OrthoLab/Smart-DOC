@@ -2,7 +2,8 @@
 const initialState = {
   uri: '/',
   queryParams: '',
-  http: ''
+  http: '',
+  showCreateUser: false
 };
 
 const navbarReducer = (state = initialState, action) => {
@@ -11,6 +12,12 @@ const navbarReducer = (state = initialState, action) => {
       return {
         ...state,
         showLogin: action.showLogin
+      }
+    }
+  case 'user-create':{
+      return {
+        ...state,
+        showCreateUser: action.showCreateUser
       }
     }
     default: {
