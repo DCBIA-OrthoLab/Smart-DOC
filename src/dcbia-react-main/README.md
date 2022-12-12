@@ -2,6 +2,8 @@
 
 # Installation of the main app
 
+This is the entry point for the dsci app. It mainly containst the landing page and navigation bar and orchestrate components such as login
+
 ## Node install 
 
 Install node using node nvm. Follow the instructions [here](https://github.com/nvm-sh/nvm)
@@ -16,6 +18,12 @@ nvm install v14.15.5
 ```
 npm install
 ```
+
+### Authentication/User management react component
+
+[react-hapi-jwt-auth](https://github.com/juanprietob/react-hapi-jwt-auth)
+
+On the back end, this library uses the package [hapi-jwt-couch](https://github.com/juanprietob/hapi-jwt-couch/tree/master/src/hapi-jwt-couch)
 
 # Start development web server
 
