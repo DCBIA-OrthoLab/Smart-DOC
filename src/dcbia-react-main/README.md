@@ -35,3 +35,8 @@ When the server starts, it will open up a tab in your browser at http://localhos
 The axios instance that is created redirects requests to port 8180, the relevant lines of codes are in the App.js file [here](https://github.com/DCBIA-OrthoLab/dsci/blob/master/src/dcbia-react-main/src/App.js#L43-L47)
 
 The next step is to start the react library that contains the views for the web app, primarily the file browser. 
+
+
+# Start dcbia-react-lib for development
+
+Follow instructions [here](https://github.com/DCBIA-OrthoLab/dsci/tree/master/src/dcbia-react-lib)
