@@ -15,6 +15,8 @@ nvm install v14.15.5
 
 ## Install dependencies
 
+Go to current directory (dcbia-react-main) and run
+
 ```
 npm install
 ```
