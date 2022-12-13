@@ -40,3 +40,7 @@ The next step is to start the react library that contains the views for the web 
 # Start dcbia-react-lib for development
 
 Follow instructions [here](https://github.com/DCBIA-OrthoLab/dsci/tree/master/src/dcbia-react-lib)
+
+# Start the backend server
+
+Follow instructions [here](https://github.com/DCBIA-OrthoLab/dsci/tree/master/src/dcbia-server)
