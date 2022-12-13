@@ -6,24 +6,16 @@
 
 ## Install
 
+Go to current directory dcbia-react-lib and run
+
 ```bash
-npm install --save dcbia-react-lib
+npm install 
 ```
 
-## Usage
+## Start the dev environment
 
-```jsx
-import React, { Component } from 'react'
-
-import MyComponent from 'dcbia-react-lib'
-
-class Example extends Component {
-  render () {
-    return (
-      <MyComponent />
-    )
-  }
-}
+```
+npm run start
 ```
 
 ## License
