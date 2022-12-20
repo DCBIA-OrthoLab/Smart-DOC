@@ -18,6 +18,7 @@ import Modal from 'react-bootstrap/Modal';
 import Carousel from 'react-bootstrap/Carousel';
 import FormControl from 'react-bootstrap/FormControl';
 import InputGroup from 'react-bootstrap/InputGroup';
+import Image from 'react-bootstrap/Image';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import ListGroup from 'react-bootstrap/ListGroup';
@@ -32,7 +33,9 @@ import {MedImgSurf} from 'react-med-img';
 
 import { Chrono } from "react-chrono";
 
-import {FolderPlus, Share2, BookOpen, Book, User} from 'react-feather'
+import {FolderPlus, Share2, BookOpen, Book, User, PlusCircle, Compass, Link, Code, ArrowLeftCircle, ArrowRightCircle} from 'react-feather';
+
+import styles from "./button.css";
 
 class App extends Component {
   
@@ -56,14 +59,16 @@ class App extends Component {
       showCreateUser: false,
       showDataFolder: false,
       showDataSharing: false,
-      surfData: [{ surf: "skull_d.vtk", color: [0, 255, 255] }]
+      showHowTo: false,
+      showRelatedLinks: false,
+      showAnalysis: false,
+      surfData: [{ surf: "skull_d.vtk", color: [0, 255, 255] }],
     }
 
     store.dispatch({
       type: 'http-factory',
       http: http
     });
-
     this.clusterpost = {};
 
     this.showCreateUserRef = React.createRef()
@@ -80,7 +85,6 @@ class App extends Component {
 
     self.dcbiareactservice = new DcbiaReactService();
     self.dcbiareactservice.setHttp(http);
-
     // http({
     //   method: 'GET',
     //   url: '/surf/skull_d.vtk',
@@ -129,7 +133,7 @@ class App extends Component {
 
   showAbout(){
     const self = this;
-    const {landingVtk, showIntegration, showUtilities, showSegmentation, surfData, showDataFolder, showDataSharing, showCreateUser} = this.state;
+    const {landingVtk, showIntegration, showUtilities, showSegmentation, surfData, showDataFolder, showDataSharing, showCreateUser, showHowTo, showRelatedLinks, showAnalysis} = this.state;
 
     var newUser = this.state.newUser
 
@@ -191,14 +195,17 @@ class App extends Component {
     return (<ListGroup>
               <ListGroup.Item>
                 <Row>
-                  <h2>Data Storage for Computation and Integration</h2>
+                  <h2>Smart-Dental Oral and Craniofacial</h2>
                 </Row>
                 <Row className="justify-content-md-center">
                   <Col sm={4}>
                     <Card style={{border: 'none'}}>
                       <Card.Body>
                         <Card.Text>
-                          The Data Storage for Computation and Integration (DSCI) is an open-source comprehensive platform for data storage, sharing and computation allowing clinicians and dental researchers to support patient-specific decision in Dentistry.
+                          <b>
+                          Smart-Dental Oral and Craniofacial&nbsp;  
+                          </b>
+                          (Smart-DOC) is an open-source federated infrastructure that expands the design of data science algorithms and develops decision support tools for patient-specific analysis a web-centric artificial intelligence-based platform.
                         </Card.Text>
                       </Card.Body>
                     </Card>
@@ -213,41 +220,37 @@ class App extends Component {
                   </Col>
                 </Row>
               </ListGroup.Item>
-              <ListGroup.Item variant="dark">
+              <ListGroup.Item variant='light'>
                 <Row>
-                  <h2>Data Storage </h2>
+                  <h2>
+                   <font color="#00000">
+                    Data Storage 
+                   </font>
+                  </h2>
                 </Row>
                 <Row className="justify-content-md-center">
                   <Col sm={4}>
-                    <Card bg="dark" text="light">
+                    <Card text="dark" style={{border: 'none'}}>
+                    <Button onClick={()=>{self.setState({showDataFolder: !showDataFolder, showDataSharing:false})}} variant='normal'>
                       <Card.Body>
                         <FolderPlus color="green" size={120}/>
                         <Card.Text>
                           Create folders and archive anonymized data in a safe cloud base environment 
                         </Card.Text>
-                        <div className="d-flex justify-content-end">
-                          <Button onClick={()=>{self.setState({showDataFolder: !showDataFolder, showDataSharing:false})}} variant="light">
-                            <BookOpen hidden={showDataFolder}/>
-                            <Book hidden={!showDataFolder}/>
-                          </Button>
-                        </div>
                       </Card.Body>
+                    </Button>
                     </Card>
                   </Col>
                   <Col sm={4}>
-                    <Card bg="dark" text="light">
+                    <Card text="dark" style={{border: 'none'}}>
+                     <Button onClick={()=>{self.setState({showDataFolder: false, showDataSharing:!showDataSharing})}} variant="normal">
                       <Card.Body>
                         <Share2 color="red" size={120}/>
                         <Card.Text>
                           Share small or large data safely with a single click in a few seconds
                         </Card.Text>
-                        <div className="d-flex justify-content-end">
-                          <Button onClick={()=>{self.setState({showDataFolder: false, showDataSharing:!showDataSharing})}} variant="light">
-                            <BookOpen hidden={showDataSharing}/>
-                            <Book hidden={!showDataSharing}/>
-                          </Button>
-                        </div>
                       </Card.Body>
+                     </Button>
                     </Card>
                   </Col>
                 </Row>
@@ -296,58 +299,56 @@ class App extends Component {
                 <Row>
                   <h2>Computation and Integration</h2>
                 </Row>
-                <Row className="justify-content-md-center">
-                  <Col sm={3}>
-                    <Alert variant="warning">
-                      <Alert.Heading>Integration</Alert.Heading>
-                      <p>
-                        9 tasks
-                      </p>
-                      <hr/>
-                      <div className="d-flex justify-content-end">
-                        <Button onClick={()=>{self.setState({showIntegration: !showIntegration, showUtilities: false, showSegmentation: false})}} variant="warning">
-                          <BookOpen hidden={showIntegration}/>
-                          <Book hidden={!showIntegration}/>
-                        </Button>
-                      </div>
-                    </Alert>
-                  </Col>
-                  <Col sm={3}>
-                    <Alert variant="dark">
-                      <Alert.Heading>Utilities</Alert.Heading>
-                      <p>
-                        4 tasks
-                      </p>
-                      <hr/>
-                      <div className="d-flex justify-content-end">
-                        <Button onClick={()=>{self.setState({showUtilities: !showUtilities, showIntegration: false, showSegmentation: false})}} variant="dark">
-                          <BookOpen hidden={showUtilities}/>
-                          <Book hidden={!showUtilities}/>
-                        </Button>
-                      </div>
-                    </Alert>
-                  </Col>
-                  <Col sm={3}>
-                    <Alert variant="warning">
-                      <Alert.Heading>Segmentation</Alert.Heading>
-                      <p>
-                        5 tasks
-                      </p>
-                      <hr/>
-                      <div className="d-flex justify-content-end">
-                        <Button onClick={()=>{self.setState({showSegmentation: !showSegmentation, showIntegration:false, showUtilities: false})}} variant="warning">
-                          <BookOpen hidden={showSegmentation}/>
-                          <Book hidden={!showSegmentation}/>
-                        </Button>
-                      </div>
-                    </Alert>
-                  </Col>
-                  <Col sm={3}>
+                <Row className="justify-content-md-left">
                     <p>
                       Create several tasks that will help patient-specific decisions required in different specialties in Dentistry
                     </p>
+                </Row>
+                <Row className="justify-content-md-center">
+                  <Col sm={3}>
+                   <button onClick={()=>{self.setState({showIntegration: !showIntegration, showUtilities: false, showSegmentation: false})}} class='yellow-rounded-btn' className={styles.btn}>
+                    <Alert>
+                    <Alert.Heading>
+                        <font color="#000000">
+                        &nbsp;Integration&nbsp;
+                        </font>
+                      </Alert.Heading>
+                      <p>
+                       <font color="#000000">
+                        <br></br><br></br>9<br></br>Tasks
+                       </font>
+                      </p>
+                    </Alert>
+                   </button>
+                  </Col>
+                  <Col sm={3}>
+                   <button onClick={()=>{self.setState({showUtilities: !showUtilities, showIntegration: false, showSegmentation: false})}} class='white-rounded-btn' className={styles.btn}>
+                    <Alert>
+                      <Alert.Heading>&nbsp;&nbsp;&nbsp;&nbsp;Utilities&nbsp;&nbsp;&nbsp;&nbsp;</Alert.Heading>
+                      <p>
+                      <br></br><br></br>4<br></br>Tasks 
+                      </p>
+                    </Alert>
+                   </button>
+                  </Col>
+                  <Col sm={3}>
+                   <button onClick={()=>{self.setState({showSegmentation: !showSegmentation, showIntegration:false, showUtilities: false})}} class='yellow-rounded-btn' className={styles.btn}>
+                    <Alert>
+                      <Alert.Heading>
+                        <font color="#000000">
+                          Segmentation
+                        </font>
+                      </Alert.Heading>
+                      <p>
+                       <font color="#000000">
+                        <br></br><br></br>5<br></br>Tasks
+                       </font>
+                      </p>
+                    </Alert>
+                   </button>
                   </Col>
                 </Row>
+                <br></br><br></br>
                 <Row className="justify-content-md-center">
                   <Container fluid="true" style={showIntegration? {display: 'block'}: {display: 'none'}}>
                     <Row>
@@ -465,19 +466,25 @@ class App extends Component {
                   </Container>
                 </Row>
               </ListGroup.Item>
-              <ListGroup.Item variant="dark">
+              <ListGroup.Item variant="light">
                 <Row>
-                  <h2>Why the DSCI?</h2>
+                  <h2>
+                    <font color="#00000">
+                     Why&nbsp;
+                      <b>
+                      Smart-DOC? 
+                      </b>
+                    </font>
+                    
+                  </h2>
                 </Row>
                 <Row className="justify-content-md-center">
                   <Col sm={8}>
-                    <Card bg="dark" text="light">
-                      <Card.Body>
-                        <Card.Text>
-                          The DSCI is a user-friendly open access platform that allows the analysis of multimodal 3D image features and diverse patient biological and clinical data in a very easy, quick and simple way.
-                        </Card.Text>
-                      </Card.Body>
-                    </Card>
+                    <p>
+                      <font color="#00000">
+                        The&nbsp;<b>Smart-DOC&nbsp;</b>is a free user-friendly web service that allows the analysis of 3D images of bone and teeth, integrating patient biological and clinical data in a very easy, quick and simple way.
+                      </font>
+                    </p>
                   </Col>
                   {/*<Col sm={4}>
                     <Card>
@@ -491,10 +498,10 @@ class App extends Component {
               </ListGroup.Item>
               <ListGroup.Item>
                 <Row className="justify-content-md-center">
-                  <Card ref={self.showCreateUserRef}>
+                  <Card ref={self.showCreateUserRef} style={{border:'none'}}>
                     <Card.Body>
                       <Card.Text>
-                        <Button onClick={()=>{self.setState({showCreateUser: !showCreateUser})}} variant="success">
+                        <Button onClick={()=>{self.setState({showCreateUser: !showCreateUser})}} variant="outline-dark" size='lg'>
                         Create Account
                         </Button>
                       </Card.Text>
@@ -505,7 +512,87 @@ class App extends Component {
                   </Card>
                 </Row>
               </ListGroup.Item>
-            </ListGroup>)
+              <ListGroup.Item variant='light'>
+                <Compass color="black" size={35} style={{float: 'left'}}/>
+                <h2>
+                  <font color='#00000'>
+                    &emsp;Guides and How-To's
+                  </font>
+                 <Button onClick={()=>{self.setState({showHowTo: !showHowTo})}} variant="none" style={{float: 'right'}}>
+                  <PlusCircle color="black" size={40} />
+                 </Button>
+                </h2>
+                <Row className="justify-content-md-center">
+                  <Container fluid="true" style={showHowTo? {display: 'block'}: {display: 'none'}}>
+                    <Carousel>
+                      <Carousel.Item>
+                      <iframe width="960" height="585" src="https://www.youtube.com/embed/A4NX1x7mEvo" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                      </Carousel.Item>
+                      <Carousel.Item>
+                      <iframe width="960" height="585" src="https://www.youtube.com/embed/mcw5UR_SZY0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                      </Carousel.Item>
+                      <Carousel.Item>
+                        <iframe width="960" height="585" src="https://www.youtube.com/embed/hEqCRGP3oGU" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                      </Carousel.Item>
+                      <Carousel.Item>
+                      <iframe width="960" height="585" src="https://www.youtube.com/embed/Sg6oaOclOV8" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                      </Carousel.Item>
+                      <Carousel.Item>
+                      <iframe width="960" height="585" src="https://www.youtube.com/embed/bwBo1szhQkk" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                      </Carousel.Item>
+                      <Carousel.Item>
+                      <iframe width="960" height="585" src="https://www.youtube.com/embed/BpsIt9zDr30" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                      </Carousel.Item>
+                      <Carousel.Item>
+                      <iframe width="960" height="585" src="https://www.youtube.com/embed/2o8TInbGmRE" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                      </Carousel.Item>
+                    </Carousel>
+                  </Container>
+
+                </Row>
+              </ListGroup.Item>
+              <ListGroup.Item>
+                <Link color="black" size={35} style={{float: 'left'}}/>
+                <h2>
+                  &emsp;Related Links
+                  <Button onClick={()=>{self.setState({showRelatedLinks: !showRelatedLinks})}} variant="none" style={{float: 'right'}}>
+                   <PlusCircle color="black" size={40} />
+                  </Button>
+                </h2>
+                <Row className="justify-content-md-center">
+                  <Container fluid="true" style={showRelatedLinks? {display: 'block'}: {display: 'none'}}>
+                    <Button href='https://www.youtube.com/@DCBIA/videos' variant='none'>
+                      <Image src='images/youtube.png'></Image>
+                    </Button>
+                    <Button href='https://www.slicer.org/' variant='none'>
+                      <Image src='images/slicer.png'></Image>
+                    </Button>
+                    <Button href='http://www.itksnap.org/pmwiki/pmwiki.php' variant='none'>
+                      <Image src='images/itksnap.png'></Image>
+                    </Button>
+                  </Container>
+                  </Row>
+              </ListGroup.Item>
+              <ListGroup.Item variant='light'>
+                <Code color="black" size={35} style={{float: 'left'}}/>
+                <h2>
+                  <font color='#00000'>
+                    &emsp;Analysis and Codes
+                  </font>
+                  <Button onClick={()=>{self.setState({showAnalysis: !showAnalysis})}} variant="none" style={{float: 'right'}}>
+                    <PlusCircle color="black" size={40} />
+                  </Button>
+                </h2>
+                <Row className="justify-content-md-center">
+                <Container fluid="true" style={showAnalysis? {display: 'block'}: {display: 'none'}}>
+                  <Button href='https://github.com/dcBIA-OrthoLab/' variant='none'>
+                      <Image src='images/github.png'></Image>
+                  </Button>
+                </Container>
+                </Row>
+              </ListGroup.Item>
+            </ListGroup>
+            )
   }
  
   showHome(){

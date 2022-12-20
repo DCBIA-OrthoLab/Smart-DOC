@@ -96,7 +96,7 @@ class NavBar extends Component{
       self.setState({showCreateUser: !self.state.showCreateUser}, ()=>{
         store.dispatch({type: 'user-create', showCreateUser: self.state.showCreateUser})
       })
-    }} variant="success">
+    }} variant="outline-dark">
         Create Account
     </Button>
   }
@@ -111,11 +111,10 @@ class NavBar extends Component{
         <Col class="title">
           <h2>
             <font color="#002855">
-            <font color="#ffcb0b">D
-            </font>ata <font color="#ffcb0b">S
-            </font>torage for <font color="#ffcb0b">C
-            </font>omputation and <font color="#ffcb0b">I
-            </font>ntegration</font>
+              <b>
+                Smart-DOC
+              </b>
+            </font>
           </h2>
         </Col>
       </Row>

@@ -1,0 +1,26 @@
+.yellow-rounded-btn {
+    background-color: #fdf3d0;
+    width: 200px;
+    height: 200px;
+    padding: 25px 10px;
+    border-radius: 100px;
+    text-align: center;
+    border: none;
+}
+
+.white-rounded-btn{
+    background-color: #ffffff;
+    width: 200px;
+    height: 200px;
+    padding: 25px 10px;
+    border-radius: 100px;
+    text-align: center;
+}
+
+.white-rounded-btn:hover {
+    background-color: #dfdbdbde;
+}
+
+.yellow-rounded-btn:hover {
+    background-color: #fad85fbb;
+}
