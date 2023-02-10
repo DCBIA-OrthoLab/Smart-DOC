@@ -1,4 +1,4 @@
-# DSCI - Data Storage for Computation and Integration
+# Smart-DOC (Dental Oral and Craniofacial, formerly DSCI - Data Storage for Computation and Integration)
 
 Is a web application to federate clinical, biological and imaging data. 
 
@@ -6,6 +6,6 @@ It has two main components. The first component is the front end which includes 
 
 The second components is the back end which includes the orchestration to data repositories. The data repositories use [couchdb](http://couchdb.apache.org/) to store patient, clinical and imaging data in the form of attachments. 
 
-## Depedencies 
+## Dependencies 
 
 1. [clusterpost-server](https://www.npmjs.com/package/clusterpost-server)
