@@ -27,8 +27,12 @@ const startServer = async (cluster) => {
     if(conf.tls && conf.tls.key && conf.tls.cert){
         tls = {
           key: fs.readFileSync(conf.tls.key),
-          cert: fs.readFileSync(conf.tls.cert)
+          cert: fs.readFileSync(conf.tls.cert),
         };
+
+        if(conf.tls.passprase){
+            tls['passphrase'] = conf.tls.passphrase
+        }
     }
     var server_options = { 
         host: conf.host,
