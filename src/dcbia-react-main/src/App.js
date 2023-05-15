@@ -211,7 +211,7 @@ class App extends Component {
                     </Card>
                   </Col>
                   <Col sm={4}>
-                    <video width="256" height="256" controls  muted  autoPlay>
+                    <video width="256" height="256" controls  muted  autoPlay loop>
                       <source src="videos/dsci.mov" type="video/mp4"/>
                     </video>
                   </Col>
