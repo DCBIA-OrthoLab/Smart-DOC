@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/DCBIA-OrthoLab/shiny-tooth.git"
+    "url": "git+https://github.com/DCBIA-OrthoLab/dsci.git"
   },
   "keywords": [
     "Dental",
@@ -18,9 +18,9 @@
   "author": "sbrosset@umich.edu",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/DCBIA-OrthoLab/shiny-tooth/issues"
+    "url": "https://github.com/DCBIA-OrthoLab/dsci/issues"
   },
-  "homepage": "https://github.com/DCBIA-OrthoLab/shiny-tooth#readme",
+  "homepage": "https://github.com/DCBIA-OrthoLab/dsci#readme",
   "dependencies": {
     "@hapi/boom": "^7.4.2",
     "@hapi/good": "^8.2.0",
